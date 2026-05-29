@@ -15,6 +15,7 @@ public class KiTechniqueProjectile : ModProjectile
     public override string Texture => $"Terraria/Images/Projectile_{ProjectileID.DiamondBolt}";
 
     private const float BaseBeamLength = 640f;
+    private const int BeamDrainIntervalTicks = 15;
 
     public override void SetDefaults()
     {
@@ -244,11 +245,17 @@ public class KiTechniqueProjectile : ModProjectile
         player.itemTime = 2;
         player.itemAnimation = 2;
 
-        int drain = Math.Max(1, (int)Math.Ceiling(technique.ChannelKiCostPerSecond / 4f));
-
-        if (!player.channel || (Main.GameUpdateCount % 15UL == 0UL && Main.netMode != NetmodeID.MultiplayerClient && !player.GetModPlayer<KiPlayer>().TryConsumeKi(drain)))
+        if (!player.channel)
         {
             Projectile.Kill();
+            return;
+        }
+
+        if (Main.GameUpdateCount % BeamDrainIntervalTicks == 0UL
+            && Main.netMode != NetmodeID.MultiplayerClient
+            && !player.GetModPlayer<KiPlayer>().TryConsumeTechniqueChannelKi(technique, BeamDrainIntervalTicks))
+        {
+            FizzleBeam(technique);
         }
     }
 
@@ -301,6 +308,30 @@ public class KiTechniqueProjectile : ModProjectile
     private static Vector2 NormalizeOrDefault(Vector2 value, Vector2 fallback)
     {
         return value.LengthSquared() <= 0.001f ? fallback : Vector2.Normalize(value);
+    }
+
+    private void FizzleBeam(KiTechniqueDefinition technique)
+    {
+        if (!Main.dedServ)
+        {
+            for (int i = 0; i < 8; i++)
+            {
+                int dust = Dust.NewDust(
+                    Projectile.position,
+                    Projectile.width,
+                    Projectile.height,
+                    GetDustType(technique),
+                    Main.rand.NextFloat(-1.2f, 1.2f),
+                    Main.rand.NextFloat(-1.2f, 1.2f),
+                    160,
+                    technique.Color,
+                    0.8f);
+
+                Main.dust[dust].noGravity = true;
+            }
+        }
+
+        Projectile.Kill();
     }
 
     private static int GetDustFrequency(KiTechniqueDefinition technique)

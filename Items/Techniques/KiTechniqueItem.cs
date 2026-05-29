@@ -1,4 +1,5 @@
 using System;
+using System.Collections.Generic;
 using KiAscension.Common;
 using KiAscension.Players;
 using KiAscension.Projectiles;
@@ -47,7 +48,7 @@ public abstract class KiTechniqueItem : ModItem
             return false;
         }
 
-        if (!kiPlayer.HasKi(technique.InitialKiCost))
+        if (!kiPlayer.HasKiForTechnique(technique))
         {
             return false;
         }
@@ -81,6 +82,19 @@ public abstract class KiTechniqueItem : ModItem
         knockback = technique.Knockback;
     }
 
+    public override void ModifyTooltips(List<TooltipLine> tooltips)
+    {
+        KiPlayer kiPlayer = Main.LocalPlayer.GetModPlayer<KiPlayer>();
+        KiTechniqueDefinition technique = Definition;
+        int initialCost = kiPlayer.GetTechniqueInitialKiCost(technique);
+
+        string text = technique.Behavior == KiTechniqueBehavior.Beam
+            ? $"Ki cost: {initialCost} start, {kiPlayer.GetTechniqueChannelKiCostPerSecond(technique)}/s while held"
+            : $"Ki cost: {initialCost}";
+
+        tooltips.Add(new TooltipLine(Mod, "KiAscensionKiCost", text));
+    }
+
     public override bool Shoot(
         Player player,
         EntitySource_ItemUse_WithAmmo source,
@@ -93,7 +107,7 @@ public abstract class KiTechniqueItem : ModItem
         KiPlayer kiPlayer = player.GetModPlayer<KiPlayer>();
         KiTechniqueDefinition technique = Definition;
 
-        if (!kiPlayer.TryConsumeKi(technique.InitialKiCost))
+        if (!kiPlayer.TryConsumeTechniqueInitialKi(technique))
         {
             return false;
         }

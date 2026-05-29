@@ -73,6 +73,8 @@ public class KiPlayer : ModPlayer
 
     public int KiRegenPerSecond => 1 + CurrentStage.KiRegenBonus + Math.Max(0, KaiLevel - 1) / 4 + Math.Max(0, KiPowerLevel - 1) / 5;
 
+    public KiResourceSnapshot KiResources => new(MaxKi, KiRegenPerSecond, ActiveKiDrainPerSecond, KiResourceMath.GetTechniqueCostMultiplier(KiPowerLevel, CurrentStage.Stage));
+
     public StageDefinition CurrentStage => AscensionStages.Get(CurrentStageIndex);
 
     public StageDefinition NextStage => AscensionStages.Get(UnlockedStageIndex + 1);
@@ -367,6 +369,21 @@ public class KiPlayer : ModPlayer
         return Ki >= amount;
     }
 
+    public bool HasKiForTechnique(KiTechniqueDefinition technique)
+    {
+        return HasKi(GetTechniqueInitialKiCost(technique));
+    }
+
+    public bool TryConsumeTechniqueInitialKi(KiTechniqueDefinition technique)
+    {
+        return TryConsumeKi(GetTechniqueInitialKiCost(technique));
+    }
+
+    public bool TryConsumeTechniqueChannelKi(KiTechniqueDefinition technique, int ticks)
+    {
+        return TryConsumeKi(GetTechniqueChannelKiCost(technique, ticks));
+    }
+
     public void AddExperience(int amount, bool announce)
     {
         AddPowerExperience(amount, announce);
@@ -391,6 +408,21 @@ public class KiPlayer : ModPlayer
     {
         float kiPowerMultiplier = 1f + Math.Max(0, KiPowerLevel - 1) * 0.055f;
         return Math.Max(1, (int)(technique.BaseDamage * kiPowerMultiplier));
+    }
+
+    public int GetTechniqueInitialKiCost(KiTechniqueDefinition technique)
+    {
+        return KiResourceMath.ScaleTechniqueCost(technique.InitialKiCost, KiPowerLevel, CurrentStage.Stage);
+    }
+
+    public int GetTechniqueChannelKiCostPerSecond(KiTechniqueDefinition technique)
+    {
+        return KiResourceMath.ScaleTechniqueCost(technique.ChannelKiCostPerSecond, KiPowerLevel, CurrentStage.Stage);
+    }
+
+    public int GetTechniqueChannelKiCost(KiTechniqueDefinition technique, int ticks)
+    {
+        return KiResourceMath.ScaleChannelCostForTicks(technique.ChannelKiCostPerSecond, ticks, KiPowerLevel, CurrentStage.Stage);
     }
 
     private void AddProgress(int powerAmount, int kiPowerAmount, bool announce)

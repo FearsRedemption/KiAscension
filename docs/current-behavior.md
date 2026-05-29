@@ -22,7 +22,7 @@ Early mobs are scaled up heavily compared to vanilla, but the starter spell and 
 6. Hold `Z` to charge up into the highest unlocked Saiyan form; hold `X` to power down to Base Saiyan.
 7. Tap or hold `C`/`V` to raise or lower the separate Kaio-Ken level.
 
-The HUD shows Kai Level, physical power, ki power, ki, ki regeneration, active Saiyan form, active Kaio-Ken state, held spell, and the next ceiling. Chat messages call out Kai Level increases, new techniques, unlocked forms, boss gates, Kaio-Ken unlocks, and witness-loss gates.
+The HUD shows Kai Level, physical power, ki power, ki, net ki regeneration after active drains, active Saiyan form, active Kaio-Ken state, held spell, and the next ceiling. Chat messages call out Kai Level increases, new techniques, unlocked forms, boss gates, Kaio-Ken unlocks, and witness-loss gates.
 
 ## Transformations
 
@@ -33,6 +33,8 @@ Kaio-Ken can run alongside the current Saiyan form. It adds extra damage and mov
 ## Technique Feel
 
 Techniques are now separate spell items. Basic blasts and barrages behave like fast projectile pressure. Kamehameha, Galick Gun, Final Flash, and God Kamehameha are held beams that drain ki over time. Destructo Disk pierces multiple enemies and steers toward the mouse while it flies. Big Bang Attack and Spirit Bomb are heavier projectile attacks.
+
+Every ki technique has an initial ki cost, and beam techniques also have a per-second sustain drain. Current ki power and advanced forms apply a modest ki-control discount through shared resource math, so training can make lower techniques smoother without making high forms free too early. Spell tooltips show the current effective costs for the local player.
 
 ## Training
 

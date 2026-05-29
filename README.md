@@ -37,6 +37,9 @@ Sources:
   - tap/hold `V`: lower Kaio-Ken one level or release it fully
 - Kaio-Ken is a separate parallel amplifier with HP/ki strain
 - Saiyan forms provide max ki, ki regeneration, defense, movement, damage, and light health regeneration hooks
+- Ki technique costs and beam drains scale through a shared ki resource system, with modest ki-control efficiency from ki power and advanced forms
+- Spell tooltips show current ki costs, including beam sustain drain
+- HUD ki readout shows net ki per second after active transformation drain
 - Enemy and boss stat scaling by world progression
 - Vanilla and non-ki weapons are heavily downscaled so Ki Ascension replaces normal Terraria weapon progression
 - Boss and witness-loss gates for major emotional breakthroughs

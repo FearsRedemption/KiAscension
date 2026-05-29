@@ -67,6 +67,8 @@ Physical power is earned from combat and weight training. Ki power is earned fro
 
 Max ki and ki regeneration both rise with Kai Level, ki power, and later forms. Early regeneration is intentionally slow so the starter loop feels closer to weak Terraria gear, then gets smoother as training pays off.
 
+Effective ki costs use a shared resource formula. Ki power grants a modest control discount, and God/Ultra Instinct-style forms add a small efficiency bonus. The discount is capped so strong attacks and high transformation drains remain meaningful.
+
 ## Training Rooms
 
 The current training pass has two pieces:
