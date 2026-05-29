@@ -24,6 +24,8 @@ Early mobs are scaled up heavily compared to vanilla, but the starter spell and 
 
 The HUD shows Kai Level, physical power, ki power, ki, net ki regeneration after active drains, active Saiyan form, active Kaio-Ken state, held spell, and the next ceiling. Chat messages call out Kai Level increases, new techniques, unlocked forms, boss gates, Kaio-Ken unlocks, and witness-loss gates.
 
+Tap `B` to toggle a read-only stats panel with current form bonuses, Kaio-Ken strain, final damage/speed multipliers, ki economy, next gates, and held-spell cost details. Tap `N` to toggle a read-only dev inspection panel for synced player state while testing.
+
 ## Transformations
 
 Saiyan forms and Kaio-Ken are separate systems. Saiyan forms provide the main transformation bonuses: max ki, ki regeneration, damage, defense, movement, light health regeneration, ki drain, and a placeholder flight-control multiplier for later flight work.
@@ -57,6 +59,8 @@ Each player has their own saved and synced:
 In multiplayer, the server owns EXP, ki power, training, and unlock progression so clients should not double-award themselves. Clients send selected Saiyan form and Kaio-Ken level to the server; the server clamps those choices to what that player has unlocked and broadcasts the result.
 
 Nearby players can still trigger witness-loss breakthroughs for each other. If one player has enough EXP for a witness-gated form and another player dies close enough, the waiting player should break through.
+
+Automatic breakthrough follows the current-form rule: if the player is already in their highest previously unlocked Saiyan form, unlocking the next form immediately transforms them into it with a stronger aura burst. If they are powered down or in a lower form, the ceiling unlocks but their current form does not jump.
 
 ## Forms And Visuals
 

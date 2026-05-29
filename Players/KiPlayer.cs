@@ -28,6 +28,7 @@ public class KiPlayer : ModPlayer
     private const int BaseKaioKenChargeTicks = 30;
     private const int KaioKenChargeTicksPerLevel = 8;
     private const int KaioKenPowerDownChargeTicks = 60;
+    private const int BreakthroughBurstTicks = 120;
     private const int GravityRoomRadiusTiles = 18;
     private const int TrainingIntervalTicks = 120;
 
@@ -41,6 +42,7 @@ public class KiPlayer : ModPlayer
     private int saiyanPowerDownTicks;
     private int kaioKenPowerUpTicks;
     private int kaioKenPowerDownTicks;
+    private int breakthroughBurstTicks;
     private int trainingTicks;
 
     public int PowerExperience { get; private set; }
@@ -151,6 +153,7 @@ public class KiPlayer : ModPlayer
         saiyanPowerDownTicks = 0;
         kaioKenPowerUpTicks = 0;
         kaioKenPowerDownTicks = 0;
+        breakthroughBurstTicks = 0;
         trainingTicks = 0;
     }
 
@@ -252,6 +255,7 @@ public class KiPlayer : ModPlayer
         clone.Ki = Ki;
         clone.SelectedTechniqueIndex = SelectedTechniqueIndex;
         clone.highestAnnouncedTechniqueIndex = highestAnnouncedTechniqueIndex;
+        clone.breakthroughBurstTicks = breakthroughBurstTicks;
     }
 
     public override void SendClientChanges(ModPlayer clientPlayer)
@@ -323,8 +327,13 @@ public class KiPlayer : ModPlayer
         }
         else
         {
-            TryUnlockAvailableStages(false);
+            if (TryUnlockAvailableStages(false))
+            {
+                SyncStateIfServer();
+            }
         }
+
+        breakthroughBurstTicks = Math.Max(0, breakthroughBurstTicks - 1);
 
         if (!Main.dedServ)
         {
@@ -519,36 +528,85 @@ public class KiPlayer : ModPlayer
         }
     }
 
-    private void TryUnlockAvailableStages(bool witnessedLoss)
+    private bool TryUnlockAvailableStages(bool witnessedLoss)
     {
+        bool unlockedAnyStage = false;
+
         while (UnlockedStageIndex < AscensionStages.MaxStageIndex)
         {
+            int previousUnlockedStageIndex = UnlockedStageIndex;
+            int previousCurrentStageIndex = CurrentStageIndex;
             StageDefinition next = AscensionStages.Get(UnlockedStageIndex + 1);
 
             if (TotalPowerExperience < next.RequiredExperience)
             {
-                return;
+                return unlockedAnyStage;
             }
 
             if (!AscensionStages.IsGateSatisfied(next))
             {
                 AnnounceProgressionGate(next);
-                return;
+                return unlockedAnyStage;
             }
 
             if (next.RequiresWitnessLoss && !witnessedLoss)
             {
                 AnnouncePendingBreakthrough();
-                return;
+                return unlockedAnyStage;
             }
 
-            UnlockedStageIndex++;
-            CurrentStageIndex = Math.Clamp(CurrentStageIndex, 0, UnlockedStageIndex);
-            Ki = MaxKi;
+            bool shouldBreakthrough = previousCurrentStageIndex == previousUnlockedStageIndex;
+            UnlockNextSaiyanStage(shouldBreakthrough);
+            unlockedAnyStage = true;
             pendingAnnouncementStage = -1;
             witnessedLoss = false;
             RefreshTechniqueUnlocks(true);
 
+        }
+
+        return unlockedAnyStage;
+    }
+
+    private void UnlockNextSaiyanStage(bool shouldBreakthrough)
+    {
+        int newStageIndex = Math.Clamp(UnlockedStageIndex + 1, 0, AscensionStages.MaxStageIndex);
+        UnlockedStageIndex = newStageIndex;
+
+        if (shouldBreakthrough)
+        {
+            BeginSaiyanBreakthrough(newStageIndex);
+            return;
+        }
+
+        CurrentStageIndex = Math.Clamp(CurrentStageIndex, 0, UnlockedStageIndex);
+        Ki = Math.Clamp(Ki, 0, MaxKi);
+    }
+
+    private void BeginSaiyanBreakthrough(int stageIndex)
+    {
+        CurrentStageIndex = Math.Clamp(stageIndex, 0, UnlockedStageIndex);
+        Ki = MaxKi;
+        breakthroughBurstTicks = BreakthroughBurstTicks;
+        saiyanPowerUpTicks = 0;
+        saiyanPowerDownTicks = 0;
+
+        StageDefinition stage = CurrentStage;
+
+        if (Player.whoAmI == Main.myPlayer)
+        {
+            Main.NewText($"Breakthrough: {stage.DisplayName}!", stage.AuraColor);
+        }
+
+        if (Main.dedServ)
+        {
+            return;
+        }
+
+        for (int i = 0; i < 28; i++)
+        {
+            Vector2 velocity = Main.rand.NextVector2Circular(3.6f, 3.6f);
+            int dust = Dust.NewDust(Player.position, Player.width, Player.height, DustID.GemTopaz, velocity.X, velocity.Y - 1.8f, 90, stage.AuraColor, 1.25f);
+            Main.dust[dust].noGravity = true;
         }
     }
 
@@ -664,6 +722,7 @@ public class KiPlayer : ModPlayer
         writer.Write(Ki);
         writer.Write(SelectedTechniqueIndex);
         writer.Write(highestAnnouncedTechniqueIndex);
+        writer.Write(breakthroughBurstTicks);
     }
 
     private void ReadState(BinaryReader reader)
@@ -678,6 +737,7 @@ public class KiPlayer : ModPlayer
         Ki = reader.ReadInt32();
         SelectedTechniqueIndex = reader.ReadInt32();
         highestAnnouncedTechniqueIndex = reader.ReadInt32();
+        breakthroughBurstTicks = reader.ReadInt32();
 
         UnlockedStageIndex = Math.Clamp(UnlockedStageIndex, 0, AscensionStages.MaxStageIndex);
         CurrentStageIndex = Math.Clamp(CurrentStageIndex, 0, UnlockedStageIndex);
@@ -687,6 +747,7 @@ public class KiPlayer : ModPlayer
         Ki = Math.Clamp(Ki, 0, MaxKi);
         SelectedTechniqueIndex = Math.Clamp(SelectedTechniqueIndex, 0, HighestUnlockedTechniqueIndex);
         highestAnnouncedTechniqueIndex = Math.Clamp(highestAnnouncedTechniqueIndex, 0, HighestUnlockedTechniqueIndex);
+        breakthroughBurstTicks = Math.Clamp(breakthroughBurstTicks, 0, BreakthroughBurstTicks);
     }
 
     private void AnnounceStateDelta(
@@ -1148,21 +1209,31 @@ public class KiPlayer : ModPlayer
         StageDefinition stage = CurrentStage;
         float saiyanChargeIntensity = GetChargeIntensity(saiyanPowerUpTicks, GetSaiyanPowerUpDuration(Math.Max(CurrentStageIndex + 1, UnlockedStageIndex)));
         float powerDownIntensity = GetChargeIntensity(saiyanPowerDownTicks, SaiyanPowerDownChargeTicks);
+        float breakthroughIntensity = GetChargeIntensity(breakthroughBurstTicks, BreakthroughBurstTicks);
 
-        if (CurrentStageIndex > 0 || saiyanChargeIntensity > 0f || powerDownIntensity > 0f)
+        if (CurrentStageIndex > 0 || saiyanChargeIntensity > 0f || powerDownIntensity > 0f || breakthroughIntensity > 0f)
         {
             Color auraColor = saiyanChargeIntensity > 0f && UnlockedStageIndex > CurrentStageIndex
                 ? AscensionStages.Get(UnlockedStageIndex).AuraColor
                 : stage.AuraColor;
             float lightStrength = CurrentStageIndex > 0 ? 0.45f : 0.2f;
             lightStrength += saiyanChargeIntensity * 0.35f;
+            lightStrength += breakthroughIntensity * 0.55f;
             lightStrength = Math.Max(0.08f, lightStrength * (1f - powerDownIntensity * 0.65f));
             Lighting.AddLight(Player.Center, auraColor.ToVector3() * lightStrength);
 
-            if (Main.rand.NextBool(CurrentStageIndex >= 3 ? 2 : 4))
+            int dustChance = breakthroughIntensity > 0.3f ? 1 : CurrentStageIndex >= 3 ? 2 : 4;
+
+            if (Main.rand.NextBool(dustChance))
             {
-                int dust = Dust.NewDust(Player.position, Player.width, Player.height, DustID.GemTopaz, 0f, -1.2f, 140, auraColor, 1.05f + saiyanChargeIntensity * 0.8f);
+                int dust = Dust.NewDust(Player.position, Player.width, Player.height, DustID.GemTopaz, 0f, -1.2f - breakthroughIntensity, 140, auraColor, 1.05f + saiyanChargeIntensity * 0.8f + breakthroughIntensity * 0.9f);
                 Main.dust[dust].noGravity = true;
+            }
+
+            if (breakthroughIntensity > 0.15f && CurrentStageIndex >= 3 && Main.rand.NextBool(4))
+            {
+                int spark = Dust.NewDust(Player.position, Player.width, Player.height, DustID.Electric, Main.rand.NextFloat(-2f, 2f), Main.rand.NextFloat(-2.4f, 0.4f), 80, Color.White, 0.9f + breakthroughIntensity);
+                Main.dust[spark].noGravity = true;
             }
         }
 

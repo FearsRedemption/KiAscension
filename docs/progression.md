@@ -12,6 +12,7 @@ The design goal is lore-inspired escalation without letting the player skip Terr
 - Tap hotkeys to step up or down through Saiyan forms and Kaio-Ken levels.
 - Hold `Z`/`X` to charge into the highest unlocked Saiyan form or power down to base.
 - Hold `C`/`V` to charge Kaio-Ken to the highest unlocked level or release it fully.
+- Trigger a dramatic automatic breakthrough only when already fighting at the highest previously unlocked Saiyan form.
 
 ## Stage Table
 
@@ -93,6 +94,8 @@ The current prototype triggers a pending breakthrough if these are true:
 - A town/friendly NPC or another player dies within 1200 pixels.
 
 This is intentionally dramatic but still Terraria-friendly. Later versions can make the moment cleaner with a custom event, a mentor NPC, or a consent-safe multiplayer toggle.
+
+When a Saiyan form unlocks, the current form changes only if the player was already in their highest previously unlocked form. For example, a player in Super Saiyan who meets every Super Saiyan 2 requirement will break through into Super Saiyan 2. A player who meets the same requirements while in Base Saiyan unlocks the Super Saiyan 2 ceiling but stays in Base until they power up manually.
 
 ## Balance Notes
 

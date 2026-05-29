@@ -40,9 +40,12 @@ Sources:
 - Ki technique costs and beam drains scale through a shared ki resource system, with modest ki-control efficiency from ki power and advanced forms
 - Spell tooltips show current ki costs, including beam sustain drain
 - HUD ki readout shows net ki per second after active transformation drain
+- Read-only inspection panels:
+  - tap `B`: toggle detailed ki stats, active drains, gates, and held-spell costs
+  - tap `N`: toggle a dev inspection panel for synced player state
 - Enemy and boss stat scaling by world progression
 - Vanilla and non-ki weapons are heavily downscaled so Ki Ascension replaces normal Terraria weapon progression
-- Boss and witness-loss gates for major emotional breakthroughs
+- Boss and witness-loss gates for major emotional breakthroughs, with auto-breakthrough only when already at the previous form ceiling
 - Multiplayer-safe per-player power, ki power, Kai Level, Saiyan form unlocks, Kaio-Ken level, and ki
 - Custom Terraria-style `ModHair` sprites for Super Saiyan-style forms
 - `Weighted Training Bands` and `Gravity Room Core` training tools
