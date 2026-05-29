@@ -43,6 +43,7 @@ public class KiPlayer : ModPlayer
     private int kaioKenPowerUpTicks;
     private int kaioKenPowerDownTicks;
     private int breakthroughBurstTicks;
+    private float kiFlightDrainAccumulator;
     private int trainingTicks;
 
     public int PowerExperience { get; private set; }
@@ -64,6 +65,8 @@ public class KiPlayer : ModPlayer
     public int SelectedTechniqueIndex { get; private set; }
 
     public bool IsWeightTraining { get; set; }
+
+    public bool IsKiFlying { get; private set; }
 
     public int TotalPowerExperience => PowerExperience + KiPowerExperience;
 
@@ -98,6 +101,10 @@ public class KiPlayer : ModPlayer
     public int ActiveLifeDrainPerSecond => CurrentKaioKenLevel.LifeDrainPerSecond;
 
     public float FlightControlMultiplier => CurrentStage.FlightControlMultiplier;
+
+    public KiFlightProfile CurrentFlightProfile => KiFlightProfiles.Get(CurrentStage.Stage);
+
+    public int KiFlightDrainPerSecond => GetKiFlightDrainPerSecond(CurrentFlightProfile);
 
     public string NextKaioKenGateText
     {
@@ -154,7 +161,9 @@ public class KiPlayer : ModPlayer
         kaioKenPowerUpTicks = 0;
         kaioKenPowerDownTicks = 0;
         breakthroughBurstTicks = 0;
+        kiFlightDrainAccumulator = 0f;
         trainingTicks = 0;
+        IsKiFlying = false;
     }
 
     public override IEnumerable<Item> AddStartingItems(bool mediumCoreDeath)
@@ -256,6 +265,7 @@ public class KiPlayer : ModPlayer
         clone.SelectedTechniqueIndex = SelectedTechniqueIndex;
         clone.highestAnnouncedTechniqueIndex = highestAnnouncedTechniqueIndex;
         clone.breakthroughBurstTicks = breakthroughBurstTicks;
+        clone.IsKiFlying = IsKiFlying;
     }
 
     public override void SendClientChanges(ModPlayer clientPlayer)
@@ -316,6 +326,7 @@ public class KiPlayer : ModPlayer
     {
         RechargeKi();
         DrainActiveTransformations();
+        HandleKiFlight();
         HandleTraining();
         RefreshTechniqueUnlocks(false);
         RefreshKaioKenUnlocks(false);
@@ -682,6 +693,19 @@ public class KiPlayer : ModPlayer
         return $"Next ceiling: {next.DisplayName} {TotalPowerExperience}/{next.RequiredExperience} total power";
     }
 
+    public string GetFlightStatusText()
+    {
+        KiFlightProfile profile = CurrentFlightProfile;
+
+        if (!profile.AllowsTrueFlight)
+        {
+            return $"Flight: locked ({profile.DisplayNote})";
+        }
+
+        string state = IsKiFlying ? "active" : "ready";
+        return $"Flight: {state}, {KiFlightDrainPerSecond}/s ki drain, x{FlightControlMultiplier:0.00} control";
+    }
+
     public void ReceivePlayerSync(BinaryReader reader)
     {
         int oldPowerExperience = PowerExperience;
@@ -723,6 +747,7 @@ public class KiPlayer : ModPlayer
         writer.Write(SelectedTechniqueIndex);
         writer.Write(highestAnnouncedTechniqueIndex);
         writer.Write(breakthroughBurstTicks);
+        writer.Write(IsKiFlying);
     }
 
     private void ReadState(BinaryReader reader)
@@ -738,6 +763,7 @@ public class KiPlayer : ModPlayer
         SelectedTechniqueIndex = reader.ReadInt32();
         highestAnnouncedTechniqueIndex = reader.ReadInt32();
         breakthroughBurstTicks = reader.ReadInt32();
+        IsKiFlying = reader.ReadBoolean();
 
         UnlockedStageIndex = Math.Clamp(UnlockedStageIndex, 0, AscensionStages.MaxStageIndex);
         CurrentStageIndex = Math.Clamp(CurrentStageIndex, 0, UnlockedStageIndex);
@@ -748,6 +774,7 @@ public class KiPlayer : ModPlayer
         SelectedTechniqueIndex = Math.Clamp(SelectedTechniqueIndex, 0, HighestUnlockedTechniqueIndex);
         highestAnnouncedTechniqueIndex = Math.Clamp(highestAnnouncedTechniqueIndex, 0, HighestUnlockedTechniqueIndex);
         breakthroughBurstTicks = Math.Clamp(breakthroughBurstTicks, 0, BreakthroughBurstTicks);
+        IsKiFlying = IsKiFlying && CurrentFlightProfile.AllowsTrueFlight;
     }
 
     private void AnnounceStateDelta(
@@ -866,6 +893,114 @@ public class KiPlayer : ModPlayer
         int highestUnlocked = KaioKenLevels.GetHighestUnlockedIndex(TotalPowerExperience);
         UnlockedKaioKenLevelIndex = Math.Max(UnlockedKaioKenLevelIndex, highestUnlocked);
         CurrentKaioKenLevelIndex = Math.Clamp(CurrentKaioKenLevelIndex, 0, UnlockedKaioKenLevelIndex);
+    }
+
+    private void HandleKiFlight()
+    {
+        IsKiFlying = false;
+        KiFlightProfile profile = CurrentFlightProfile;
+
+        if (!profile.AllowsTrueFlight || Player.dead || Player.mount.Active || Player.frozen || Player.webbed)
+        {
+            kiFlightDrainAccumulator = 0f;
+            return;
+        }
+
+        bool wantsFlight = Player.controlJump || Player.controlUp || Player.controlDown;
+        bool airborneOrTakingOff = Math.Abs(Player.velocity.Y) > 0.05f || Player.controlJump || Player.controlUp;
+
+        if (!wantsFlight || !airborneOrTakingOff)
+        {
+            kiFlightDrainAccumulator = 0f;
+            return;
+        }
+
+        int drainPerSecond = KiFlightDrainPerSecond;
+
+        if (drainPerSecond > 0 && Ki <= 0)
+        {
+            kiFlightDrainAccumulator = 0f;
+            return;
+        }
+
+        if (!TryDrainKiFlight(drainPerSecond))
+        {
+            return;
+        }
+
+        IsKiFlying = true;
+        Player.noFallDmg = true;
+        Player.fallStart = (int)(Player.position.Y / 16f);
+        ApplyKiFlightMovement(profile);
+    }
+
+    private void ApplyKiFlightMovement(KiFlightProfile profile)
+    {
+        float control = Math.Max(1f, FlightControlMultiplier);
+        float maxHorizontalSpeed = profile.MaxHorizontalSpeed * control;
+        float horizontalAcceleration = profile.HorizontalAcceleration * control;
+
+        if (Player.controlLeft)
+        {
+            Player.velocity.X = Math.Max(Player.velocity.X - horizontalAcceleration, -maxHorizontalSpeed);
+        }
+        else if (Player.controlRight)
+        {
+            Player.velocity.X = Math.Min(Player.velocity.X + horizontalAcceleration, maxHorizontalSpeed);
+        }
+        else
+        {
+            Player.velocity.X = MathHelper.Lerp(Player.velocity.X, 0f, 0.025f * control);
+        }
+
+        float targetVerticalVelocity = Math.Min(Player.velocity.Y, profile.HoverFallSpeed);
+
+        if (Player.controlJump || Player.controlUp)
+        {
+            targetVerticalVelocity = -profile.MaxRiseSpeed * control;
+        }
+        else if (Player.controlDown)
+        {
+            targetVerticalVelocity = profile.HoverFallSpeed * 2.6f;
+        }
+
+        Player.velocity.Y = MathHelper.Lerp(Player.velocity.Y, targetVerticalVelocity, profile.VerticalControl);
+    }
+
+    private bool TryDrainKiFlight(int drainPerSecond)
+    {
+        if (drainPerSecond <= 0)
+        {
+            return true;
+        }
+
+        kiFlightDrainAccumulator += drainPerSecond / 60f;
+        int drainAmount = (int)kiFlightDrainAccumulator;
+
+        if (drainAmount <= 0)
+        {
+            return true;
+        }
+
+        if (!TryConsumeKi(drainAmount))
+        {
+            kiFlightDrainAccumulator = 0f;
+            return false;
+        }
+
+        kiFlightDrainAccumulator -= drainAmount;
+        return true;
+    }
+
+    private int GetKiFlightDrainPerSecond(KiFlightProfile profile)
+    {
+        if (!profile.AllowsTrueFlight)
+        {
+            return 0;
+        }
+
+        int trainingDiscount = Math.Max(0, KiPowerLevel - 1) / 8;
+        return Math.Max(1, profile.KiDrainPerSecond - trainingDiscount);
     }
 
     private void HandleSaiyanPowerUpInput()
@@ -1247,6 +1382,19 @@ public class KiPlayer : ModPlayer
             if (Main.rand.NextBool(2))
             {
                 int dust = Dust.NewDust(Player.position, Player.width, Player.height, DustID.Torch, Main.rand.NextFloat(-1.3f, 1.3f), Main.rand.NextFloat(-1.7f, 0.4f), 120, kaioKen.AuraColor, scale);
+                Main.dust[dust].noGravity = true;
+            }
+        }
+
+        if (IsKiFlying)
+        {
+            Color flightColor = CurrentStage.AuraColor;
+            Lighting.AddLight(Player.Center, flightColor.ToVector3() * 0.25f);
+
+            if (Main.rand.NextBool(2))
+            {
+                Vector2 trailVelocity = new(-Player.direction * Main.rand.NextFloat(0.6f, 1.8f), Main.rand.NextFloat(0.8f, 2.2f));
+                int dust = Dust.NewDust(Player.position, Player.width, Player.height, DustID.GemDiamond, trailVelocity.X, trailVelocity.Y, 130, flightColor, 0.9f);
                 Main.dust[dust].noGravity = true;
             }
         }

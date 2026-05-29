@@ -12,6 +12,9 @@ public static class KiTechniques
         new(
             KiTechnique.BasicKiBlast,
             KiTechniqueBehavior.Bolt,
+            KiTechniqueCategory.BasicBlast,
+            KiTechniqueSourceType.GeneralKi,
+            KiTechniqueCollisionStyle.TerrainBlocked,
             "Basic Ki Blast",
             AscensionStage.Base,
             0,
@@ -29,6 +32,9 @@ public static class KiTechniques
         new(
             KiTechnique.KiBarrage,
             KiTechniqueBehavior.Barrage,
+            KiTechniqueCategory.Barrage,
+            KiTechniqueSourceType.GeneralKi,
+            KiTechniqueCollisionStyle.TerrainBlocked,
             "Ki Barrage",
             AscensionStage.Base,
             260,
@@ -46,6 +52,9 @@ public static class KiTechniques
         new(
             KiTechnique.Kamehameha,
             KiTechniqueBehavior.Beam,
+            KiTechniqueCategory.ContinuousBeam,
+            KiTechniqueSourceType.TurtleSchool,
+            KiTechniqueCollisionStyle.SustainedLine,
             "Kamehameha",
             AscensionStage.Awakened,
             800,
@@ -63,6 +72,9 @@ public static class KiTechniques
         new(
             KiTechnique.DestructoDisk,
             KiTechniqueBehavior.SteeringDisk,
+            KiTechniqueCategory.CuttingDisk,
+            KiTechniqueSourceType.EarthlingTactical,
+            KiTechniqueCollisionStyle.GuidedPiercing,
             "Destructo Disk",
             AscensionStage.Awakened,
             1600,
@@ -80,6 +92,9 @@ public static class KiTechniques
         new(
             KiTechnique.GalickGun,
             KiTechniqueBehavior.Beam,
+            KiTechniqueCategory.ContinuousBeam,
+            KiTechniqueSourceType.VegetaLine,
+            KiTechniqueCollisionStyle.SustainedLine,
             "Galick Gun",
             AscensionStage.Awakened,
             2200,
@@ -97,6 +112,9 @@ public static class KiTechniques
         new(
             KiTechnique.BigBangAttack,
             KiTechniqueBehavior.HeavyBlast,
+            KiTechniqueCategory.HeavyBlast,
+            KiTechniqueSourceType.VegetaLine,
+            KiTechniqueCollisionStyle.HeavyImpact,
             "Big Bang Attack",
             AscensionStage.SuperSaiyan,
             3600,
@@ -114,6 +132,9 @@ public static class KiTechniques
         new(
             KiTechnique.FinalFlash,
             KiTechniqueBehavior.Beam,
+            KiTechniqueCategory.ContinuousBeam,
+            KiTechniqueSourceType.VegetaLine,
+            KiTechniqueCollisionStyle.SustainedLine,
             "Final Flash",
             AscensionStage.SuperSaiyan2,
             7600,
@@ -131,6 +152,9 @@ public static class KiTechniques
         new(
             KiTechnique.SpiritBomb,
             KiTechniqueBehavior.HeavyBlast,
+            KiTechniqueCategory.Ultimate,
+            KiTechniqueSourceType.TurtleSchool,
+            KiTechniqueCollisionStyle.TerrainPassingUltimate,
             "Spirit Bomb",
             AscensionStage.SuperSaiyan3,
             14500,
@@ -148,6 +172,9 @@ public static class KiTechniques
         new(
             KiTechnique.GodKamehameha,
             KiTechniqueBehavior.Beam,
+            KiTechniqueCategory.ContinuousBeam,
+            KiTechniqueSourceType.GodKi,
+            KiTechniqueCollisionStyle.SustainedLine,
             "God Kamehameha",
             AscensionStage.SuperSaiyanGod,
             26000,
@@ -165,6 +192,9 @@ public static class KiTechniques
         new(
             KiTechnique.UltraInstinctBarrage,
             KiTechniqueBehavior.Barrage,
+            KiTechniqueCategory.Barrage,
+            KiTechniqueSourceType.UltraInstinct,
+            KiTechniqueCollisionStyle.TerrainBlocked,
             "Ultra Instinct Barrage",
             AscensionStage.UltraInstinctSign,
             54000,

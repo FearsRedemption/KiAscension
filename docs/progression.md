@@ -70,6 +70,22 @@ Max ki and ki regeneration both rise with Kai Level, ki power, and later forms. 
 
 Effective ki costs use a shared resource formula. Ki power grants a modest control discount, and God/Ultra Instinct-style forms add a small efficiency bonus. The discount is capped so strong attacks and high transformation drains remain meaningful.
 
+## Flight Progression
+
+True ki flight starts at Super Saiyan. It is active only while holding jump/up/down in an eligible form, and it consumes ki while active. Later forms increase responsiveness and efficiency so flight grows from a difficult burst tool into an endgame movement identity.
+
+| Stage | Flight behavior |
+| --- | --- |
+| Base Saiyan | No true flight. |
+| Awakened State | Movement boost only; true flight is still locked. |
+| Super Saiyan | First true flight, powerful but ki hungry. |
+| Super Saiyan 2 | Sharper control with more strain. |
+| Super Saiyan 3 | Strong lift and speed, high ki drain. |
+| Super Saiyan God | Better efficiency and calmer control. |
+| Super Saiyan Blue | Fast, controlled, still expensive. |
+| Ultra Instinct Sign | Highly responsive evasive flight. |
+| Ultra Instinct | Efficient endgame flight. |
+
 ## Training Rooms
 
 The current training pass has two pieces:

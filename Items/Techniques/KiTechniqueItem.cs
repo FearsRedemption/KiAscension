@@ -95,6 +95,8 @@ public abstract class KiTechniqueItem : ModItem
             : $"Ki cost: {initialCost}";
 
         tooltips.Add(new TooltipLine(Mod, "KiAscensionKiCost", text));
+        tooltips.Add(new TooltipLine(Mod, "KiAscensionTechniqueType", $"Type: {technique.CategoryLabel} | {technique.SourceLabel}"));
+        tooltips.Add(new TooltipLine(Mod, "KiAscensionTechniqueCollision", $"Behavior: {technique.CollisionLabel}"));
     }
 
     public override bool Shoot(
@@ -202,6 +204,11 @@ public abstract class KiTechniqueItem : ModItem
             projectile.height = 18;
             projectile.tileCollide = false;
             projectile.penetrate = -1;
+        }
+
+        if (technique.IgnoresTerrain)
+        {
+            projectile.tileCollide = false;
         }
     }
 

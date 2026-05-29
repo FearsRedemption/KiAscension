@@ -32,11 +32,15 @@ Saiyan forms and Kaio-Ken are separate systems. Saiyan forms provide the main tr
 
 Kaio-Ken can run alongside the current Saiyan form. It adds extra damage and movement, but it drains ki and slowly strains HP while active. Releasing Kaio-Ken returns only the Kaio-Ken level to `Off`; it does not change the active Saiyan form.
 
+True ki flight is available only while an active Saiyan form is Super Saiyan or higher. Hold jump/up/down to engage flight movement. Early forms drain more ki and feel heavier, while God and Ultra Instinct tiers are more efficient and responsive. Flight does not replace wings or mounts permanently; it is a transformation movement layer.
+
 ## Technique Feel
 
 Techniques are now separate spell items. Basic blasts and barrages behave like fast projectile pressure. Kamehameha, Galick Gun, Final Flash, and God Kamehameha are held beams that drain ki over time. Destructo Disk pierces multiple enemies and steers toward the mouse while it flies. Big Bang Attack and Spirit Bomb are heavier projectile attacks.
 
 Every ki technique has an initial ki cost, and beam techniques also have a per-second sustain drain. Current ki power and advanced forms apply a modest ki-control discount through shared resource math, so training can make lower techniques smoother without making high forms free too early. Spell tooltips show the current effective costs for the local player.
+
+Technique definitions now include metadata for category, source label, collision style, held behavior, terrain behavior, piercing, and cursor tracking. This is the foundation for a larger lore-inspired roster without forcing every technique into custom one-off logic.
 
 ## Training
 

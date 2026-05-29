@@ -93,7 +93,7 @@ public class KiHudSystem : ModSystem
             ($"Technique Cost: {(resources.TechniqueCostMultiplier * 100f):0}% of base", new Color(180, 235, 255)),
             ($"Damage: x{kiPlayer.CombinedDamageMultiplier:0.00}  Speed: x{kiPlayer.CombinedSpeedMultiplier:0.00}", new Color(255, 220, 130)),
             ($"Defense: +{kiPlayer.CurrentStage.DefenseBonus}  HP Regen: +{kiPlayer.CurrentStage.LifeRegenBonus}/s", new Color(170, 255, 175)),
-            ($"Flight Control Hook: x{kiPlayer.FlightControlMultiplier:0.00}", new Color(190, 210, 255)),
+            (kiPlayer.GetFlightStatusText(), new Color(190, 210, 255)),
             (kiPlayer.GetNextCeilingText(), new Color(235, 235, 235)),
             (kiPlayer.NextKaioKenGateText, new Color(255, 150, 130))
         };
@@ -131,6 +131,8 @@ public class KiHudSystem : ModSystem
 
         KiTechniqueDefinition technique = techniqueItem.TechniqueDefinition;
         lines.Add(($"Held Spell: {technique.DisplayName}", technique.Color));
+        lines.Add(($"Held Type: {technique.CategoryLabel} | {technique.SourceLabel}", technique.Color));
+        lines.Add(($"Held Behavior: {technique.CollisionLabel}", technique.Color));
         lines.Add(technique.Behavior == KiTechniqueBehavior.Beam
             ? ($"Held Cost: {kiPlayer.GetTechniqueInitialKiCost(technique)} start, {kiPlayer.GetTechniqueChannelKiCostPerSecond(technique)}/s", technique.Color)
             : ($"Held Cost: {kiPlayer.GetTechniqueInitialKiCost(technique)}", technique.Color));

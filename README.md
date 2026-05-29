@@ -43,6 +43,8 @@ Sources:
 - Read-only inspection panels:
   - tap `B`: toggle detailed ki stats, active drains, gates, and held-spell costs
   - tap `N`: toggle a dev inspection panel for synced player state
+- Form-gated ki flight starts at Super Saiyan and scales through later forms with different control and ki drain
+- Ki techniques have metadata for category, source label, collision style, terrain behavior, pierce, held-beam, and cursor-tracking behavior
 - Enemy and boss stat scaling by world progression
 - Vanilla and non-ki weapons are heavily downscaled so Ki Ascension replaces normal Terraria weapon progression
 - Boss and witness-loss gates for major emotional breakthroughs, with auto-breakthrough only when already at the previous form ceiling
@@ -66,7 +68,7 @@ Implemented Saiyan form path:
 
 Kaio-Ken is implemented as a separate parallel track from `Off` through late-game fantasy levels such as `x20`, `x100`, and `x200`. The display names keep the anime flavor, while the actual multipliers are tuned for Terraria instead of literal numeric scaling.
 
-See [docs/progression.md](docs/progression.md) for the design pass that keeps it lore-inspired while still fitting Terraria pacing. See [docs/current-behavior.md](docs/current-behavior.md) for what the current prototype should feel like in game.
+See [docs/progression.md](docs/progression.md) for the design pass that keeps it lore-inspired while still fitting Terraria pacing. See [docs/current-behavior.md](docs/current-behavior.md) for what the current prototype should feel like in game. See [docs/ki-skills.md](docs/ki-skills.md) for the implemented technique metadata and planned roster buckets.
 
 ## Development Setup
 

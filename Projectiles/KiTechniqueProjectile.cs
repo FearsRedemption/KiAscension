@@ -196,17 +196,16 @@ public class KiTechniqueProjectile : ModProjectile
         Projectile.penetrate = technique.Penetration;
         Projectile.timeLeft = Math.Max(2, technique.TimeLeft);
         Projectile.scale = technique.ProjectileScale;
+        Projectile.tileCollide = !technique.IgnoresTerrain;
         Projectile.localNPCHitCooldown = technique.Behavior == KiTechniqueBehavior.Beam ? 8 : 12;
 
         if (technique.Behavior == KiTechniqueBehavior.SteeringDisk)
         {
-            Projectile.tileCollide = false;
             Projectile.localNPCHitCooldown = 10;
         }
 
         if (technique.Behavior == KiTechniqueBehavior.Beam)
         {
-            Projectile.tileCollide = false;
             Projectile.penetrate = -1;
             Projectile.localNPCHitCooldown = 6;
         }
