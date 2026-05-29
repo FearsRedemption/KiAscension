@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using KiAscension.Common;
 using KiAscension.Players;
 using KiAscension.Projectiles;
+using KiAscension.Systems;
 using Microsoft.Xna.Framework;
 using Terraria;
 using Terraria.DataStructures;
@@ -115,6 +116,8 @@ public abstract class KiTechniqueItem : ModItem
         {
             return false;
         }
+
+        KiSoundSystem.PlayTechniqueFire(position, technique);
 
         if (technique.Behavior == KiTechniqueBehavior.Barrage)
         {

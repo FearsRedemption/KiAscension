@@ -90,8 +90,7 @@ public readonly struct KiTechniqueDefinition
 
     public bool TracksCursor => Behavior == KiTechniqueBehavior.SteeringDisk;
 
-    public bool IgnoresTerrain => CollisionStyle is KiTechniqueCollisionStyle.SustainedLine
-        or KiTechniqueCollisionStyle.GuidedPiercing
+    public bool IgnoresTerrain => CollisionStyle is KiTechniqueCollisionStyle.GuidedPiercing
         or KiTechniqueCollisionStyle.TerrainPassingUltimate;
 
     public string CategoryLabel => Category switch

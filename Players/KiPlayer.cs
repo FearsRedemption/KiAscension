@@ -606,6 +606,7 @@ public class KiPlayer : ModPlayer
         if (Player.whoAmI == Main.myPlayer)
         {
             Main.NewText($"Breakthrough: {stage.DisplayName}!", stage.AuraColor);
+            KiSoundSystem.PlayTransformationComplete(Player.Center);
         }
 
         if (Main.dedServ)
@@ -613,10 +614,12 @@ public class KiPlayer : ModPlayer
             return;
         }
 
+        AscensionAuraProfile aura = AscensionAuraProfiles.Get(stage.Stage);
+
         for (int i = 0; i < 28; i++)
         {
             Vector2 velocity = Main.rand.NextVector2Circular(3.6f, 3.6f);
-            int dust = Dust.NewDust(Player.position, Player.width, Player.height, DustID.GemTopaz, velocity.X, velocity.Y - 1.8f, 90, stage.AuraColor, 1.25f);
+            int dust = Dust.NewDust(Player.position, Player.width, Player.height, aura.DustType, velocity.X, velocity.Y - 1.8f, 90, aura.PrimaryColor, 1.25f);
             Main.dust[dust].noGravity = true;
         }
     }
@@ -1007,6 +1010,11 @@ public class KiPlayer : ModPlayer
     {
         if (AscensionKeybindSystem.PowerUpKey.Current)
         {
+            if (saiyanPowerUpTicks == 0 && UnlockedStageIndex > CurrentStageIndex && Player.whoAmI == Main.myPlayer)
+            {
+                KiSoundSystem.PlayPowerUpStart(Player.Center);
+            }
+
             saiyanPowerUpTicks++;
             saiyanPowerDownTicks = 0;
             int targetStageIndex = UnlockedStageIndex;
@@ -1032,6 +1040,11 @@ public class KiPlayer : ModPlayer
     {
         if (AscensionKeybindSystem.PowerDownKey.Current)
         {
+            if (saiyanPowerDownTicks == 0 && CurrentStageIndex > 0 && Player.whoAmI == Main.myPlayer)
+            {
+                KiSoundSystem.PlayPowerDown(Player.Center);
+            }
+
             saiyanPowerDownTicks++;
             saiyanPowerUpTicks = 0;
 
@@ -1056,6 +1069,11 @@ public class KiPlayer : ModPlayer
     {
         if (AscensionKeybindSystem.KaioKenPowerUpKey.Current)
         {
+            if (kaioKenPowerUpTicks == 0 && UnlockedKaioKenLevelIndex > CurrentKaioKenLevelIndex && Player.whoAmI == Main.myPlayer)
+            {
+                KiSoundSystem.PlayPowerUpStart(Player.Center);
+            }
+
             kaioKenPowerUpTicks++;
             kaioKenPowerDownTicks = 0;
             int targetLevelIndex = UnlockedKaioKenLevelIndex;
@@ -1081,6 +1099,11 @@ public class KiPlayer : ModPlayer
     {
         if (AscensionKeybindSystem.KaioKenPowerDownKey.Current)
         {
+            if (kaioKenPowerDownTicks == 0 && CurrentKaioKenLevelIndex > 0 && Player.whoAmI == Main.myPlayer)
+            {
+                KiSoundSystem.PlayPowerDown(Player.Center);
+            }
+
             kaioKenPowerDownTicks++;
             kaioKenPowerUpTicks = 0;
 
@@ -1137,6 +1160,7 @@ public class KiPlayer : ModPlayer
     private void SetForm(int stageIndex)
     {
         int nextStageIndex = Math.Clamp(stageIndex, 0, UnlockedStageIndex);
+        int oldStageIndex = CurrentStageIndex;
 
         if (nextStageIndex == CurrentStageIndex)
         {
@@ -1149,6 +1173,14 @@ public class KiPlayer : ModPlayer
         if (Player.whoAmI == Main.myPlayer)
         {
             Main.NewText($"Form: {stage.DisplayName}", stage.AuraColor);
+            if (nextStageIndex > oldStageIndex)
+            {
+                KiSoundSystem.PlayTransformationComplete(Player.Center);
+            }
+            else
+            {
+                KiSoundSystem.PlayPowerDown(Player.Center);
+            }
         }
 
         SendClientSelection();
@@ -1174,6 +1206,14 @@ public class KiPlayer : ModPlayer
         if (Player.whoAmI == Main.myPlayer)
         {
             Main.NewText(CurrentKaioKenLevelIndex == 0 ? "Kaio-Ken released." : $"Kaio-Ken: {level.DisplayName}", level.AuraColor);
+            if (CurrentKaioKenLevelIndex == 0)
+            {
+                KiSoundSystem.PlayPowerDown(Player.Center);
+            }
+            else
+            {
+                KiSoundSystem.PlayPowerUpStart(Player.Center);
+            }
         }
 
         SendClientSelection();
@@ -1231,6 +1271,7 @@ public class KiPlayer : ModPlayer
             if (Player.whoAmI == Main.myPlayer)
             {
                 Main.NewText("Your ki falters and Kaio-Ken strains out.", new Color(255, 100, 90));
+                KiSoundSystem.PlayLowKiFizzle(Player.Center);
             }
 
             SendClientSelection();
@@ -1247,6 +1288,7 @@ public class KiPlayer : ModPlayer
         if (Player.whoAmI == Main.myPlayer)
         {
             Main.NewText("Your ki drops and the form slips.", new Color(190, 210, 255));
+            KiSoundSystem.PlayLowKiFizzle(Player.Center);
         }
 
         SendClientSelection();
@@ -1342,32 +1384,38 @@ public class KiPlayer : ModPlayer
         }
 
         StageDefinition stage = CurrentStage;
+        AscensionAuraProfile auraProfile = AscensionAuraProfiles.Get(stage.Stage);
         float saiyanChargeIntensity = GetChargeIntensity(saiyanPowerUpTicks, GetSaiyanPowerUpDuration(Math.Max(CurrentStageIndex + 1, UnlockedStageIndex)));
         float powerDownIntensity = GetChargeIntensity(saiyanPowerDownTicks, SaiyanPowerDownChargeTicks);
         float breakthroughIntensity = GetChargeIntensity(breakthroughBurstTicks, BreakthroughBurstTicks);
 
         if (CurrentStageIndex > 0 || saiyanChargeIntensity > 0f || powerDownIntensity > 0f || breakthroughIntensity > 0f)
         {
-            Color auraColor = saiyanChargeIntensity > 0f && UnlockedStageIndex > CurrentStageIndex
-                ? AscensionStages.Get(UnlockedStageIndex).AuraColor
-                : stage.AuraColor;
-            float lightStrength = CurrentStageIndex > 0 ? 0.45f : 0.2f;
+            AscensionAuraProfile visibleProfile = saiyanChargeIntensity > 0f && UnlockedStageIndex > CurrentStageIndex
+                ? AscensionAuraProfiles.Get(AscensionStages.Get(UnlockedStageIndex).Stage)
+                : auraProfile;
+            Color auraColor = visibleProfile.PrimaryColor;
+            float lightStrength = CurrentStageIndex > 0 ? visibleProfile.LightStrength : 0.2f;
             lightStrength += saiyanChargeIntensity * 0.35f;
             lightStrength += breakthroughIntensity * 0.55f;
             lightStrength = Math.Max(0.08f, lightStrength * (1f - powerDownIntensity * 0.65f));
             Lighting.AddLight(Player.Center, auraColor.ToVector3() * lightStrength);
 
-            int dustChance = breakthroughIntensity > 0.3f ? 1 : CurrentStageIndex >= 3 ? 2 : 4;
+            int dustChance = breakthroughIntensity > 0.3f ? 1 : Math.Max(1, visibleProfile.IdleDustChance);
 
             if (Main.rand.NextBool(dustChance))
             {
-                int dust = Dust.NewDust(Player.position, Player.width, Player.height, DustID.GemTopaz, 0f, -1.2f - breakthroughIntensity, 140, auraColor, 1.05f + saiyanChargeIntensity * 0.8f + breakthroughIntensity * 0.9f);
+                int dust = Dust.NewDust(Player.position, Player.width, Player.height, visibleProfile.DustType, 0f, -1.2f - breakthroughIntensity, 140, auraColor, visibleProfile.DustScale + saiyanChargeIntensity * 0.8f + breakthroughIntensity * 0.9f);
                 Main.dust[dust].noGravity = true;
             }
 
-            if (breakthroughIntensity > 0.15f && CurrentStageIndex >= 3 && Main.rand.NextBool(4))
+            bool emitElectricArc = visibleProfile.EmitsElectricArcs
+                ? Main.rand.NextBool(breakthroughIntensity > 0.15f ? 4 : 10)
+                : breakthroughIntensity > 0.45f && Main.rand.NextBool(4);
+
+            if (emitElectricArc)
             {
-                int spark = Dust.NewDust(Player.position, Player.width, Player.height, DustID.Electric, Main.rand.NextFloat(-2f, 2f), Main.rand.NextFloat(-2.4f, 0.4f), 80, Color.White, 0.9f + breakthroughIntensity);
+                int spark = Dust.NewDust(Player.position, Player.width, Player.height, DustID.Electric, Main.rand.NextFloat(-2f, 2f), Main.rand.NextFloat(-2.4f, 0.4f), 80, visibleProfile.SecondaryColor, 0.9f + breakthroughIntensity);
                 Main.dust[spark].noGravity = true;
             }
         }

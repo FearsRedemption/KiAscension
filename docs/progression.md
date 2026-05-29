@@ -86,6 +86,12 @@ True ki flight starts at Super Saiyan. It is active only while holding jump/up/d
 | Ultra Instinct Sign | Highly responsive evasive flight. |
 | Ultra Instinct | Efficient endgame flight. |
 
+## Aura Progression
+
+Each Saiyan form has a profile for primary color, secondary color, light strength, dust type, dust intensity, and electric arcs. Kaio-Ken is not a Saiyan hair/form profile; it remains a red overlay and HP-strain state that can stack on top of the active Saiyan form.
+
+Super Saiyan 2 and higher high-energy forms can emit electric arcs. God forms use cleaner red/blue aura profiles, while Ultra Instinct profiles lean silver-white and more controlled.
+
 ## Training Rooms
 
 The current training pass has two pieces:

@@ -1,6 +1,7 @@
 using System;
 using KiAscension.Common;
 using KiAscension.Players;
+using KiAscension.Systems;
 using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
 using Terraria;
@@ -164,7 +165,18 @@ public class KiTechniqueProjectile : ModProjectile
     public override void OnKill(int timeLeft)
     {
         KiTechniqueDefinition technique = CurrentTechnique;
-        int burstCount = technique.Technique is KiTechnique.BigBangAttack or KiTechnique.SpiritBomb ? 24 : 10;
+        int burstCount = technique.Category switch
+        {
+            KiTechniqueCategory.Ultimate => 38,
+            KiTechniqueCategory.HeavyBlast => 24,
+            KiTechniqueCategory.CuttingDisk => 14,
+            _ => 10
+        };
+
+        if (technique.Behavior != KiTechniqueBehavior.Beam)
+        {
+            KiSoundSystem.PlayTechniqueImpact(Projectile.Center, technique);
+        }
 
         for (int i = 0; i < burstCount; i++)
         {
@@ -295,8 +307,16 @@ public class KiTechniqueProjectile : ModProjectile
 
     private Vector2 GetBeamEnd(KiTechniqueDefinition technique)
     {
+        Vector2 start = GetBeamStart();
         Vector2 direction = NormalizeOrDefault(Projectile.velocity, Vector2.UnitX);
-        return GetBeamStart() + direction * (BaseBeamLength + technique.ProjectileScale * 80f);
+        float beamLength = BaseBeamLength + technique.ProjectileScale * 80f;
+
+        if (!technique.IgnoresTerrain)
+        {
+            beamLength = GetTerrainBlockedDistance(start, direction, beamLength);
+        }
+
+        return start + direction * beamLength;
     }
 
     private static float GetBeamWidth(KiTechniqueDefinition technique)
@@ -311,6 +331,8 @@ public class KiTechniqueProjectile : ModProjectile
 
     private void FizzleBeam(KiTechniqueDefinition technique)
     {
+        KiSoundSystem.PlayLowKiFizzle(Projectile.Center);
+
         if (!Main.dedServ)
         {
             for (int i = 0; i < 8; i++)
@@ -331,6 +353,28 @@ public class KiTechniqueProjectile : ModProjectile
         }
 
         Projectile.Kill();
+    }
+
+    private static float GetTerrainBlockedDistance(Vector2 start, Vector2 direction, float maxDistance)
+    {
+        for (float distance = 16f; distance <= maxDistance; distance += 8f)
+        {
+            Point tilePoint = (start + direction * distance).ToTileCoordinates();
+
+            if (!WorldGen.InWorld(tilePoint.X, tilePoint.Y, 10))
+            {
+                return distance;
+            }
+
+            Tile tile = Framing.GetTileSafely(tilePoint.X, tilePoint.Y);
+
+            if (tile.HasTile && Main.tileSolid[tile.TileType] && !Main.tileSolidTop[tile.TileType])
+            {
+                return Math.Max(16f, distance - 8f);
+            }
+        }
+
+        return maxDistance;
     }
 
     private static int GetDustFrequency(KiTechniqueDefinition technique)

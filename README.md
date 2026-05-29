@@ -24,6 +24,7 @@ Sources:
 - Starting items: `Ki Training Focus` and `Basic Ki Blast`
 - Separate ki spell items, from basic blasts through Kamehameha, Destructo Disk, Galick Gun, Big Bang Attack, Final Flash, Spirit Bomb, God Kamehameha, and Ultra Instinct Barrage
 - Held beam behavior for Kamehameha-style techniques
+- Terrain-aware beam range for sustained beams, while ultimate terrain-passing attacks remain supported
 - Guided/piercing Destructo Disk behavior
 - Kai Level, physical power, and ki power tracking per player
 - On-screen ki/power/form/held-spell/next-ceiling HUD
@@ -45,6 +46,8 @@ Sources:
   - tap `N`: toggle a dev inspection panel for synced player state
 - Form-gated ki flight starts at Super Saiyan and scales through later forms with different control and ki drain
 - Ki techniques have metadata for category, source label, collision style, terrain behavior, pierce, held-beam, and cursor-tracking behavior
+- Central ki sound helper wired to transformations, technique fire/impact, beam fizzle, and strain events using placeholder Terraria sounds
+- Aura profiles per Saiyan form for dust type, light strength, electric arcs, and visual notes
 - Enemy and boss stat scaling by world progression
 - Vanilla and non-ki weapons are heavily downscaled so Ki Ascension replaces normal Terraria weapon progression
 - Boss and witness-loss gates for major emotional breakthroughs, with auto-breakthrough only when already at the previous form ceiling

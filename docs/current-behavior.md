@@ -38,9 +38,11 @@ True ki flight is available only while an active Saiyan form is Super Saiyan or 
 
 Techniques are now separate spell items. Basic blasts and barrages behave like fast projectile pressure. Kamehameha, Galick Gun, Final Flash, and God Kamehameha are held beams that drain ki over time. Destructo Disk pierces multiple enemies and steers toward the mouse while it flies. Big Bang Attack and Spirit Bomb are heavier projectile attacks.
 
-Every ki technique has an initial ki cost, and beam techniques also have a per-second sustain drain. Current ki power and advanced forms apply a modest ki-control discount through shared resource math, so training can make lower techniques smoother without making high forms free too early. Spell tooltips show the current effective costs for the local player.
+Every ki technique has an initial ki cost, and beam techniques also have a per-second sustain drain. Current ki power and advanced forms apply a modest ki-control discount through shared resource math, so training can make lower techniques smoother without making high forms free too early. Spell tooltips show the current effective costs for the local player. Sustained beams now stop at solid terrain, while techniques marked as terrain-passing, such as Spirit Bomb, can still use special terrain behavior.
 
 Technique definitions now include metadata for category, source label, collision style, held behavior, terrain behavior, piercing, and cursor tracking. This is the foundation for a larger lore-inspired roster without forcing every technique into custom one-off logic.
+
+Technique fire, impact, beam fizzle, transformations, Kaio-Ken changes, and ki strain now route through a central placeholder sound helper. The mod still uses vanilla Terraria sounds until original assets are added.
 
 ## Training
 
@@ -77,6 +79,8 @@ When the player transforms, the mod applies custom Terraria-style `ModHair` spri
 - Super Saiyan God: custom red-tinted compact hair
 - Super Saiyan Blue: custom spiky blue hair
 - Ultra Instinct: custom silver/white hair
+
+Aura behavior is now profile-driven per form, with separate dust type, light strength, dust intensity, secondary color, and electric-arc settings. Kaio-Ken remains a separate red overlay.
 
 ## Boss Direction
 
