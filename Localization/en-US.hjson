@@ -1,0 +1,16 @@
+Mods: {
+  KiAscension: {
+    Items: {
+      KiTrainingFocus: {
+        DisplayName: Ki Training Focus
+        Tooltip: Channels your selected ki technique. Press C/V to cycle unlocked techniques.
+      }
+    }
+
+    Projectiles: {
+      KiTechniqueProjectile: {
+        DisplayName: Ki Technique
+      }
+    }
+  }
+}
