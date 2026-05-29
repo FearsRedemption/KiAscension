@@ -21,7 +21,13 @@ public class KiPlayer : ModPlayer
     private const int BaseMaxKi = 70;
     private const int KaiLevelExperienceFactor = 220;
     private const int WitnessRange = 1200;
-    private const int PowerUpHoldThreshold = 45;
+    private const int TapInputThreshold = 12;
+    private const int BaseSaiyanChargeTicks = 45;
+    private const int SaiyanChargeTicksPerStage = 18;
+    private const int SaiyanPowerDownChargeTicks = 90;
+    private const int BaseKaioKenChargeTicks = 30;
+    private const int KaioKenChargeTicksPerLevel = 8;
+    private const int KaioKenPowerDownChargeTicks = 60;
     private const int GravityRoomRadiusTiles = 18;
     private const int TrainingIntervalTicks = 120;
 
@@ -31,7 +37,10 @@ public class KiPlayer : ModPlayer
     private Color naturalHairColor;
     private bool naturalHairCaptured;
     private bool shownProgressionNotice;
-    private int powerUpHoldTicks;
+    private int saiyanPowerUpTicks;
+    private int saiyanPowerDownTicks;
+    private int kaioKenPowerUpTicks;
+    private int kaioKenPowerDownTicks;
     private int trainingTicks;
 
     public int PowerExperience { get; private set; }
@@ -43,6 +52,10 @@ public class KiPlayer : ModPlayer
     public int CurrentStageIndex { get; private set; }
 
     public int UnlockedStageIndex { get; private set; }
+
+    public int CurrentKaioKenLevelIndex { get; private set; }
+
+    public int UnlockedKaioKenLevelIndex { get; private set; }
 
     public int Ki { get; private set; }
 
@@ -58,11 +71,25 @@ public class KiPlayer : ModPlayer
 
     public int MaxKi => BaseMaxKi + CurrentStage.MaxKiBonus + Math.Max(0, KaiLevel - 1) * 8 + Math.Max(0, KiPowerLevel - 1) * 6;
 
-    public int KiRegenPerSecond => 1 + Math.Max(0, KaiLevel - 1) / 4 + Math.Max(0, KiPowerLevel - 1) / 5 + CurrentStageIndex / 3;
+    public int KiRegenPerSecond => 1 + CurrentStage.KiRegenBonus + Math.Max(0, KaiLevel - 1) / 4 + Math.Max(0, KiPowerLevel - 1) / 5;
 
     public StageDefinition CurrentStage => AscensionStages.Get(CurrentStageIndex);
 
     public StageDefinition NextStage => AscensionStages.Get(UnlockedStageIndex + 1);
+
+    public KaioKenLevelDefinition CurrentKaioKenLevel => KaioKenLevels.Get(CurrentKaioKenLevelIndex);
+
+    public bool IsKaioKenActive => CurrentKaioKenLevelIndex > 0;
+
+    public float CombinedDamageMultiplier => CurrentStage.DamageMultiplier * CurrentKaioKenLevel.DamageMultiplier;
+
+    public float CombinedSpeedMultiplier => CurrentStage.SpeedMultiplier * CurrentKaioKenLevel.SpeedMultiplier;
+
+    public int ActiveKiDrainPerSecond => CurrentStage.KiDrainPerSecond + CurrentKaioKenLevel.KiDrainPerSecond;
+
+    public int ActiveLifeDrainPerSecond => CurrentKaioKenLevel.LifeDrainPerSecond;
+
+    public float FlightControlMultiplier => CurrentStage.FlightControlMultiplier;
 
     public int HighestUnlockedTechniqueIndex => KiTechniques.GetHighestUnlockedIndex(KiPowerExperience, UnlockedStageIndex);
 
@@ -83,6 +110,8 @@ public class KiPlayer : ModPlayer
         KaiLevel = 1;
         CurrentStageIndex = 0;
         UnlockedStageIndex = 0;
+        CurrentKaioKenLevelIndex = 0;
+        UnlockedKaioKenLevelIndex = 0;
         Ki = BaseMaxKi;
         SelectedTechniqueIndex = 0;
         highestAnnouncedTechniqueIndex = 0;
@@ -90,7 +119,10 @@ public class KiPlayer : ModPlayer
         naturalHairColor = Color.White;
         naturalHairCaptured = false;
         shownProgressionNotice = false;
-        powerUpHoldTicks = 0;
+        saiyanPowerUpTicks = 0;
+        saiyanPowerDownTicks = 0;
+        kaioKenPowerUpTicks = 0;
+        kaioKenPowerDownTicks = 0;
         trainingTicks = 0;
     }
 
@@ -112,6 +144,8 @@ public class KiPlayer : ModPlayer
         tag["KaiLevel"] = KaiLevel;
         tag["CurrentStageIndex"] = CurrentStageIndex;
         tag["UnlockedStageIndex"] = UnlockedStageIndex;
+        tag["CurrentKaioKenLevelIndex"] = CurrentKaioKenLevelIndex;
+        tag["UnlockedKaioKenLevelIndex"] = UnlockedKaioKenLevelIndex;
         tag["Ki"] = Ki;
         tag["SelectedTechniqueIndex"] = SelectedTechniqueIndex;
         tag["HighestAnnouncedTechniqueIndex"] = highestAnnouncedTechniqueIndex;
@@ -124,11 +158,15 @@ public class KiPlayer : ModPlayer
         KaiLevel = tag.ContainsKey("KaiLevel") ? tag.GetInt("KaiLevel") : CalculateKaiLevel(TotalPowerExperience);
         CurrentStageIndex = tag.ContainsKey("CurrentStageIndex") ? tag.GetInt("CurrentStageIndex") : 0;
         UnlockedStageIndex = tag.ContainsKey("UnlockedStageIndex") ? tag.GetInt("UnlockedStageIndex") : 0;
+        CurrentKaioKenLevelIndex = tag.ContainsKey("CurrentKaioKenLevelIndex") ? tag.GetInt("CurrentKaioKenLevelIndex") : 0;
+        UnlockedKaioKenLevelIndex = tag.ContainsKey("UnlockedKaioKenLevelIndex") ? tag.GetInt("UnlockedKaioKenLevelIndex") : 0;
         Ki = tag.ContainsKey("Ki") ? tag.GetInt("Ki") : BaseMaxKi;
         SelectedTechniqueIndex = tag.ContainsKey("SelectedTechniqueIndex") ? tag.GetInt("SelectedTechniqueIndex") : 0;
 
         UnlockedStageIndex = Math.Clamp(UnlockedStageIndex, 0, AscensionStages.MaxStageIndex);
         CurrentStageIndex = Math.Clamp(CurrentStageIndex, 0, UnlockedStageIndex);
+        UnlockedKaioKenLevelIndex = Math.Clamp(Math.Max(UnlockedKaioKenLevelIndex, KaioKenLevels.GetHighestUnlockedIndex(TotalPowerExperience)), 0, KaioKenLevels.MaxLevelIndex);
+        CurrentKaioKenLevelIndex = Math.Clamp(CurrentKaioKenLevelIndex, 0, UnlockedKaioKenLevelIndex);
         KaiLevel = Math.Max(1, CalculateKaiLevel(TotalPowerExperience));
         Ki = Math.Clamp(Ki, 0, MaxKi);
         SelectedTechniqueIndex = Math.Clamp(SelectedTechniqueIndex, 0, HighestUnlockedTechniqueIndex);
@@ -181,6 +219,8 @@ public class KiPlayer : ModPlayer
         clone.KaiLevel = KaiLevel;
         clone.CurrentStageIndex = CurrentStageIndex;
         clone.UnlockedStageIndex = UnlockedStageIndex;
+        clone.CurrentKaioKenLevelIndex = CurrentKaioKenLevelIndex;
+        clone.UnlockedKaioKenLevelIndex = UnlockedKaioKenLevelIndex;
         clone.Ki = Ki;
         clone.SelectedTechniqueIndex = SelectedTechniqueIndex;
         clone.highestAnnouncedTechniqueIndex = highestAnnouncedTechniqueIndex;
@@ -191,6 +231,7 @@ public class KiPlayer : ModPlayer
         KiPlayer clone = (KiPlayer)clientPlayer;
 
         if (clone.CurrentStageIndex == CurrentStageIndex
+            && clone.CurrentKaioKenLevelIndex == CurrentKaioKenLevelIndex
             && clone.SelectedTechniqueIndex == SelectedTechniqueIndex)
         {
             return;
@@ -201,29 +242,10 @@ public class KiPlayer : ModPlayer
 
     public override void ProcessTriggers(TriggersSet triggersSet)
     {
-        if (AscensionKeybindSystem.PowerUpKey.JustPressed)
-        {
-            ShiftForm(1);
-        }
-
-        if (AscensionKeybindSystem.PowerUpKey.Current)
-        {
-            powerUpHoldTicks++;
-
-            if (powerUpHoldTicks == PowerUpHoldThreshold)
-            {
-                SetForm(UnlockedStageIndex);
-            }
-        }
-        else
-        {
-            powerUpHoldTicks = 0;
-        }
-
-        if (AscensionKeybindSystem.PowerDownKey.JustPressed)
-        {
-            ShiftForm(-1);
-        }
+        HandleSaiyanPowerUpInput();
+        HandleSaiyanPowerDownInput();
+        HandleKaioKenPowerUpInput();
+        HandleKaioKenPowerDownInput();
     }
 
     public override void PostUpdateEquips()
@@ -231,14 +253,16 @@ public class KiPlayer : ModPlayer
         StageDefinition stage = CurrentStage;
         Player.statDefense += stage.DefenseBonus;
         Player.endurance = MathHelper.Clamp(Player.endurance + stage.DefenseBonus * 0.003f, 0f, 0.9f);
+        Player.lifeRegen += stage.LifeRegenBonus * 2;
     }
 
     public override void PostUpdateRunSpeeds()
     {
         StageDefinition stage = CurrentStage;
-        Player.maxRunSpeed *= stage.SpeedMultiplier;
-        Player.accRunSpeed *= stage.SpeedMultiplier;
-        Player.runAcceleration *= stage.SpeedMultiplier;
+        float speedMultiplier = CombinedSpeedMultiplier;
+        Player.maxRunSpeed *= speedMultiplier;
+        Player.accRunSpeed *= speedMultiplier;
+        Player.runAcceleration *= speedMultiplier;
 
         if (IsWeightTraining)
         {
@@ -258,9 +282,10 @@ public class KiPlayer : ModPlayer
     public override void PostUpdate()
     {
         RechargeKi();
-        DrainTransformedKi();
+        DrainActiveTransformations();
         HandleTraining();
         RefreshTechniqueUnlocks(false);
+        RefreshKaioKenUnlocks(false);
         ShowProgressionNoticeOnce();
 
         if (Main.netMode == NetmodeID.MultiplayerClient)
@@ -282,7 +307,7 @@ public class KiPlayer : ModPlayer
 
     public override void ModifyHitNPC(NPC target, ref NPC.HitModifiers modifiers)
     {
-        modifiers.FinalDamage *= CurrentStage.DamageMultiplier;
+        modifiers.FinalDamage *= CombinedDamageMultiplier;
     }
 
     public override void OnHitNPC(NPC target, NPC.HitInfo hit, int damageDone)
@@ -379,6 +404,7 @@ public class KiPlayer : ModPlayer
         int oldKiPowerExperience = KiPowerExperience;
         int oldKaiLevel = KaiLevel;
         int oldUnlockedStageIndex = UnlockedStageIndex;
+        int oldUnlockedKaioKenLevelIndex = UnlockedKaioKenLevelIndex;
         int oldHighestTechniqueIndex = HighestUnlockedTechniqueIndex;
         PowerExperience += Math.Max(0, powerAmount);
         KiPowerExperience += Math.Max(0, kiPowerAmount);
@@ -398,8 +424,9 @@ public class KiPlayer : ModPlayer
         }
 
         TryUnlockAvailableStages(false);
+        RefreshKaioKenUnlocks(true);
         RefreshTechniqueUnlocks(true);
-        AnnounceStateDelta(oldPowerExperience, oldKiPowerExperience, oldKaiLevel, oldUnlockedStageIndex, oldHighestTechniqueIndex);
+        AnnounceStateDelta(oldPowerExperience, oldKiPowerExperience, oldKaiLevel, oldUnlockedStageIndex, oldUnlockedKaioKenLevelIndex, oldHighestTechniqueIndex);
         SyncStateIfServer();
     }
 
@@ -419,15 +446,17 @@ public class KiPlayer : ModPlayer
         int oldKiPowerExperience = KiPowerExperience;
         int oldKaiLevel = KaiLevel;
         int oldUnlockedStageIndex = UnlockedStageIndex;
+        int oldUnlockedKaioKenLevelIndex = UnlockedKaioKenLevelIndex;
         int oldHighestTechniqueIndex = HighestUnlockedTechniqueIndex;
         TryUnlockAvailableStages(true);
-        AnnounceStateDelta(oldPowerExperience, oldKiPowerExperience, oldKaiLevel, oldUnlockedStageIndex, oldHighestTechniqueIndex);
+        RefreshKaioKenUnlocks(true);
+        AnnounceStateDelta(oldPowerExperience, oldKiPowerExperience, oldKaiLevel, oldUnlockedStageIndex, oldUnlockedKaioKenLevelIndex, oldHighestTechniqueIndex);
         SyncStateIfServer();
 
         if (Player.whoAmI == Main.myPlayer)
         {
-            StageDefinition stage = CurrentStage;
-            Main.NewText($"A nearby {source} loss pushes you beyond your limit: {stage.DisplayName}.", stage.AuraColor);
+            StageDefinition unlockedStage = AscensionStages.Get(UnlockedStageIndex);
+            Main.NewText($"A nearby {source} loss pushes your ceiling beyond its limit: {unlockedStage.DisplayName}.", unlockedStage.AuraColor);
         }
     }
 
@@ -455,7 +484,7 @@ public class KiPlayer : ModPlayer
             }
 
             UnlockedStageIndex++;
-            CurrentStageIndex = UnlockedStageIndex;
+            CurrentStageIndex = Math.Clamp(CurrentStageIndex, 0, UnlockedStageIndex);
             Ki = MaxKi;
             pendingAnnouncementStage = -1;
             witnessedLoss = false;
@@ -542,13 +571,14 @@ public class KiPlayer : ModPlayer
         int oldKiPowerExperience = KiPowerExperience;
         int oldKaiLevel = KaiLevel;
         int oldUnlockedStageIndex = UnlockedStageIndex;
+        int oldUnlockedKaioKenLevelIndex = UnlockedKaioKenLevelIndex;
         int oldHighestTechniqueIndex = HighestUnlockedTechniqueIndex;
 
         ReadState(reader);
 
         if (Player.whoAmI == Main.myPlayer)
         {
-            AnnounceStateDelta(oldPowerExperience, oldKiPowerExperience, oldKaiLevel, oldUnlockedStageIndex, oldHighestTechniqueIndex);
+            AnnounceStateDelta(oldPowerExperience, oldKiPowerExperience, oldKaiLevel, oldUnlockedStageIndex, oldUnlockedKaioKenLevelIndex, oldHighestTechniqueIndex);
         }
     }
 
@@ -556,9 +586,11 @@ public class KiPlayer : ModPlayer
     {
         int requestedStageIndex = reader.ReadInt32();
         int requestedTechniqueIndex = reader.ReadInt32();
+        int requestedKaioKenLevelIndex = reader.ReadInt32();
 
         CurrentStageIndex = Math.Clamp(requestedStageIndex, 0, UnlockedStageIndex);
         SelectedTechniqueIndex = Math.Clamp(requestedTechniqueIndex, 0, HighestUnlockedTechniqueIndex);
+        CurrentKaioKenLevelIndex = Math.Clamp(requestedKaioKenLevelIndex, 0, UnlockedKaioKenLevelIndex);
     }
 
     private void WriteState(BinaryWriter writer)
@@ -568,6 +600,8 @@ public class KiPlayer : ModPlayer
         writer.Write(KaiLevel);
         writer.Write(CurrentStageIndex);
         writer.Write(UnlockedStageIndex);
+        writer.Write(CurrentKaioKenLevelIndex);
+        writer.Write(UnlockedKaioKenLevelIndex);
         writer.Write(Ki);
         writer.Write(SelectedTechniqueIndex);
         writer.Write(highestAnnouncedTechniqueIndex);
@@ -580,19 +614,29 @@ public class KiPlayer : ModPlayer
         KaiLevel = reader.ReadInt32();
         CurrentStageIndex = reader.ReadInt32();
         UnlockedStageIndex = reader.ReadInt32();
+        CurrentKaioKenLevelIndex = reader.ReadInt32();
+        UnlockedKaioKenLevelIndex = reader.ReadInt32();
         Ki = reader.ReadInt32();
         SelectedTechniqueIndex = reader.ReadInt32();
         highestAnnouncedTechniqueIndex = reader.ReadInt32();
 
         UnlockedStageIndex = Math.Clamp(UnlockedStageIndex, 0, AscensionStages.MaxStageIndex);
         CurrentStageIndex = Math.Clamp(CurrentStageIndex, 0, UnlockedStageIndex);
+        UnlockedKaioKenLevelIndex = Math.Clamp(Math.Max(UnlockedKaioKenLevelIndex, KaioKenLevels.GetHighestUnlockedIndex(TotalPowerExperience)), 0, KaioKenLevels.MaxLevelIndex);
+        CurrentKaioKenLevelIndex = Math.Clamp(CurrentKaioKenLevelIndex, 0, UnlockedKaioKenLevelIndex);
         KaiLevel = Math.Max(1, CalculateKaiLevel(TotalPowerExperience));
         Ki = Math.Clamp(Ki, 0, MaxKi);
         SelectedTechniqueIndex = Math.Clamp(SelectedTechniqueIndex, 0, HighestUnlockedTechniqueIndex);
         highestAnnouncedTechniqueIndex = Math.Clamp(highestAnnouncedTechniqueIndex, 0, HighestUnlockedTechniqueIndex);
     }
 
-    private void AnnounceStateDelta(int oldPowerExperience, int oldKiPowerExperience, int oldKaiLevel, int oldUnlockedStageIndex, int oldHighestTechniqueIndex)
+    private void AnnounceStateDelta(
+        int oldPowerExperience,
+        int oldKiPowerExperience,
+        int oldKaiLevel,
+        int oldUnlockedStageIndex,
+        int oldUnlockedKaioKenLevelIndex,
+        int oldHighestTechniqueIndex)
     {
         if (Player.whoAmI != Main.myPlayer)
         {
@@ -610,6 +654,15 @@ public class KiPlayer : ModPlayer
             {
                 StageDefinition stage = AscensionStages.Get(stageIndex);
                 Main.NewText($"Ceiling surpassed: {stage.DisplayName}", stage.AuraColor);
+            }
+        }
+
+        if (UnlockedKaioKenLevelIndex > oldUnlockedKaioKenLevelIndex)
+        {
+            for (int levelIndex = oldUnlockedKaioKenLevelIndex + 1; levelIndex <= UnlockedKaioKenLevelIndex; levelIndex++)
+            {
+                KaioKenLevelDefinition level = KaioKenLevels.Get(levelIndex);
+                Main.NewText($"Kaio-Ken unlocked: {level.DisplayName}", level.AuraColor);
             }
         }
 
@@ -658,6 +711,7 @@ public class KiPlayer : ModPlayer
         packet.Write((byte)Player.whoAmI);
         packet.Write(CurrentStageIndex);
         packet.Write(SelectedTechniqueIndex);
+        packet.Write(CurrentKaioKenLevelIndex);
         packet.Send();
     }
 
@@ -687,6 +741,121 @@ public class KiPlayer : ModPlayer
         highestAnnouncedTechniqueIndex = highestUnlocked;
     }
 
+    private void RefreshKaioKenUnlocks(bool announce)
+    {
+        int highestUnlocked = KaioKenLevels.GetHighestUnlockedIndex(TotalPowerExperience);
+        UnlockedKaioKenLevelIndex = Math.Max(UnlockedKaioKenLevelIndex, highestUnlocked);
+        CurrentKaioKenLevelIndex = Math.Clamp(CurrentKaioKenLevelIndex, 0, UnlockedKaioKenLevelIndex);
+    }
+
+    private void HandleSaiyanPowerUpInput()
+    {
+        if (AscensionKeybindSystem.PowerUpKey.Current)
+        {
+            saiyanPowerUpTicks++;
+            saiyanPowerDownTicks = 0;
+            int targetStageIndex = UnlockedStageIndex;
+
+            if (targetStageIndex > CurrentStageIndex && saiyanPowerUpTicks >= GetSaiyanPowerUpDuration(targetStageIndex))
+            {
+                SetForm(targetStageIndex);
+                saiyanPowerUpTicks = 0;
+            }
+
+            return;
+        }
+
+        if (saiyanPowerUpTicks > 0 && saiyanPowerUpTicks <= TapInputThreshold)
+        {
+            ShiftForm(1);
+        }
+
+        saiyanPowerUpTicks = 0;
+    }
+
+    private void HandleSaiyanPowerDownInput()
+    {
+        if (AscensionKeybindSystem.PowerDownKey.Current)
+        {
+            saiyanPowerDownTicks++;
+            saiyanPowerUpTicks = 0;
+
+            if (CurrentStageIndex > 0 && saiyanPowerDownTicks >= SaiyanPowerDownChargeTicks)
+            {
+                SetForm(0);
+                saiyanPowerDownTicks = 0;
+            }
+
+            return;
+        }
+
+        if (saiyanPowerDownTicks > 0 && saiyanPowerDownTicks <= TapInputThreshold)
+        {
+            ShiftForm(-1);
+        }
+
+        saiyanPowerDownTicks = 0;
+    }
+
+    private void HandleKaioKenPowerUpInput()
+    {
+        if (AscensionKeybindSystem.KaioKenPowerUpKey.Current)
+        {
+            kaioKenPowerUpTicks++;
+            kaioKenPowerDownTicks = 0;
+            int targetLevelIndex = UnlockedKaioKenLevelIndex;
+
+            if (targetLevelIndex > CurrentKaioKenLevelIndex && kaioKenPowerUpTicks >= GetKaioKenPowerUpDuration(targetLevelIndex))
+            {
+                SetKaioKenLevel(targetLevelIndex);
+                kaioKenPowerUpTicks = 0;
+            }
+
+            return;
+        }
+
+        if (kaioKenPowerUpTicks > 0 && kaioKenPowerUpTicks <= TapInputThreshold)
+        {
+            ShiftKaioKen(1);
+        }
+
+        kaioKenPowerUpTicks = 0;
+    }
+
+    private void HandleKaioKenPowerDownInput()
+    {
+        if (AscensionKeybindSystem.KaioKenPowerDownKey.Current)
+        {
+            kaioKenPowerDownTicks++;
+            kaioKenPowerUpTicks = 0;
+
+            if (CurrentKaioKenLevelIndex > 0 && kaioKenPowerDownTicks >= KaioKenPowerDownChargeTicks)
+            {
+                SetKaioKenLevel(0);
+                kaioKenPowerDownTicks = 0;
+            }
+
+            return;
+        }
+
+        if (kaioKenPowerDownTicks > 0 && kaioKenPowerDownTicks <= TapInputThreshold)
+        {
+            ShiftKaioKen(-1);
+        }
+
+        kaioKenPowerDownTicks = 0;
+    }
+
+    private static int GetSaiyanPowerUpDuration(int targetStageIndex)
+    {
+        return BaseSaiyanChargeTicks + targetStageIndex * SaiyanChargeTicksPerStage;
+    }
+
+    private static int GetKaioKenPowerUpDuration(int targetLevelIndex)
+    {
+        return BaseKaioKenChargeTicks + targetLevelIndex * KaioKenChargeTicksPerLevel;
+    }
+
     private void ShiftForm(int direction)
     {
         SetForm(Math.Clamp(CurrentStageIndex + direction, 0, UnlockedStageIndex));
@@ -712,6 +881,31 @@ public class KiPlayer : ModPlayer
         SendClientSelection();
     }
 
+    private void ShiftKaioKen(int direction)
+    {
+        SetKaioKenLevel(Math.Clamp(CurrentKaioKenLevelIndex + direction, 0, UnlockedKaioKenLevelIndex));
+    }
+
+    private void SetKaioKenLevel(int levelIndex)
+    {
+        int nextLevelIndex = Math.Clamp(levelIndex, 0, UnlockedKaioKenLevelIndex);
+
+        if (nextLevelIndex == CurrentKaioKenLevelIndex)
+        {
+            return;
+        }
+
+        CurrentKaioKenLevelIndex = nextLevelIndex;
+        KaioKenLevelDefinition level = CurrentKaioKenLevel;
+
+        if (Player.whoAmI == Main.myPlayer)
+        {
+            Main.NewText(CurrentKaioKenLevelIndex == 0 ? "Kaio-Ken released." : $"Kaio-Ken: {level.DisplayName}", level.AuraColor);
+        }
+
+        SendClientSelection();
+    }
+
     private void RechargeKi()
     {
         if (Main.GameUpdateCount % 60UL != 0UL)
@@ -723,22 +917,58 @@ public class KiPlayer : ModPlayer
         SyncStateIfServer();
     }
 
-    private void DrainTransformedKi()
+    private void DrainActiveTransformations()
     {
-        StageDefinition stage = CurrentStage;
-
-        if (stage.KiDrainPerSecond <= 0 || Main.GameUpdateCount % 60UL != 0UL)
+        if (Main.GameUpdateCount % 60UL != 0UL)
         {
             return;
         }
 
-        if (Ki >= stage.KiDrainPerSecond)
+        int kiDrain = ActiveKiDrainPerSecond;
+
+        if (kiDrain > 0)
         {
-            Ki -= stage.KiDrainPerSecond;
+            if (Ki >= kiDrain)
+            {
+                Ki -= kiDrain;
+            }
+            else
+            {
+                Ki = 0;
+                StepDownFromStrain();
+            }
+
+            SyncStateIfServer();
+        }
+
+        int lifeDrain = ActiveLifeDrainPerSecond;
+
+        if (lifeDrain > 0)
+        {
+            Player.statLife = Math.Max(1, Player.statLife - lifeDrain);
+        }
+    }
+
+    private void StepDownFromStrain()
+    {
+        if (CurrentKaioKenLevelIndex > 0)
+        {
+            CurrentKaioKenLevelIndex = Math.Max(0, CurrentKaioKenLevelIndex - 1);
+
+            if (Player.whoAmI == Main.myPlayer)
+            {
+                Main.NewText("Your ki falters and Kaio-Ken strains out.", new Color(255, 100, 90));
+            }
+
+            SendClientSelection();
             return;
         }
 
-        Ki = 0;
+        if (CurrentStageIndex <= 0)
+        {
+            return;
+        }
+
         CurrentStageIndex = Math.Max(0, CurrentStageIndex - 1);
 
         if (Player.whoAmI == Main.myPlayer)
@@ -833,18 +1063,49 @@ public class KiPlayer : ModPlayer
 
     private void DrawAura()
     {
-        if (CurrentStageIndex == 0 || Main.dedServ)
+        if (Main.dedServ)
         {
             return;
         }
 
         StageDefinition stage = CurrentStage;
-        Lighting.AddLight(Player.Center, stage.AuraColor.ToVector3() * 0.45f);
+        float saiyanChargeIntensity = GetChargeIntensity(saiyanPowerUpTicks, GetSaiyanPowerUpDuration(Math.Max(CurrentStageIndex + 1, UnlockedStageIndex)));
+        float powerDownIntensity = GetChargeIntensity(saiyanPowerDownTicks, SaiyanPowerDownChargeTicks);
 
-        if (Main.rand.NextBool(4))
+        if (CurrentStageIndex > 0 || saiyanChargeIntensity > 0f || powerDownIntensity > 0f)
         {
-            int dust = Dust.NewDust(Player.position, Player.width, Player.height, DustID.GemTopaz, 0f, -1.2f, 140, stage.AuraColor, 1.15f);
-            Main.dust[dust].noGravity = true;
+            Color auraColor = saiyanChargeIntensity > 0f && UnlockedStageIndex > CurrentStageIndex
+                ? AscensionStages.Get(UnlockedStageIndex).AuraColor
+                : stage.AuraColor;
+            float lightStrength = CurrentStageIndex > 0 ? 0.45f : 0.2f;
+            lightStrength += saiyanChargeIntensity * 0.35f;
+            lightStrength = Math.Max(0.08f, lightStrength * (1f - powerDownIntensity * 0.65f));
+            Lighting.AddLight(Player.Center, auraColor.ToVector3() * lightStrength);
+
+            if (Main.rand.NextBool(CurrentStageIndex >= 3 ? 2 : 4))
+            {
+                int dust = Dust.NewDust(Player.position, Player.width, Player.height, DustID.GemTopaz, 0f, -1.2f, 140, auraColor, 1.05f + saiyanChargeIntensity * 0.8f);
+                Main.dust[dust].noGravity = true;
+            }
         }
+
+        if (IsKaioKenActive || kaioKenPowerUpTicks > 0 || kaioKenPowerDownTicks > 0)
+        {
+            KaioKenLevelDefinition kaioKen = CurrentKaioKenLevel;
+            float chargeIntensity = GetChargeIntensity(kaioKenPowerUpTicks, GetKaioKenPowerUpDuration(Math.Max(CurrentKaioKenLevelIndex + 1, UnlockedKaioKenLevelIndex)));
+            float scale = 1.1f + CurrentKaioKenLevelIndex * 0.05f + chargeIntensity * 0.8f;
+            Lighting.AddLight(Player.Center, new Vector3(0.65f, 0.08f, 0.05f) * (0.25f + chargeIntensity * 0.4f));
+
+            if (Main.rand.NextBool(2))
+            {
+                int dust = Dust.NewDust(Player.position, Player.width, Player.height, DustID.Torch, Main.rand.NextFloat(-1.3f, 1.3f), Main.rand.NextFloat(-1.7f, 0.4f), 120, kaioKen.AuraColor, scale);
+                Main.dust[dust].noGravity = true;
+            }
+        }
+    }
+
+    private static float GetChargeIntensity(int ticks, int requiredTicks)
+    {
+        return requiredTicks <= 0 ? 0f : MathHelper.Clamp(ticks / (float)requiredTicks, 0f, 1f);
     }
 }

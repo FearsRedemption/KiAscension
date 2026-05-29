@@ -4,7 +4,6 @@ public enum AscensionStage
 {
     Base,
     Awakened,
-    KaioKen,
     SuperSaiyan,
     SuperSaiyan2,
     SuperSaiyan3,

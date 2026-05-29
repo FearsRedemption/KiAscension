@@ -60,6 +60,8 @@ Mods: {
 		Keybinds: {
 			"Ascend Form.DisplayName": Ascend Form
 			"Descend Form.DisplayName": Descend Form
+			"Kaio-Ken Power Up.DisplayName": Kaio-Ken Power Up
+			"Kaio-Ken Power Down.DisplayName": Kaio-Ken Power Down
 		}
 	}
 }

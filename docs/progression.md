@@ -9,8 +9,9 @@ The design goal is lore-inspired escalation without letting the player skip Terr
 - Scale all combat around higher enemy health and damage, so training matters.
 - Unlock low forms through practice, then lock Super Saiyan-style jumps behind Terraria boss milestones.
 - Unlock major Super Saiyan-style breakthroughs by witnessing a nearby town NPC or player death after meeting the experience threshold.
-- Use hotkeys to move up or down through forms as ki allows.
-- Hold `Z` to jump directly to the highest unlocked form.
+- Tap hotkeys to step up or down through Saiyan forms and Kaio-Ken levels.
+- Hold `Z`/`X` to charge into the highest unlocked Saiyan form or power down to base.
+- Hold `C`/`V` to charge Kaio-Ken to the highest unlocked level or release it fully.
 
 ## Stage Table
 
@@ -18,7 +19,6 @@ The design goal is lore-inspired escalation without letting the player skip Terr
 | --- | ---: | --- | --- |
 | Base Saiyan | 0 | Starting state | New character |
 | Awakened State | 500 | Training | Early surface/cavern |
-| Kaio-Ken | 1400 | Training, drains ki | Pre-boss pressure tool |
 | Super Saiyan | 3000 | Eye of Cthulhu plus witness loss | Early boss breakthrough |
 | Super Saiyan 2 | 6500 | Eater of Worlds or Brain of Cthulhu plus witness loss | Evil boss tier |
 | Super Saiyan 3 | 12000 | Skeletron | Dungeon/pre-hardmode mastery |
@@ -26,6 +26,23 @@ The design goal is lore-inspired escalation without letting the player skip Terr
 | Super Saiyan Blue | 34000 | Any mechanical boss | Mechanical boss tier |
 | Ultra Instinct Sign | 50000 | Plantera plus witness loss | Jungle temple lead-in |
 | Ultra Instinct | 72000 | Moon Lord | Endgame |
+
+## Kaio-Ken Table
+
+Kaio-Ken is now parallel to Saiyan forms. Its display names keep the anime fantasy, but the actual stat multipliers are softened for Terraria balance. It can stack with Saiyan forms, but drains ki and HP while active.
+
+| Kaio-Ken level | Total power | Gate | Role |
+| --- | ---: | --- | --- |
+| Off | 0 | Starting state | No strain |
+| Kaio-Ken | 700 | Training | First risky burst |
+| Kaio-Ken x2 | 1100 | Training | Early combat amplifier |
+| Kaio-Ken x3 | 1800 | Eye of Cthulhu | Pre-boss to early boss tier |
+| Kaio-Ken x5 | 3400 | Eater of Worlds or Brain of Cthulhu | Evil boss tier |
+| Kaio-Ken x10 | 6500 | Skeletron | Late pre-hardmode |
+| Kaio-Ken x20 | 12000 | Wall of Flesh | Early hardmode |
+| Kaio-Ken x50 | 24000 | Any mechanical boss | Mechanical tier fantasy |
+| Kaio-Ken x100 | 42000 | Plantera | Late hardmode strain |
+| Kaio-Ken x200 | 72000 | Moon Lord | Endgame burst fantasy |
 
 ## Technique Order
 
@@ -36,8 +53,8 @@ The technique ladder is ordered by a mix of lore chronology and Terraria combat 
 | Basic Ki Blast | 0 | Base Saiyan | Starter projectile pressure |
 | Ki Barrage | 260 | Base Saiyan | Multiple quick blasts |
 | Kamehameha | 800 | Awakened State | Held blue beam that drains ki |
-| Destructo Disk | 1600 | Kaio-Ken | Guided piercing disk |
-| Galick Gun | 2200 | Kaio-Ken | Held purple rival beam |
+| Destructo Disk | 1600 | Awakened State | Guided piercing disk |
+| Galick Gun | 2200 | Awakened State | Held purple rival beam |
 | Big Bang Attack | 3600 | Super Saiyan | Heavy compact burst |
 | Final Flash | 7600 | Super Saiyan 2 | Expensive long golden beam |
 | Spirit Bomb | 14500 | Super Saiyan 3 | Slow boss-scale projectile |
@@ -69,7 +86,7 @@ Ultra Ego and Legendary Wrath should become late-game branches rather than simpl
 
 The current prototype triggers a pending breakthrough if these are true:
 
-- The player has enough power experience for the next form.
+- The player has enough total power for the next Saiyan form.
 - The next form requires witness loss.
 - A town/friendly NPC or another player dies within 1200 pixels.
 
@@ -77,7 +94,8 @@ This is intentionally dramatic but still Terraria-friendly. Later versions can m
 
 ## Balance Notes
 
-- Forms multiply final NPC hit damage, increase movement, add defense, and add max ki.
-- Strong forms drain ki so the best play is cycling up for bursts and powering down to recover.
+- Saiyan forms multiply final NPC hit damage, increase movement, add defense, add max ki, improve ki regeneration, and add light health regeneration.
+- Kaio-Ken adds a parallel damage/speed multiplier, but drains ki and HP while active.
+- Strong forms drain ki so the best play is charging up for bursts and powering down to recover.
 - Enemy scaling starts immediately and rises with boss progression.
 - Boss rewards are intentionally high because boss fights should feel like training arcs.

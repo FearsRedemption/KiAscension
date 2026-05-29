@@ -14,7 +14,10 @@ public readonly struct StageDefinition
         float speedMultiplier,
         int defenseBonus,
         int maxKiBonus,
+        int kiRegenBonus,
         int kiDrainPerSecond,
+        int lifeRegenBonus,
+        float flightControlMultiplier,
         Color auraColor)
     {
         Stage = stage;
@@ -26,7 +29,10 @@ public readonly struct StageDefinition
         SpeedMultiplier = speedMultiplier;
         DefenseBonus = defenseBonus;
         MaxKiBonus = maxKiBonus;
+        KiRegenBonus = kiRegenBonus;
         KiDrainPerSecond = kiDrainPerSecond;
+        LifeRegenBonus = lifeRegenBonus;
+        FlightControlMultiplier = flightControlMultiplier;
         AuraColor = auraColor;
     }
 
@@ -48,7 +54,13 @@ public readonly struct StageDefinition
 
     public int MaxKiBonus { get; }
 
+    public int KiRegenBonus { get; }
+
     public int KiDrainPerSecond { get; }
+
+    public int LifeRegenBonus { get; }
+
+    public float FlightControlMultiplier { get; }
 
     public Color AuraColor { get; }
 }

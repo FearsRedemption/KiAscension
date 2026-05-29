@@ -217,7 +217,6 @@ public abstract class KiTechniqueItem : ModItem
         {
             AscensionStage.Base => ItemRarityID.White,
             AscensionStage.Awakened => ItemRarityID.Blue,
-            AscensionStage.KaioKen => ItemRarityID.Green,
             AscensionStage.SuperSaiyan => ItemRarityID.Orange,
             AscensionStage.SuperSaiyan2 => ItemRarityID.LightRed,
             AscensionStage.SuperSaiyan3 => ItemRarityID.Pink,

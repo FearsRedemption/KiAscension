@@ -18,10 +18,17 @@ Early mobs are scaled up heavily compared to vanilla, but the starter spell and 
 2. Gain physical power from combat/training and ki power from ki technique hits.
 3. Raise Kai Level as combined power increases.
 4. Unlock new technique items and forms when power, ki power, boss gates, and breakthrough requirements are met.
-5. Use `Z` and `X` to move up or down through unlocked forms.
-6. Hold `Z` to power directly up to the highest unlocked form.
+5. Tap `Z` and `X` to step up or down through unlocked Saiyan forms.
+6. Hold `Z` to charge up into the highest unlocked Saiyan form; hold `X` to power down to Base Saiyan.
+7. Tap or hold `C`/`V` to raise or lower the separate Kaio-Ken level.
 
-The HUD shows Kai Level, physical power, ki power, ki, ki regeneration, active form, held spell, and the next ceiling. Chat messages call out Kai Level increases, new techniques, unlocked forms, boss gates, and witness-loss gates.
+The HUD shows Kai Level, physical power, ki power, ki, ki regeneration, active Saiyan form, active Kaio-Ken state, held spell, and the next ceiling. Chat messages call out Kai Level increases, new techniques, unlocked forms, boss gates, Kaio-Ken unlocks, and witness-loss gates.
+
+## Transformations
+
+Saiyan forms and Kaio-Ken are separate systems. Saiyan forms provide the main transformation bonuses: max ki, ki regeneration, damage, defense, movement, light health regeneration, ki drain, and a placeholder flight-control multiplier for later flight work.
+
+Kaio-Ken can run alongside the current Saiyan form. It adds extra damage and movement, but it drains ki and slowly strains HP while active. Releasing Kaio-Ken returns only the Kaio-Ken level to `Off`; it does not change the active Saiyan form.
 
 ## Technique Feel
 
@@ -40,10 +47,12 @@ Each player has their own saved and synced:
 - Kai Level
 - unlocked form ceiling
 - current form
+- unlocked Kaio-Ken level
+- current Kaio-Ken level
 - unlocked technique ceiling
 - ki
 
-In multiplayer, the server owns EXP, ki power, training, and unlock progression so clients should not double-award themselves. Clients send only their selected form to the server; the server clamps that choice to what that player has unlocked and broadcasts the result.
+In multiplayer, the server owns EXP, ki power, training, and unlock progression so clients should not double-award themselves. Clients send selected Saiyan form and Kaio-Ken level to the server; the server clamps those choices to what that player has unlocked and broadcasts the result.
 
 Nearby players can still trigger witness-loss breakthroughs for each other. If one player has enough EXP for a witness-gated form and another player dies close enough, the waiting player should break through.
 
@@ -51,7 +60,8 @@ Nearby players can still trigger witness-loss breakthroughs for each other. If o
 
 When the player transforms, the mod applies custom Terraria-style `ModHair` sprites and stage colors:
 
-- Kaio-Ken: red hair tint
+- Kaio-Ken: separate red aura overlay, no Saiyan hair change
+- Awakened State: mostly natural hair with a light tint
 - Super Saiyan forms: custom spiky gold hair
 - Super Saiyan 3: longer custom gold hair
 - Super Saiyan God: custom red-tinted compact hair

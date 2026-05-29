@@ -44,8 +44,9 @@ public class KiHudSystem : ModSystem
         DrawBar(new Rectangle((int)position.X, (int)position.Y + 62, 220, 8), kiPlayer.GetKiProgress(), new Color(80, 205, 255));
 
         DrawText($"Form: {kiPlayer.CurrentStage.DisplayName}", position + new Vector2(0f, 76f), kiPlayer.CurrentStage.AuraColor);
-        DrawText(GetHeldTechniqueText(), position + new Vector2(0f, 96f), new Color(180, 235, 255));
-        DrawText(kiPlayer.GetNextCeilingText(), position + new Vector2(0f, 116f), new Color(235, 235, 235));
+        DrawText($"Kaio-Ken: {kiPlayer.CurrentKaioKenLevel.DisplayName}", position + new Vector2(0f, 96f), kiPlayer.CurrentKaioKenLevel.AuraColor == Color.Transparent ? new Color(190, 190, 190) : kiPlayer.CurrentKaioKenLevel.AuraColor);
+        DrawText(GetHeldTechniqueText(), position + new Vector2(0f, 116f), new Color(180, 235, 255));
+        DrawText(kiPlayer.GetNextCeilingText(), position + new Vector2(0f, 136f), new Color(235, 235, 235));
 
         return true;
     }

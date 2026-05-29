@@ -28,7 +28,6 @@ public static class AscensionVisuals
         {
             AscensionStage.Base => naturalHairColor,
             AscensionStage.Awakened => new Color(255, 239, 125),
-            AscensionStage.KaioKen => new Color(255, 70, 65),
             AscensionStage.SuperSaiyan => new Color(255, 226, 70),
             AscensionStage.SuperSaiyan2 => new Color(255, 242, 110),
             AscensionStage.SuperSaiyan3 => new Color(255, 205, 55),

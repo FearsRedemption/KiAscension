@@ -27,4 +27,6 @@ Tiles: {
 Keybinds: {
 	"Descend Form.DisplayName": Descend Form
 	"Ascend Form.DisplayName": Ascend Form
+	"Kaio-Ken Power Up.DisplayName": Kaio-Ken Power Up
+	"Kaio-Ken Power Down.DisplayName": Kaio-Ken Power Down
 }

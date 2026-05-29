@@ -29,30 +29,36 @@ Sources:
 - On-screen ki/power/form/held-spell/next-ceiling HUD
 - Power experience from combat, enemy kills, weight training, meditation, and gravity room training
 - Hotkeys:
-  - `Z`: ascend one unlocked form
-  - hold `Z`: power directly up to the highest unlocked form
-  - `X`: descend one form
+  - tap `Z`: ascend one unlocked Saiyan form
+  - hold `Z`: charge up to the highest unlocked Saiyan form
+  - tap `X`: descend one Saiyan form
+  - hold `X`: controlled power-down to Base Saiyan
+  - tap/hold `C`: raise Kaio-Ken one level or charge to the highest unlocked Kaio-Ken level
+  - tap/hold `V`: lower Kaio-Ken one level or release it fully
+- Kaio-Ken is a separate parallel amplifier with HP/ki strain
+- Saiyan forms provide max ki, ki regeneration, defense, movement, damage, and light health regeneration hooks
 - Enemy and boss stat scaling by world progression
 - Vanilla and non-ki weapons are heavily downscaled so Ki Ascension replaces normal Terraria weapon progression
 - Boss and witness-loss gates for major emotional breakthroughs
-- Multiplayer-safe per-player power, ki power, Kai Level, form unlocks, and ki
+- Multiplayer-safe per-player power, ki power, Kai Level, Saiyan form unlocks, Kaio-Ken level, and ki
 - Custom Terraria-style `ModHair` sprites for Super Saiyan-style forms
 - `Weighted Training Bands` and `Gravity Room Core` training tools
 
 ## Progression
 
-The first implementation is a straight path:
+Implemented Saiyan form path:
 
 1. Base Saiyan
 2. Awakened State
-3. Kaio-Ken
-4. Super Saiyan, witness-loss gated
-5. Super Saiyan 2, witness-loss gated
-6. Super Saiyan 3
-7. Super Saiyan God
-8. Super Saiyan Blue
-9. Ultra Instinct Sign, witness-loss gated
-10. Ultra Instinct
+3. Super Saiyan, witness-loss gated
+4. Super Saiyan 2, witness-loss gated
+5. Super Saiyan 3
+6. Super Saiyan God
+7. Super Saiyan Blue
+8. Ultra Instinct Sign, witness-loss gated
+9. Ultra Instinct
+
+Kaio-Ken is implemented as a separate parallel track from `Off` through late-game fantasy levels such as `x20`, `x100`, and `x200`. The display names keep the anime flavor, while the actual multipliers are tuned for Terraria instead of literal numeric scaling.
 
 See [docs/progression.md](docs/progression.md) for the design pass that keeps it lore-inspired while still fitting Terraria pacing. See [docs/current-behavior.md](docs/current-behavior.md) for what the current prototype should feel like in game.
 
