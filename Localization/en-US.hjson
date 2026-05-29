@@ -62,6 +62,8 @@ Mods: {
 			"Descend Form.DisplayName": Descend Form
 			"Kaio-Ken Power Up.DisplayName": Kaio-Ken Power Up
 			"Kaio-Ken Power Down.DisplayName": Kaio-Ken Power Down
+			"Toggle Ki Stats.DisplayName": Toggle Ki Stats
+			"Toggle Ki Dev Panel.DisplayName": Toggle Ki Dev Panel
 		}
 	}
 }

@@ -17,6 +17,8 @@ public abstract class KiTechniqueItem : ModItem
 
     protected KiTechniqueDefinition Definition => KiTechniques.Get((int)Technique);
 
+    public KiTechniqueDefinition TechniqueDefinition => Definition;
+
     public override void SetDefaults()
     {
         KiTechniqueDefinition technique = Definition;

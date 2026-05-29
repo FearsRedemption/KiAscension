@@ -83,6 +83,10 @@ public class KiPlayer : ModPlayer
 
     public bool IsKaioKenActive => CurrentKaioKenLevelIndex > 0;
 
+    public StageDefinition UnlockedStage => AscensionStages.Get(UnlockedStageIndex);
+
+    public KaioKenLevelDefinition UnlockedKaioKenLevel => KaioKenLevels.Get(UnlockedKaioKenLevelIndex);
+
     public float CombinedDamageMultiplier => CurrentStage.DamageMultiplier * CurrentKaioKenLevel.DamageMultiplier;
 
     public float CombinedSpeedMultiplier => CurrentStage.SpeedMultiplier * CurrentKaioKenLevel.SpeedMultiplier;
@@ -92,6 +96,28 @@ public class KiPlayer : ModPlayer
     public int ActiveLifeDrainPerSecond => CurrentKaioKenLevel.LifeDrainPerSecond;
 
     public float FlightControlMultiplier => CurrentStage.FlightControlMultiplier;
+
+    public string NextKaioKenGateText
+    {
+        get
+        {
+            if (UnlockedKaioKenLevelIndex >= KaioKenLevels.MaxLevelIndex)
+            {
+                return "Kaio-Ken: mastered";
+            }
+
+            KaioKenLevelDefinition next = KaioKenLevels.Get(UnlockedKaioKenLevelIndex + 1);
+
+            if (TotalPowerExperience < next.RequiredPower)
+            {
+                return $"Next Kaio-Ken: {next.DisplayName} {TotalPowerExperience}/{next.RequiredPower} total power";
+            }
+
+            return AscensionStages.IsGateSatisfied(next.RequiredGate)
+                ? $"Next Kaio-Ken ready: {next.DisplayName}"
+                : $"Next Kaio-Ken: {next.DisplayName}; {AscensionStages.GetGateText(next.RequiredGate)}";
+        }
+    }
 
     public int HighestUnlockedTechniqueIndex => KiTechniques.GetHighestUnlockedIndex(KiPowerExperience, UnlockedStageIndex);
 
@@ -248,6 +274,7 @@ public class KiPlayer : ModPlayer
         HandleSaiyanPowerDownInput();
         HandleKaioKenPowerUpInput();
         HandleKaioKenPowerDownInput();
+        HandleInspectionInput();
     }
 
     public override void PostUpdateEquips()
@@ -876,6 +903,24 @@ public class KiPlayer : ModPlayer
         }
 
         kaioKenPowerDownTicks = 0;
+    }
+
+    private void HandleInspectionInput()
+    {
+        if (Player.whoAmI != Main.myPlayer)
+        {
+            return;
+        }
+
+        if (AscensionKeybindSystem.ToggleStatsKey.JustPressed)
+        {
+            KiHudSystem.ToggleStatsPanel();
+        }
+
+        if (AscensionKeybindSystem.ToggleDevPanelKey.JustPressed)
+        {
+            KiHudSystem.ToggleDevPanel();
+        }
     }
 
     private static int GetSaiyanPowerUpDuration(int targetStageIndex)
