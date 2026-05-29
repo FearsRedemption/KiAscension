@@ -1,6 +1,10 @@
+using System;
 using KiAscension.Common;
+using KiAscension.Players;
 using Microsoft.Xna.Framework;
+using Microsoft.Xna.Framework.Graphics;
 using Terraria;
+using Terraria.GameContent;
 using Terraria.ID;
 using Terraria.ModLoader;
 
@@ -9,6 +13,8 @@ namespace KiAscension.Projectiles;
 public class KiTechniqueProjectile : ModProjectile
 {
     public override string Texture => $"Terraria/Images/Projectile_{ProjectileID.DiamondBolt}";
+
+    private const float BaseBeamLength = 640f;
 
     public override void SetDefaults()
     {
@@ -26,12 +32,33 @@ public class KiTechniqueProjectile : ModProjectile
         Projectile.localNPCHitCooldown = 12;
     }
 
+    public override bool ShouldUpdatePosition()
+    {
+        return CurrentTechnique.Behavior != KiTechniqueBehavior.Beam;
+    }
+
     public override void AI()
     {
-        KiTechniqueDefinition technique = KiTechniques.Get((int)Projectile.ai[0]);
-        Projectile.rotation = technique.Technique == KiTechnique.DestructoDisk
-            ? Main.GameUpdateCount * 0.35f
-            : Projectile.velocity.ToRotation();
+        KiTechniqueDefinition technique = CurrentTechnique;
+
+        ApplyBehaviorDefaults(technique);
+
+        switch (technique.Behavior)
+        {
+            case KiTechniqueBehavior.Beam:
+                BeamAI(technique);
+                break;
+            case KiTechniqueBehavior.SteeringDisk:
+                SteeringDiskAI(technique);
+                break;
+            case KiTechniqueBehavior.HeavyBlast:
+                HeavyBlastAI(technique);
+                break;
+            default:
+                Projectile.rotation = Projectile.velocity.ToRotation();
+                break;
+        }
+
         Lighting.AddLight(Projectile.Center, technique.Color.ToVector3() * 0.55f);
 
         if (Main.rand.NextBool(GetDustFrequency(technique)))
@@ -52,9 +79,90 @@ public class KiTechniqueProjectile : ModProjectile
         }
     }
 
+    public override bool? Colliding(Rectangle projHitbox, Rectangle targetHitbox)
+    {
+        KiTechniqueDefinition technique = CurrentTechnique;
+
+        if (technique.Behavior != KiTechniqueBehavior.Beam)
+        {
+            return null;
+        }
+
+        float collisionPoint = 0f;
+        return Collision.CheckAABBvLineCollision(
+            new Vector2(targetHitbox.Left, targetHitbox.Top),
+            new Vector2(targetHitbox.Width, targetHitbox.Height),
+            GetBeamStart(),
+            GetBeamEnd(technique),
+            GetBeamWidth(technique),
+            ref collisionPoint);
+    }
+
+    public override bool PreDraw(ref Color lightColor)
+    {
+        KiTechniqueDefinition technique = CurrentTechnique;
+
+        if (technique.Behavior != KiTechniqueBehavior.Beam)
+        {
+            return true;
+        }
+
+        Texture2D pixel = TextureAssets.MagicPixel.Value;
+        Vector2 start = GetBeamStart() - Main.screenPosition;
+        Vector2 end = GetBeamEnd(technique) - Main.screenPosition;
+        Vector2 direction = end - start;
+        float length = direction.Length();
+        float rotation = direction.ToRotation();
+        float width = GetBeamWidth(technique);
+
+        Main.EntitySpriteDraw(
+            pixel,
+            start,
+            new Rectangle(0, 0, 1, 1),
+            technique.Color * 0.55f,
+            rotation,
+            new Vector2(0f, 0.5f),
+            new Vector2(length, width),
+            SpriteEffects.None);
+
+        Main.EntitySpriteDraw(
+            pixel,
+            start,
+            new Rectangle(0, 0, 1, 1),
+            Color.White * 0.82f,
+            rotation,
+            new Vector2(0f, 0.5f),
+            new Vector2(length, Math.Max(3f, width * 0.35f)),
+            SpriteEffects.None);
+
+        return false;
+    }
+
+    public override Color? GetAlpha(Color lightColor)
+    {
+        return CurrentTechnique.Color;
+    }
+
+    public override void OnHitNPC(NPC target, NPC.HitInfo hit, int damageDone)
+    {
+        if (Main.netMode == NetmodeID.MultiplayerClient || Projectile.owner < 0 || Projectile.owner >= Main.maxPlayers)
+        {
+            return;
+        }
+
+        Player owner = Main.player[Projectile.owner];
+
+        if (owner is null || !owner.active)
+        {
+            return;
+        }
+
+        owner.GetModPlayer<KiPlayer>().AddKiExperience(Math.Max(1, damageDone / 9), false);
+    }
+
     public override void OnKill(int timeLeft)
     {
-        KiTechniqueDefinition technique = KiTechniques.Get((int)Projectile.ai[0]);
+        KiTechniqueDefinition technique = CurrentTechnique;
         int burstCount = technique.Technique is KiTechnique.BigBangAttack or KiTechnique.SpiritBomb ? 24 : 10;
 
         for (int i = 0; i < burstCount; i++)
@@ -72,6 +180,127 @@ public class KiTechniqueProjectile : ModProjectile
 
             Main.dust[dust].noGravity = true;
         }
+    }
+
+    private KiTechniqueDefinition CurrentTechnique => KiTechniques.Get((int)Projectile.ai[0]);
+
+    private void ApplyBehaviorDefaults(KiTechniqueDefinition technique)
+    {
+        if (Projectile.localAI[0] == 1f)
+        {
+            return;
+        }
+
+        Projectile.localAI[0] = 1f;
+        Projectile.penetrate = technique.Penetration;
+        Projectile.timeLeft = Math.Max(2, technique.TimeLeft);
+        Projectile.scale = technique.ProjectileScale;
+        Projectile.localNPCHitCooldown = technique.Behavior == KiTechniqueBehavior.Beam ? 8 : 12;
+
+        if (technique.Behavior == KiTechniqueBehavior.SteeringDisk)
+        {
+            Projectile.tileCollide = false;
+            Projectile.localNPCHitCooldown = 10;
+        }
+
+        if (technique.Behavior == KiTechniqueBehavior.Beam)
+        {
+            Projectile.tileCollide = false;
+            Projectile.penetrate = -1;
+            Projectile.localNPCHitCooldown = 6;
+        }
+    }
+
+    private void BeamAI(KiTechniqueDefinition technique)
+    {
+        Player player = Main.player[Projectile.owner];
+
+        if (player is null || !player.active || player.dead)
+        {
+            Projectile.Kill();
+            return;
+        }
+
+        Vector2 origin = player.MountedCenter;
+
+        if (Projectile.owner == Main.myPlayer)
+        {
+            Vector2 aim = Main.MouseWorld - origin;
+
+            if (aim.LengthSquared() > 16f)
+            {
+                Projectile.velocity = Vector2.Normalize(aim);
+                Projectile.netUpdate = Main.GameUpdateCount % 8UL == 0UL;
+            }
+        }
+
+        Projectile.velocity = NormalizeOrDefault(Projectile.velocity, new Vector2(player.direction, 0f));
+        Projectile.Center = origin + Projectile.velocity * 24f;
+        Projectile.rotation = Projectile.velocity.ToRotation();
+        Projectile.timeLeft = 2;
+
+        player.ChangeDir(Projectile.velocity.X >= 0f ? 1 : -1);
+        player.itemRotation = Projectile.rotation;
+        player.itemTime = 2;
+        player.itemAnimation = 2;
+
+        int drain = Math.Max(1, (int)Math.Ceiling(technique.ChannelKiCostPerSecond / 4f));
+
+        if (!player.channel || (Main.GameUpdateCount % 15UL == 0UL && Main.netMode != NetmodeID.MultiplayerClient && !player.GetModPlayer<KiPlayer>().TryConsumeKi(drain)))
+        {
+            Projectile.Kill();
+        }
+    }
+
+    private void SteeringDiskAI(KiTechniqueDefinition technique)
+    {
+        Player player = Main.player[Projectile.owner];
+
+        if (Projectile.owner == Main.myPlayer && player is not null && player.active)
+        {
+            Vector2 aim = Main.MouseWorld - Projectile.Center;
+
+            if (aim.LengthSquared() > 64f)
+            {
+                Vector2 desiredVelocity = Vector2.Normalize(aim) * technique.ShootSpeed;
+                Projectile.velocity = Vector2.Lerp(Projectile.velocity, desiredVelocity, 0.085f);
+                Projectile.netUpdate = Main.GameUpdateCount % 10UL == 0UL;
+            }
+        }
+
+        Projectile.rotation += 0.45f * Math.Sign(Projectile.velocity.X == 0f ? 1f : Projectile.velocity.X);
+    }
+
+    private void HeavyBlastAI(KiTechniqueDefinition technique)
+    {
+        Projectile.rotation = Projectile.velocity.ToRotation();
+
+        if (technique.Technique == KiTechnique.SpiritBomb)
+        {
+            Projectile.velocity *= 0.988f;
+        }
+    }
+
+    private Vector2 GetBeamStart()
+    {
+        Player player = Main.player[Projectile.owner];
+        return player is null || !player.active ? Projectile.Center : player.MountedCenter;
+    }
+
+    private Vector2 GetBeamEnd(KiTechniqueDefinition technique)
+    {
+        Vector2 direction = NormalizeOrDefault(Projectile.velocity, Vector2.UnitX);
+        return GetBeamStart() + direction * (BaseBeamLength + technique.ProjectileScale * 80f);
+    }
+
+    private static float GetBeamWidth(KiTechniqueDefinition technique)
+    {
+        return 12f + technique.ProjectileScale * 8f;
+    }
+
+    private static Vector2 NormalizeOrDefault(Vector2 value, Vector2 fallback)
+    {
+        return value.LengthSquared() <= 0.001f ? fallback : Vector2.Normalize(value);
     }
 
     private static int GetDustFrequency(KiTechniqueDefinition technique)

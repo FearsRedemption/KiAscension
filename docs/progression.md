@@ -4,44 +4,58 @@ The design goal is lore-inspired escalation without letting the player skip Terr
 
 ## Core Loops
 
-- Fight enemies to gain power experience.
-- Use the `Ki Training Focus` early for basic ranged ki pressure.
+- Fight enemies to gain physical power and ki power.
+- Use separate ki spell items for attacks; use the `Ki Training Focus` for light meditation training.
 - Scale all combat around higher enemy health and damage, so training matters.
-- Unlock low forms through practice.
+- Unlock low forms through practice, then lock Super Saiyan-style jumps behind Terraria boss milestones.
 - Unlock major Super Saiyan-style breakthroughs by witnessing a nearby town NPC or player death after meeting the experience threshold.
 - Use hotkeys to move up or down through forms as ki allows.
+- Hold `Z` to jump directly to the highest unlocked form.
 
 ## Stage Table
 
-| Stage | XP | Gate | Terraria pacing |
+| Stage | Total power | Gate | Terraria pacing |
 | --- | ---: | --- | --- |
 | Base Saiyan | 0 | Starting state | New character |
-| Awakened State | 150 | Training | Early surface/cavern |
-| Kaio-Ken | 450 | Training, drains ki | Pre-boss pressure tool |
-| Super Saiyan | 1000 | Witness loss | Around Eye/Eater/Brain/Skeletron |
-| Super Saiyan 2 | 2200 | Witness loss | Late pre-hardmode into early hardmode |
-| Super Saiyan 3 | 4200 | Training, heavy drain | Mechanical boss tier |
-| Super Saiyan God | 7000 | Future ritual/trainer gate | Plantera/Golem tier |
-| Super Saiyan Blue | 10000 | God form mastery | Cultist/Pillars |
-| Ultra Instinct Sign | 14000 | Witness loss | Moon Lord and post-Moon Lord |
-| Ultra Instinct | 19000 | Mastery | Endgame |
+| Awakened State | 500 | Training | Early surface/cavern |
+| Kaio-Ken | 1400 | Training, drains ki | Pre-boss pressure tool |
+| Super Saiyan | 3000 | Eye of Cthulhu plus witness loss | Early boss breakthrough |
+| Super Saiyan 2 | 6500 | Eater of Worlds or Brain of Cthulhu plus witness loss | Evil boss tier |
+| Super Saiyan 3 | 12000 | Skeletron | Dungeon/pre-hardmode mastery |
+| Super Saiyan God | 22000 | Wall of Flesh | Hardmode entry |
+| Super Saiyan Blue | 34000 | Any mechanical boss | Mechanical boss tier |
+| Ultra Instinct Sign | 50000 | Plantera plus witness loss | Jungle temple lead-in |
+| Ultra Instinct | 72000 | Moon Lord | Endgame |
 
 ## Technique Order
 
 The technique ladder is ordered by a mix of lore chronology and Terraria combat pacing. Big Bang Attack intentionally comes before Final Flash, and Destructo Disk comes before the heavier Vegeta-style finishers.
 
-| Technique | XP | Form gate | Why it sits here |
+| Technique | Ki power | Form gate | Feel |
 | --- | ---: | --- | --- |
-| Basic Ki Blast | 0 | Base Saiyan | Starter projectile and training tool |
-| Ki Barrage | 120 | Base Saiyan | Faster fundamentals before true signature attacks |
-| Kamehameha | 300 | Awakened State | First controlled signature beam |
-| Destructo Disk | 650 | Kaio-Ken | Early precision/cutting skill, strong but not a late finisher |
-| Galick Gun | 900 | Kaio-Ken | Rival beam before the Super Saiyan finisher tier |
-| Big Bang Attack | 1400 | Super Saiyan | First major Super Saiyan finisher |
-| Final Flash | 2600 | Super Saiyan 2 | Bigger late-Cell-saga-style beam, after Big Bang |
-| Spirit Bomb | 4600 | Super Saiyan 3 | Lore-early technique moved later because it plays like a boss nuke |
-| God Kamehameha | 7600 | Super Saiyan God | God-ki signature beam upgrade |
-| Ultra Instinct Barrage | 14000 | Ultra Instinct Sign | Endgame rapid instinct pressure |
+| Basic Ki Blast | 0 | Base Saiyan | Starter projectile pressure |
+| Ki Barrage | 260 | Base Saiyan | Multiple quick blasts |
+| Kamehameha | 800 | Awakened State | Held blue beam that drains ki |
+| Destructo Disk | 1600 | Kaio-Ken | Guided piercing disk |
+| Galick Gun | 2200 | Kaio-Ken | Held purple rival beam |
+| Big Bang Attack | 3600 | Super Saiyan | Heavy compact burst |
+| Final Flash | 7600 | Super Saiyan 2 | Expensive long golden beam |
+| Spirit Bomb | 14500 | Super Saiyan 3 | Slow boss-scale projectile |
+| God Kamehameha | 26000 | Super Saiyan God | God-ki held beam |
+| Ultra Instinct Barrage | 54000 | Ultra Instinct Sign | Endgame rapid instinct pressure |
+
+## Power Types
+
+Physical power is earned from combat and weight training. Ki power is earned from ki technique hits, meditation, and gravity room training. Kai Level is based on combined power, while ki technique unlocks care about ki power specifically.
+
+Max ki and ki regeneration both rise with Kai Level, ki power, and later forms. Early regeneration is intentionally slow so the starter loop feels closer to weak Terraria gear, then gets smoother as training pays off.
+
+## Training Rooms
+
+The current training pass has two pieces:
+
+- `Weighted Training Bands`: accessory-based weight training for physical power.
+- `Gravity Room Core`: placeable training tile that rewards moving nearby with physical power and ki power.
 
 ## Branches To Add
 

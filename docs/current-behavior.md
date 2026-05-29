@@ -8,48 +8,55 @@ Ki Ascension is meant to replace normal Terraria weapon progression. Vanilla and
 
 ## Starting A Character
 
-New characters start with `Ki Training Focus`. It fires Basic Ki Blast at a low ki cost, and the starter ki pool was raised so early enemies are not a wall. If the item is lost, it can be remade from one Dirt Block as a safety valve.
+New characters start with `Ki Training Focus` and `Basic Ki Blast`. The focus is now a training tool, not a cycling weapon: using it meditates for a small amount of physical power and ki power. If it is lost, it can be remade from one Dirt Block as a safety valve.
 
-Early mobs are scaled up only lightly. They should take more attention than vanilla, but the first slimes and zombies should still be killable with Basic Ki Blast.
+Early mobs are scaled up heavily compared to vanilla, but the starter spell and slow ki regeneration are tuned so the first slimes and zombies are not a wall.
 
 ## Core Loop
 
-1. Fight enemies with ki techniques.
-2. Gain EXP from hits and kills.
-3. Raise Kai Level as total EXP increases.
-4. Unlock new techniques and forms when EXP and form requirements are met.
+1. Fight enemies with separate ki technique items.
+2. Gain physical power from combat/training and ki power from ki technique hits.
+3. Raise Kai Level as combined power increases.
+4. Unlock new technique items and forms when power, ki power, boss gates, and breakthrough requirements are met.
 5. Use `Z` and `X` to move up or down through unlocked forms.
-6. Use `C` and `V` to cycle unlocked ki techniques.
+6. Hold `Z` to power directly up to the highest unlocked form.
 
-The HUD shows Kai Level, EXP, ki, active form, active technique, and the next ceiling. Chat messages also call out Kai Level increases, new techniques, unlocked forms, and witness-loss gates.
+The HUD shows Kai Level, physical power, ki power, ki, ki regeneration, active form, held spell, and the next ceiling. Chat messages call out Kai Level increases, new techniques, unlocked forms, boss gates, and witness-loss gates.
+
+## Technique Feel
+
+Techniques are now separate spell items. Basic blasts and barrages behave like fast projectile pressure. Kamehameha, Galick Gun, Final Flash, and God Kamehameha are held beams that drain ki over time. Destructo Disk pierces multiple enemies and steers toward the mouse while it flies. Big Bang Attack and Spirit Bomb are heavier projectile attacks.
+
+## Training
+
+`Weighted Training Bands` slow the player while equipped, but moving and jumping under the extra load builds physical power. `Gravity Room Core` is a placeable 2x2 tile that creates a training field nearby; moving in its radius builds physical power and ki power. The training numbers are intentionally small so training helps without replacing boss progression.
 
 ## Multiplayer
 
 Each player has their own saved and synced:
 
 - EXP
+- Ki power EXP
 - Kai Level
 - unlocked form ceiling
 - current form
 - unlocked technique ceiling
-- selected technique
 - ki
 
-In multiplayer, the server owns EXP and unlock progression so clients should not double-award themselves. Clients send only their selected form and selected technique to the server; the server clamps those choices to what that player has unlocked and broadcasts the result.
+In multiplayer, the server owns EXP, ki power, training, and unlock progression so clients should not double-award themselves. Clients send only their selected form to the server; the server clamps that choice to what that player has unlocked and broadcasts the result.
 
 Nearby players can still trigger witness-loss breakthroughs for each other. If one player has enough EXP for a witness-gated form and another player dies close enough, the waiting player should break through.
 
 ## Forms And Visuals
 
-When the player transforms, the mod applies a Terraria-style hair color and available vanilla hairstyle intended to suggest that form:
+When the player transforms, the mod applies custom Terraria-style `ModHair` sprites and stage colors:
 
 - Kaio-Ken: red hair tint
-- Super Saiyan forms: gold hair tint and spikier/longer style picks
-- Super Saiyan God: red hair tint
-- Super Saiyan Blue: blue hair tint
-- Ultra Instinct: silver/white tint
-
-These are runtime visuals. Proper custom `ModHair` sprites are a later art pass.
+- Super Saiyan forms: custom spiky gold hair
+- Super Saiyan 3: longer custom gold hair
+- Super Saiyan God: custom red-tinted compact hair
+- Super Saiyan Blue: custom spiky blue hair
+- Ultra Instinct: custom silver/white hair
 
 ## Boss Direction
 

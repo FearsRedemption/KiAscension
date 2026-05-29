@@ -6,11 +6,13 @@ public readonly struct KiTechniqueDefinition
 {
     public KiTechniqueDefinition(
         KiTechnique technique,
+        KiTechniqueBehavior behavior,
         string displayName,
         AscensionStage requiredStage,
-        int requiredExperience,
+        int requiredKiPower,
         int baseDamage,
-        int kiCost,
+        int initialKiCost,
+        int channelKiCostPerSecond,
         int useTime,
         float shootSpeed,
         float knockback,
@@ -21,11 +23,13 @@ public readonly struct KiTechniqueDefinition
         string progressionNote)
     {
         Technique = technique;
+        Behavior = behavior;
         DisplayName = displayName;
         RequiredStage = requiredStage;
-        RequiredExperience = requiredExperience;
+        RequiredKiPower = requiredKiPower;
         BaseDamage = baseDamage;
-        KiCost = kiCost;
+        InitialKiCost = initialKiCost;
+        ChannelKiCostPerSecond = channelKiCostPerSecond;
         UseTime = useTime;
         ShootSpeed = shootSpeed;
         Knockback = knockback;
@@ -38,15 +42,19 @@ public readonly struct KiTechniqueDefinition
 
     public KiTechnique Technique { get; }
 
+    public KiTechniqueBehavior Behavior { get; }
+
     public string DisplayName { get; }
 
     public AscensionStage RequiredStage { get; }
 
-    public int RequiredExperience { get; }
+    public int RequiredKiPower { get; }
 
     public int BaseDamage { get; }
 
-    public int KiCost { get; }
+    public int InitialKiCost { get; }
+
+    public int ChannelKiCostPerSecond { get; }
 
     public int UseTime { get; }
 

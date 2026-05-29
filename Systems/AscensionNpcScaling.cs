@@ -59,42 +59,44 @@ public class AscensionNpcScaling : GlobalNPC
                 continue;
             }
 
-            player.GetModPlayer<KiPlayer>().AddExperience(reward, npc.boss);
+            KiPlayer kiPlayer = player.GetModPlayer<KiPlayer>();
+            kiPlayer.AddPowerExperience(reward, npc.boss);
+            kiPlayer.AddKiExperience(Math.Max(1, reward / 2), false);
         }
     }
 
     private static float GetWorldScale(NPC npc)
     {
-        float scale = 1.05f;
+        float scale = 2f;
 
         if (NPC.downedBoss1)
-        {
-            scale += 0.1f;
-        }
-
-        if (NPC.downedBoss2)
-        {
-            scale += 0.1f;
-        }
-
-        if (NPC.downedBoss3)
         {
             scale += 0.15f;
         }
 
-        if (Main.hardMode)
+        if (NPC.downedBoss2)
         {
-            scale += 0.35f;
+            scale += 0.15f;
         }
 
-        if (NPC.downedMechBossAny)
+        if (NPC.downedBoss3)
         {
             scale += 0.2f;
         }
 
-        if (NPC.downedPlantBoss)
+        if (Main.hardMode)
+        {
+            scale += 0.45f;
+        }
+
+        if (NPC.downedMechBossAny)
         {
             scale += 0.25f;
+        }
+
+        if (NPC.downedPlantBoss)
+        {
+            scale += 0.3f;
         }
 
         if (NPC.downedMoonlord)
@@ -104,7 +106,7 @@ public class AscensionNpcScaling : GlobalNPC
 
         if (npc.boss)
         {
-            scale += 0.35f;
+            scale += 0.65f;
         }
 
         return scale;

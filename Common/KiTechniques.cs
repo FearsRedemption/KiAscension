@@ -1,5 +1,7 @@
 using System;
+using KiAscension.Items.Techniques;
 using Microsoft.Xna.Framework;
+using Terraria.ModLoader;
 
 namespace KiAscension.Common;
 
@@ -9,11 +11,13 @@ public static class KiTechniques
     {
         new(
             KiTechnique.BasicKiBlast,
+            KiTechniqueBehavior.Bolt,
             "Basic Ki Blast",
             AscensionStage.Base,
             0,
             12,
             4,
+            0,
             22,
             10f,
             2f,
@@ -24,11 +28,13 @@ public static class KiTechniques
             "Starter ranged pressure."),
         new(
             KiTechnique.KiBarrage,
+            KiTechniqueBehavior.Barrage,
             "Ki Barrage",
             AscensionStage.Base,
-            120,
+            260,
             9,
-            4,
+            5,
+            0,
             12,
             11f,
             1.2f,
@@ -39,56 +45,64 @@ public static class KiTechniques
             "Fast training volley before signature beams."),
         new(
             KiTechnique.Kamehameha,
+            KiTechniqueBehavior.Beam,
             "Kamehameha",
             AscensionStage.Awakened,
-            300,
-            28,
+            800,
             16,
-            38,
+            8,
+            18,
+            24,
             14f,
             3.2f,
-            3,
-            115,
+            -1,
+            2,
             1.25f,
             new Color(90, 190, 255),
             "First signature beam after the player learns controlled output."),
         new(
             KiTechnique.DestructoDisk,
+            KiTechniqueBehavior.SteeringDisk,
             "Destructo Disk",
             AscensionStage.KaioKen,
-            650,
+            1600,
             38,
             22,
+            0,
             44,
             10f,
             1.5f,
-            5,
-            135,
+            8,
+            210,
             1.15f,
             new Color(255, 245, 150),
             "Precision cutter unlocked before the heavier Vegeta-style finishers."),
         new(
             KiTechnique.GalickGun,
+            KiTechniqueBehavior.Beam,
             "Galick Gun",
             AscensionStage.KaioKen,
-            900,
-            48,
+            2200,
+            22,
+            12,
+            24,
             28,
-            48,
             14.5f,
             4f,
-            4,
-            120,
+            -1,
+            2,
             1.35f,
             new Color(185, 95, 255),
             "Rival beam tier, placed before Super Saiyan-exclusive finishers."),
         new(
             KiTechnique.BigBangAttack,
+            KiTechniqueBehavior.HeavyBlast,
             "Big Bang Attack",
             AscensionStage.SuperSaiyan,
-            1400,
+            3600,
             58,
             42,
+            0,
             56,
             9f,
             6f,
@@ -99,26 +113,30 @@ public static class KiTechniques
             "First Super Saiyan finisher; lore-wise before Final Flash."),
         new(
             KiTechnique.FinalFlash,
+            KiTechniqueBehavior.Beam,
             "Final Flash",
             AscensionStage.SuperSaiyan2,
-            2600,
-            82,
-            58,
-            66,
+            7600,
+            34,
+            20,
+            36,
+            40,
             16f,
             7f,
-            6,
-            135,
+            -1,
+            2,
             1.8f,
             new Color(255, 220, 70),
             "Heavier late-Cell-saga beam after Big Bang Attack."),
         new(
             KiTechnique.SpiritBomb,
+            KiTechniqueBehavior.HeavyBlast,
             "Spirit Bomb",
             AscensionStage.SuperSaiyan3,
-            4600,
+            14500,
             115,
             85,
+            0,
             82,
             7f,
             8f,
@@ -129,26 +147,30 @@ public static class KiTechniques
             "Moved later than its lore introduction because it is a boss-scale Terraria nuke."),
         new(
             KiTechnique.GodKamehameha,
+            KiTechniqueBehavior.Beam,
             "God Kamehameha",
             AscensionStage.SuperSaiyanGod,
-            7600,
-            145,
-            95,
-            58,
+            26000,
+            48,
+            28,
+            52,
+            44,
             17f,
             7.5f,
-            7,
-            145,
+            -1,
+            2,
             2f,
             new Color(245, 80, 105),
             "God-ki version of the signature beam."),
         new(
             KiTechnique.UltraInstinctBarrage,
+            KiTechniqueBehavior.Barrage,
             "Ultra Instinct Barrage",
             AscensionStage.UltraInstinctSign,
-            14000,
+            54000,
             190,
             120,
+            0,
             20,
             18f,
             3f,
@@ -166,19 +188,19 @@ public static class KiTechniques
         return Definitions[Math.Clamp(techniqueIndex, 0, MaxTechniqueIndex)];
     }
 
-    public static bool IsUnlocked(KiTechniqueDefinition definition, int powerExperience, int unlockedStageIndex)
+    public static bool IsUnlocked(KiTechniqueDefinition definition, int kiPowerExperience, int unlockedStageIndex)
     {
-        return powerExperience >= definition.RequiredExperience
+        return kiPowerExperience >= definition.RequiredKiPower
             && unlockedStageIndex >= (int)definition.RequiredStage;
     }
 
-    public static int GetHighestUnlockedIndex(int powerExperience, int unlockedStageIndex)
+    public static int GetHighestUnlockedIndex(int kiPowerExperience, int unlockedStageIndex)
     {
         int highestUnlockedIndex = 0;
 
         for (int i = 1; i < Definitions.Length; i++)
         {
-            if (!IsUnlocked(Definitions[i], powerExperience, unlockedStageIndex))
+            if (!IsUnlocked(Definitions[i], kiPowerExperience, unlockedStageIndex))
             {
                 continue;
             }
@@ -187,5 +209,23 @@ public static class KiTechniques
         }
 
         return highestUnlockedIndex;
+    }
+
+    public static int GetItemType(KiTechnique technique)
+    {
+        return technique switch
+        {
+            KiTechnique.BasicKiBlast => ModContent.ItemType<BasicKiBlastSpell>(),
+            KiTechnique.KiBarrage => ModContent.ItemType<KiBarrageSpell>(),
+            KiTechnique.Kamehameha => ModContent.ItemType<KamehamehaSpell>(),
+            KiTechnique.DestructoDisk => ModContent.ItemType<DestructoDiskSpell>(),
+            KiTechnique.GalickGun => ModContent.ItemType<GalickGunSpell>(),
+            KiTechnique.BigBangAttack => ModContent.ItemType<BigBangAttackSpell>(),
+            KiTechnique.FinalFlash => ModContent.ItemType<FinalFlashSpell>(),
+            KiTechnique.SpiritBomb => ModContent.ItemType<SpiritBombSpell>(),
+            KiTechnique.GodKamehameha => ModContent.ItemType<GodKamehamehaSpell>(),
+            KiTechnique.UltraInstinctBarrage => ModContent.ItemType<UltraInstinctBarrageSpell>(),
+            _ => ModContent.ItemType<BasicKiBlastSpell>()
+        };
     }
 }

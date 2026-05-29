@@ -8,6 +8,7 @@ public readonly struct StageDefinition
         AscensionStage stage,
         string displayName,
         int requiredExperience,
+        AscensionProgressionGate requiredGate,
         bool requiresWitnessLoss,
         float damageMultiplier,
         float speedMultiplier,
@@ -19,6 +20,7 @@ public readonly struct StageDefinition
         Stage = stage;
         DisplayName = displayName;
         RequiredExperience = requiredExperience;
+        RequiredGate = requiredGate;
         RequiresWitnessLoss = requiresWitnessLoss;
         DamageMultiplier = damageMultiplier;
         SpeedMultiplier = speedMultiplier;
@@ -33,6 +35,8 @@ public readonly struct StageDefinition
     public string DisplayName { get; }
 
     public int RequiredExperience { get; }
+
+    public AscensionProgressionGate RequiredGate { get; }
 
     public bool RequiresWitnessLoss { get; }
 

@@ -3,7 +3,9 @@ using System.Collections.Generic;
 using System.IO;
 using KiAscension.Common;
 using KiAscension.Items;
+using KiAscension.Items.Techniques;
 using KiAscension.Systems;
+using KiAscension.Tiles;
 using Microsoft.Xna.Framework;
 using Terraria;
 using Terraria.DataStructures;
@@ -16,9 +18,12 @@ namespace KiAscension.Players;
 
 public class KiPlayer : ModPlayer
 {
-    private const int BaseMaxKi = 140;
-    private const int KaiLevelExperienceFactor = 80;
+    private const int BaseMaxKi = 70;
+    private const int KaiLevelExperienceFactor = 220;
     private const int WitnessRange = 1200;
+    private const int PowerUpHoldThreshold = 45;
+    private const int GravityRoomRadiusTiles = 18;
+    private const int TrainingIntervalTicks = 120;
 
     private int pendingAnnouncementStage = -1;
     private int highestAnnouncedTechniqueIndex;
@@ -26,8 +31,12 @@ public class KiPlayer : ModPlayer
     private Color naturalHairColor;
     private bool naturalHairCaptured;
     private bool shownProgressionNotice;
+    private int powerUpHoldTicks;
+    private int trainingTicks;
 
     public int PowerExperience { get; private set; }
+
+    public int KiPowerExperience { get; private set; }
 
     public int KaiLevel { get; private set; }
 
@@ -39,13 +48,23 @@ public class KiPlayer : ModPlayer
 
     public int SelectedTechniqueIndex { get; private set; }
 
-    public int MaxKi => BaseMaxKi + CurrentStage.MaxKiBonus;
+    public bool IsWeightTraining { get; set; }
+
+    public int TotalPowerExperience => PowerExperience + KiPowerExperience;
+
+    public int PhysicalPowerLevel => CalculateKaiLevel(PowerExperience);
+
+    public int KiPowerLevel => CalculateKaiLevel(KiPowerExperience);
+
+    public int MaxKi => BaseMaxKi + CurrentStage.MaxKiBonus + Math.Max(0, KaiLevel - 1) * 8 + Math.Max(0, KiPowerLevel - 1) * 6;
+
+    public int KiRegenPerSecond => 1 + Math.Max(0, KaiLevel - 1) / 4 + Math.Max(0, KiPowerLevel - 1) / 5 + CurrentStageIndex / 3;
 
     public StageDefinition CurrentStage => AscensionStages.Get(CurrentStageIndex);
 
     public StageDefinition NextStage => AscensionStages.Get(UnlockedStageIndex + 1);
 
-    public int HighestUnlockedTechniqueIndex => KiTechniques.GetHighestUnlockedIndex(PowerExperience, UnlockedStageIndex);
+    public int HighestUnlockedTechniqueIndex => KiTechniques.GetHighestUnlockedIndex(KiPowerExperience, UnlockedStageIndex);
 
     public KiTechniqueDefinition CurrentTechnique => KiTechniques.Get(Math.Clamp(SelectedTechniqueIndex, 0, HighestUnlockedTechniqueIndex));
 
@@ -53,12 +72,14 @@ public class KiPlayer : ModPlayer
 
     public bool HasPendingWitnessBreakthrough =>
         UnlockedStageIndex < AscensionStages.MaxStageIndex
-        && PowerExperience >= NextStage.RequiredExperience
+        && TotalPowerExperience >= NextStage.RequiredExperience
+        && AscensionStages.IsGateSatisfied(NextStage)
         && NextStage.RequiresWitnessLoss;
 
     public override void Initialize()
     {
         PowerExperience = 0;
+        KiPowerExperience = 0;
         KaiLevel = 1;
         CurrentStageIndex = 0;
         UnlockedStageIndex = 0;
@@ -69,18 +90,25 @@ public class KiPlayer : ModPlayer
         naturalHairColor = Color.White;
         naturalHairCaptured = false;
         shownProgressionNotice = false;
+        powerUpHoldTicks = 0;
+        trainingTicks = 0;
     }
 
     public override IEnumerable<Item> AddStartingItems(bool mediumCoreDeath)
     {
-        Item item = new();
-        item.SetDefaults(ModContent.ItemType<KiTrainingFocus>());
-        return new[] { item };
+        Item focus = new();
+        focus.SetDefaults(ModContent.ItemType<KiTrainingFocus>());
+
+        Item basicBlast = new();
+        basicBlast.SetDefaults(ModContent.ItemType<BasicKiBlastSpell>());
+
+        return new[] { focus, basicBlast };
     }
 
     public override void SaveData(TagCompound tag)
     {
         tag["PowerExperience"] = PowerExperience;
+        tag["KiPowerExperience"] = KiPowerExperience;
         tag["KaiLevel"] = KaiLevel;
         tag["CurrentStageIndex"] = CurrentStageIndex;
         tag["UnlockedStageIndex"] = UnlockedStageIndex;
@@ -92,7 +120,8 @@ public class KiPlayer : ModPlayer
     public override void LoadData(TagCompound tag)
     {
         PowerExperience = tag.ContainsKey("PowerExperience") ? tag.GetInt("PowerExperience") : 0;
-        KaiLevel = tag.ContainsKey("KaiLevel") ? tag.GetInt("KaiLevel") : CalculateKaiLevel(PowerExperience);
+        KiPowerExperience = tag.ContainsKey("KiPowerExperience") ? tag.GetInt("KiPowerExperience") : PowerExperience;
+        KaiLevel = tag.ContainsKey("KaiLevel") ? tag.GetInt("KaiLevel") : CalculateKaiLevel(TotalPowerExperience);
         CurrentStageIndex = tag.ContainsKey("CurrentStageIndex") ? tag.GetInt("CurrentStageIndex") : 0;
         UnlockedStageIndex = tag.ContainsKey("UnlockedStageIndex") ? tag.GetInt("UnlockedStageIndex") : 0;
         Ki = tag.ContainsKey("Ki") ? tag.GetInt("Ki") : BaseMaxKi;
@@ -100,13 +129,29 @@ public class KiPlayer : ModPlayer
 
         UnlockedStageIndex = Math.Clamp(UnlockedStageIndex, 0, AscensionStages.MaxStageIndex);
         CurrentStageIndex = Math.Clamp(CurrentStageIndex, 0, UnlockedStageIndex);
-        KaiLevel = Math.Max(1, CalculateKaiLevel(PowerExperience));
+        KaiLevel = Math.Max(1, CalculateKaiLevel(TotalPowerExperience));
         Ki = Math.Clamp(Ki, 0, MaxKi);
         SelectedTechniqueIndex = Math.Clamp(SelectedTechniqueIndex, 0, HighestUnlockedTechniqueIndex);
         highestAnnouncedTechniqueIndex = tag.ContainsKey("HighestAnnouncedTechniqueIndex")
             ? Math.Clamp(tag.GetInt("HighestAnnouncedTechniqueIndex"), 0, HighestUnlockedTechniqueIndex)
             : HighestUnlockedTechniqueIndex;
         pendingAnnouncementStage = -1;
+    }
+
+    public override void ResetEffects()
+    {
+        IsWeightTraining = false;
+    }
+
+    public override void OnEnterWorld()
+    {
+        if (Player.whoAmI != Main.myPlayer)
+        {
+            return;
+        }
+
+        EnsureInventoryItem(ModContent.ItemType<KiTrainingFocus>());
+        EnsureInventoryItem(ModContent.ItemType<BasicKiBlastSpell>());
     }
 
     public void NetSend(BinaryWriter writer)
@@ -132,6 +177,7 @@ public class KiPlayer : ModPlayer
     {
         KiPlayer clone = (KiPlayer)targetCopy;
         clone.PowerExperience = PowerExperience;
+        clone.KiPowerExperience = KiPowerExperience;
         clone.KaiLevel = KaiLevel;
         clone.CurrentStageIndex = CurrentStageIndex;
         clone.UnlockedStageIndex = UnlockedStageIndex;
@@ -160,19 +206,23 @@ public class KiPlayer : ModPlayer
             ShiftForm(1);
         }
 
+        if (AscensionKeybindSystem.PowerUpKey.Current)
+        {
+            powerUpHoldTicks++;
+
+            if (powerUpHoldTicks == PowerUpHoldThreshold)
+            {
+                SetForm(UnlockedStageIndex);
+            }
+        }
+        else
+        {
+            powerUpHoldTicks = 0;
+        }
+
         if (AscensionKeybindSystem.PowerDownKey.JustPressed)
         {
             ShiftForm(-1);
-        }
-
-        if (AscensionKeybindSystem.NextTechniqueKey.JustPressed)
-        {
-            CycleTechnique(1);
-        }
-
-        if (AscensionKeybindSystem.PreviousTechniqueKey.JustPressed)
-        {
-            CycleTechnique(-1);
         }
     }
 
@@ -189,12 +239,27 @@ public class KiPlayer : ModPlayer
         Player.maxRunSpeed *= stage.SpeedMultiplier;
         Player.accRunSpeed *= stage.SpeedMultiplier;
         Player.runAcceleration *= stage.SpeedMultiplier;
+
+        if (IsWeightTraining)
+        {
+            Player.maxRunSpeed *= 0.84f;
+            Player.accRunSpeed *= 0.78f;
+            Player.runAcceleration *= 0.78f;
+        }
+
+        if (IsNearGravityRoomCore())
+        {
+            Player.maxRunSpeed *= 0.82f;
+            Player.accRunSpeed *= 0.75f;
+            Player.runAcceleration *= 0.75f;
+        }
     }
 
     public override void PostUpdate()
     {
         RechargeKi();
         DrainTransformedKi();
+        HandleTraining();
         RefreshTechniqueUnlocks(false);
         ShowProgressionNoticeOnce();
 
@@ -227,7 +292,12 @@ public class KiPlayer : ModPlayer
             return;
         }
 
-        AddExperience(Math.Max(1, damageDone / 10), false);
+        if (Player.HeldItem?.ModItem is KiTechniqueItem)
+        {
+            return;
+        }
+
+        AddPowerExperience(Math.Max(1, damageDone / 14), false);
     }
 
     public override void Kill(double damage, int hitDirection, bool pvp, PlayerDeathReason damageSource)
@@ -263,6 +333,7 @@ public class KiPlayer : ModPlayer
         }
 
         Ki -= amount;
+        SyncStateIfServer();
         return true;
     }
 
@@ -273,26 +344,62 @@ public class KiPlayer : ModPlayer
 
     public void AddExperience(int amount, bool announce)
     {
-        if (amount <= 0 || Main.netMode == NetmodeID.MultiplayerClient)
+        AddPowerExperience(amount, announce);
+    }
+
+    public void AddPowerExperience(int amount, bool announce)
+    {
+        AddProgress(amount, 0, announce);
+    }
+
+    public void AddKiExperience(int amount, bool announce)
+    {
+        AddProgress(0, amount, announce);
+    }
+
+    public void AddTrainingExperience(int powerAmount, int kiPowerAmount, bool announce)
+    {
+        AddProgress(powerAmount, kiPowerAmount, announce);
+    }
+
+    public int GetKiTechniqueDamage(KiTechniqueDefinition technique)
+    {
+        float kiPowerMultiplier = 1f + Math.Max(0, KiPowerLevel - 1) * 0.055f;
+        return Math.Max(1, (int)(technique.BaseDamage * kiPowerMultiplier));
+    }
+
+    private void AddProgress(int powerAmount, int kiPowerAmount, bool announce)
+    {
+        if ((powerAmount <= 0 && kiPowerAmount <= 0) || Main.netMode == NetmodeID.MultiplayerClient)
         {
             return;
         }
 
-        int oldExperience = PowerExperience;
+        int oldPowerExperience = PowerExperience;
+        int oldKiPowerExperience = KiPowerExperience;
         int oldKaiLevel = KaiLevel;
         int oldUnlockedStageIndex = UnlockedStageIndex;
         int oldHighestTechniqueIndex = HighestUnlockedTechniqueIndex;
-        PowerExperience += amount;
-        KaiLevel = CalculateKaiLevel(PowerExperience);
+        PowerExperience += Math.Max(0, powerAmount);
+        KiPowerExperience += Math.Max(0, kiPowerAmount);
+        KaiLevel = CalculateKaiLevel(TotalPowerExperience);
 
         if (announce && Player.whoAmI == Main.myPlayer)
         {
-            Main.NewText($"+{amount} power experience", new Color(255, 230, 120));
+            if (powerAmount > 0)
+            {
+                Main.NewText($"+{powerAmount} physical power", new Color(255, 220, 130));
+            }
+
+            if (kiPowerAmount > 0)
+            {
+                Main.NewText($"+{kiPowerAmount} ki power", new Color(120, 220, 255));
+            }
         }
 
         TryUnlockAvailableStages(false);
         RefreshTechniqueUnlocks(true);
-        AnnounceStateDelta(oldExperience, oldKaiLevel, oldUnlockedStageIndex, oldHighestTechniqueIndex);
+        AnnounceStateDelta(oldPowerExperience, oldKiPowerExperience, oldKaiLevel, oldUnlockedStageIndex, oldHighestTechniqueIndex);
         SyncStateIfServer();
     }
 
@@ -308,12 +415,13 @@ public class KiPlayer : ModPlayer
             return;
         }
 
-        int oldExperience = PowerExperience;
+        int oldPowerExperience = PowerExperience;
+        int oldKiPowerExperience = KiPowerExperience;
         int oldKaiLevel = KaiLevel;
         int oldUnlockedStageIndex = UnlockedStageIndex;
         int oldHighestTechniqueIndex = HighestUnlockedTechniqueIndex;
         TryUnlockAvailableStages(true);
-        AnnounceStateDelta(oldExperience, oldKaiLevel, oldUnlockedStageIndex, oldHighestTechniqueIndex);
+        AnnounceStateDelta(oldPowerExperience, oldKiPowerExperience, oldKaiLevel, oldUnlockedStageIndex, oldHighestTechniqueIndex);
         SyncStateIfServer();
 
         if (Player.whoAmI == Main.myPlayer)
@@ -329,8 +437,14 @@ public class KiPlayer : ModPlayer
         {
             StageDefinition next = AscensionStages.Get(UnlockedStageIndex + 1);
 
-            if (PowerExperience < next.RequiredExperience)
+            if (TotalPowerExperience < next.RequiredExperience)
             {
+                return;
+            }
+
+            if (!AscensionStages.IsGateSatisfied(next))
+            {
+                AnnounceProgressionGate(next);
                 return;
             }
 
@@ -348,6 +462,19 @@ public class KiPlayer : ModPlayer
             RefreshTechniqueUnlocks(true);
 
         }
+    }
+
+    private void AnnounceProgressionGate(StageDefinition stage)
+    {
+        int nextStageIndex = UnlockedStageIndex + 1;
+        int gateAnnouncementMarker = -nextStageIndex;
+
+        if (Player.whoAmI == Main.myPlayer && pendingAnnouncementStage != gateAnnouncementMarker)
+        {
+            Main.NewText($"{stage.DisplayName} needs one more trial: {AscensionStages.GetGateText(stage.RequiredGate)}.", new Color(255, 180, 120));
+        }
+
+        pendingAnnouncementStage = gateAnnouncementMarker;
     }
 
     private void AnnouncePendingBreakthrough()
@@ -382,7 +509,7 @@ public class KiPlayer : ModPlayer
             return 1f;
         }
 
-        return MathHelper.Clamp((PowerExperience - previousLevelExperience) / (float)(nextLevelExperience - previousLevelExperience), 0f, 1f);
+        return MathHelper.Clamp((TotalPowerExperience - previousLevelExperience) / (float)(nextLevelExperience - previousLevelExperience), 0f, 1f);
     }
 
     public string GetNextCeilingText()
@@ -394,19 +521,25 @@ public class KiPlayer : ModPlayer
 
         StageDefinition next = NextStage;
 
-        if (PowerExperience >= next.RequiredExperience)
+        if (TotalPowerExperience >= next.RequiredExperience)
         {
+            if (!AscensionStages.IsGateSatisfied(next))
+            {
+                return $"Ceiling ready: {next.DisplayName}; {AscensionStages.GetGateText(next.RequiredGate)}";
+            }
+
             return next.RequiresWitnessLoss
                 ? $"Ceiling ready: {next.DisplayName} needs a breaking point"
                 : $"Ceiling ready: {next.DisplayName}";
         }
 
-        return $"Next ceiling: {next.DisplayName} {PowerExperience}/{next.RequiredExperience} EXP";
+        return $"Next ceiling: {next.DisplayName} {TotalPowerExperience}/{next.RequiredExperience} total power";
     }
 
     public void ReceivePlayerSync(BinaryReader reader)
     {
-        int oldExperience = PowerExperience;
+        int oldPowerExperience = PowerExperience;
+        int oldKiPowerExperience = KiPowerExperience;
         int oldKaiLevel = KaiLevel;
         int oldUnlockedStageIndex = UnlockedStageIndex;
         int oldHighestTechniqueIndex = HighestUnlockedTechniqueIndex;
@@ -415,7 +548,7 @@ public class KiPlayer : ModPlayer
 
         if (Player.whoAmI == Main.myPlayer)
         {
-            AnnounceStateDelta(oldExperience, oldKaiLevel, oldUnlockedStageIndex, oldHighestTechniqueIndex);
+            AnnounceStateDelta(oldPowerExperience, oldKiPowerExperience, oldKaiLevel, oldUnlockedStageIndex, oldHighestTechniqueIndex);
         }
     }
 
@@ -431,6 +564,7 @@ public class KiPlayer : ModPlayer
     private void WriteState(BinaryWriter writer)
     {
         writer.Write(PowerExperience);
+        writer.Write(KiPowerExperience);
         writer.Write(KaiLevel);
         writer.Write(CurrentStageIndex);
         writer.Write(UnlockedStageIndex);
@@ -442,6 +576,7 @@ public class KiPlayer : ModPlayer
     private void ReadState(BinaryReader reader)
     {
         PowerExperience = reader.ReadInt32();
+        KiPowerExperience = reader.ReadInt32();
         KaiLevel = reader.ReadInt32();
         CurrentStageIndex = reader.ReadInt32();
         UnlockedStageIndex = reader.ReadInt32();
@@ -451,20 +586,20 @@ public class KiPlayer : ModPlayer
 
         UnlockedStageIndex = Math.Clamp(UnlockedStageIndex, 0, AscensionStages.MaxStageIndex);
         CurrentStageIndex = Math.Clamp(CurrentStageIndex, 0, UnlockedStageIndex);
-        KaiLevel = Math.Max(1, CalculateKaiLevel(PowerExperience));
+        KaiLevel = Math.Max(1, CalculateKaiLevel(TotalPowerExperience));
         Ki = Math.Clamp(Ki, 0, MaxKi);
         SelectedTechniqueIndex = Math.Clamp(SelectedTechniqueIndex, 0, HighestUnlockedTechniqueIndex);
         highestAnnouncedTechniqueIndex = Math.Clamp(highestAnnouncedTechniqueIndex, 0, HighestUnlockedTechniqueIndex);
     }
 
-    private void AnnounceStateDelta(int oldExperience, int oldKaiLevel, int oldUnlockedStageIndex, int oldHighestTechniqueIndex)
+    private void AnnounceStateDelta(int oldPowerExperience, int oldKiPowerExperience, int oldKaiLevel, int oldUnlockedStageIndex, int oldHighestTechniqueIndex)
     {
         if (Player.whoAmI != Main.myPlayer)
         {
             return;
         }
 
-        if (PowerExperience > oldExperience && KaiLevel > oldKaiLevel)
+        if ((PowerExperience > oldPowerExperience || KiPowerExperience > oldKiPowerExperience) && KaiLevel > oldKaiLevel)
         {
             Main.NewText($"Kai Level increased: {KaiLevel}", new Color(255, 230, 130));
         }
@@ -486,8 +621,29 @@ public class KiPlayer : ModPlayer
             {
                 KiTechniqueDefinition technique = KiTechniques.Get(techniqueIndex);
                 Main.NewText($"Technique unlocked: {technique.DisplayName}", technique.Color);
+                GrantTechniqueItem(technique);
             }
         }
+    }
+
+    private void GrantTechniqueItem(KiTechniqueDefinition technique)
+    {
+        int itemType = KiTechniques.GetItemType(technique.Technique);
+
+        EnsureInventoryItem(itemType);
+    }
+
+    private void EnsureInventoryItem(int itemType)
+    {
+        foreach (Item item in Player.inventory)
+        {
+            if (!item.IsAir && item.type == itemType)
+            {
+                return;
+            }
+        }
+
+        Player.QuickSpawnItem(new EntitySource_Misc("KiAscensionItemGrant"), itemType);
     }
 
     private void SendClientSelection()
@@ -528,43 +684,17 @@ public class KiPlayer : ModPlayer
             return;
         }
 
-        SelectedTechniqueIndex = highestUnlocked;
         highestAnnouncedTechniqueIndex = highestUnlocked;
-    }
-
-    private void CycleTechnique(int direction)
-    {
-        int highestUnlocked = HighestUnlockedTechniqueIndex;
-
-        if (highestUnlocked <= 0)
-        {
-            return;
-        }
-
-        SelectedTechniqueIndex += direction;
-
-        if (SelectedTechniqueIndex > highestUnlocked)
-        {
-            SelectedTechniqueIndex = 0;
-        }
-        else if (SelectedTechniqueIndex < 0)
-        {
-            SelectedTechniqueIndex = highestUnlocked;
-        }
-
-        KiTechniqueDefinition technique = CurrentTechnique;
-
-        if (Player.whoAmI == Main.myPlayer)
-        {
-            Main.NewText($"Technique: {technique.DisplayName}", technique.Color);
-        }
-
-        SendClientSelection();
     }
 
     private void ShiftForm(int direction)
     {
-        int nextStageIndex = Math.Clamp(CurrentStageIndex + direction, 0, UnlockedStageIndex);
+        SetForm(Math.Clamp(CurrentStageIndex + direction, 0, UnlockedStageIndex));
+    }
+
+    private void SetForm(int stageIndex)
+    {
+        int nextStageIndex = Math.Clamp(stageIndex, 0, UnlockedStageIndex);
 
         if (nextStageIndex == CurrentStageIndex)
         {
@@ -584,13 +714,13 @@ public class KiPlayer : ModPlayer
 
     private void RechargeKi()
     {
-        if (Main.GameUpdateCount % 10UL != 0UL)
+        if (Main.GameUpdateCount % 60UL != 0UL)
         {
             return;
         }
 
-        int recharge = CurrentStageIndex <= 1 ? 2 : 1;
-        Ki = Math.Min(MaxKi, Ki + recharge);
+        Ki = Math.Min(MaxKi, Ki + KiRegenPerSecond);
+        SyncStateIfServer();
     }
 
     private void DrainTransformedKi()
@@ -619,6 +749,65 @@ public class KiPlayer : ModPlayer
         SendClientSelection();
     }
 
+    private void HandleTraining()
+    {
+        bool inGravityRoom = IsNearGravityRoomCore();
+
+        if (!IsWeightTraining && !inGravityRoom)
+        {
+            trainingTicks = 0;
+            return;
+        }
+
+        bool movingUnderLoad = Math.Abs(Player.velocity.X) > 0.45f || Math.Abs(Player.velocity.Y) > 0.45f || Player.controlJump;
+
+        if (!movingUnderLoad)
+        {
+            return;
+        }
+
+        trainingTicks++;
+
+        if (trainingTicks < TrainingIntervalTicks)
+        {
+            return;
+        }
+
+        trainingTicks = 0;
+        int physicalPower = IsWeightTraining ? 3 : 0;
+        int kiPower = 0;
+
+        if (inGravityRoom)
+        {
+            physicalPower += 4;
+            kiPower += 3;
+        }
+
+        AddTrainingExperience(physicalPower, kiPower, false);
+    }
+
+    private bool IsNearGravityRoomCore()
+    {
+        int centerX = (int)(Player.Center.X / 16f);
+        int centerY = (int)(Player.Center.Y / 16f);
+        int tileType = ModContent.TileType<GravityRoomCoreTile>();
+
+        for (int x = centerX - GravityRoomRadiusTiles; x <= centerX + GravityRoomRadiusTiles; x++)
+        {
+            for (int y = centerY - GravityRoomRadiusTiles; y <= centerY + GravityRoomRadiusTiles; y++)
+            {
+                Tile tile = Framing.GetTileSafely(x, y);
+
+                if (tile.HasTile && tile.TileType == tileType)
+                {
+                    return true;
+                }
+            }
+        }
+
+        return false;
+    }
+
     private void ApplyAscensionVisuals()
     {
         if (!naturalHairCaptured || CurrentStageIndex == 0)
@@ -639,7 +828,7 @@ public class KiPlayer : ModPlayer
         }
 
         shownProgressionNotice = true;
-        Main.NewText("Ki Ascension active: normal weapons are heavily weakened. Train with Ki Training Focus.", new Color(255, 230, 130));
+        Main.NewText("Ki Ascension active: normal weapons are heavily weakened. Use ki spells and train with weights or gravity rooms.", new Color(255, 230, 130));
     }
 
     private void DrawAura()

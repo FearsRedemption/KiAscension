@@ -4,11 +4,27 @@
 Items: {
 	KiTrainingFocus: {
 		DisplayName: Ki Training Focus
-		Tooltip:
-			'''
-			Template of an item
-			Replacing this tooltip is duty 
-			It's snowing on Mt.Fuji
-			'''
+		Tooltip: Meditate with it to build a little physical power and ki power.
 	}
+	BasicKiBlastSpell.DisplayName: Basic Ki Blast
+	KiBarrageSpell.DisplayName: Ki Barrage
+	KamehamehaSpell.DisplayName: Kamehameha
+	DestructoDiskSpell.DisplayName: Destructo Disk
+	GalickGunSpell.DisplayName: Galick Gun
+	BigBangAttackSpell.DisplayName: Big Bang Attack
+	FinalFlashSpell.DisplayName: Final Flash
+	SpiritBombSpell.DisplayName: Spirit Bomb
+	GodKamehamehaSpell.DisplayName: God Kamehameha
+	UltraInstinctBarrageSpell.DisplayName: Ultra Instinct Barrage
+	WeightedTrainingBands.DisplayName: Weighted Training Bands
+	GravityRoomCore.DisplayName: Gravity Room Core
+}
+
+Tiles: {
+	GravityRoomCoreTile.MapEntry: Gravity Room Core
+}
+
+Keybinds: {
+	"Descend Form.DisplayName": Descend Form
+	"Ascend Form.DisplayName": Ascend Form
 }

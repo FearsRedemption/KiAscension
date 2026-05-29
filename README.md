@@ -21,21 +21,23 @@ Sources:
 
 ## Implemented Foundation
 
-- Starting item: `Ki Training Focus`
-- Ordered ki technique ladder, from basic blasts through Kamehameha, Destructo Disk, Galick Gun, Big Bang Attack, Final Flash, Spirit Bomb, God Kamehameha, and Ultra Instinct Barrage
-- Kai Level and EXP tracking per player
-- On-screen ki/EXP/form/technique/next-ceiling HUD
-- Power experience from combat and enemy kills
+- Starting items: `Ki Training Focus` and `Basic Ki Blast`
+- Separate ki spell items, from basic blasts through Kamehameha, Destructo Disk, Galick Gun, Big Bang Attack, Final Flash, Spirit Bomb, God Kamehameha, and Ultra Instinct Barrage
+- Held beam behavior for Kamehameha-style techniques
+- Guided/piercing Destructo Disk behavior
+- Kai Level, physical power, and ki power tracking per player
+- On-screen ki/power/form/held-spell/next-ceiling HUD
+- Power experience from combat, enemy kills, weight training, meditation, and gravity room training
 - Hotkeys:
   - `Z`: ascend one unlocked form
+  - hold `Z`: power directly up to the highest unlocked form
   - `X`: descend one form
-  - `C`: next unlocked ki technique
-  - `V`: previous unlocked ki technique
 - Enemy and boss stat scaling by world progression
 - Vanilla and non-ki weapons are heavily downscaled so Ki Ascension replaces normal Terraria weapon progression
-- Witness-loss gates for major emotional breakthroughs
-- Multiplayer-safe per-player power, Kai Level, form unlocks, selected technique, and ki
-- Runtime ascension hair color/style changes for Super Saiyan-style forms
+- Boss and witness-loss gates for major emotional breakthroughs
+- Multiplayer-safe per-player power, ki power, Kai Level, form unlocks, and ki
+- Custom Terraria-style `ModHair` sprites for Super Saiyan-style forms
+- `Weighted Training Bands` and `Gravity Room Core` training tools
 
 ## Progression
 

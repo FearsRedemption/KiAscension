@@ -1,5 +1,7 @@
+using KiAscension.Hairs;
 using Microsoft.Xna.Framework;
 using Terraria;
+using Terraria.ModLoader;
 
 namespace KiAscension.Common;
 
@@ -9,12 +11,13 @@ public static class AscensionVisuals
     {
         return stage switch
         {
-            AscensionStage.SuperSaiyan => 7,
-            AscensionStage.SuperSaiyan2 => 10,
-            AscensionStage.SuperSaiyan3 => 27,
-            AscensionStage.SuperSaiyanBlue => 10,
-            AscensionStage.UltraInstinctSign => 7,
-            AscensionStage.UltraInstinct => 10,
+            AscensionStage.SuperSaiyan => ModContent.GetInstance<SuperSaiyanHair>().Type,
+            AscensionStage.SuperSaiyan2 => ModContent.GetInstance<SuperSaiyan2Hair>().Type,
+            AscensionStage.SuperSaiyan3 => ModContent.GetInstance<SuperSaiyan3Hair>().Type,
+            AscensionStage.SuperSaiyanGod => ModContent.GetInstance<GodHair>().Type,
+            AscensionStage.SuperSaiyanBlue => ModContent.GetInstance<SuperSaiyan2Hair>().Type,
+            AscensionStage.UltraInstinctSign => ModContent.GetInstance<UltraInstinctHair>().Type,
+            AscensionStage.UltraInstinct => ModContent.GetInstance<UltraInstinctHair>().Type,
             _ => naturalHairStyle
         };
     }
