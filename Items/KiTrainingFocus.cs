@@ -40,20 +40,36 @@ public class KiTrainingFocus : ModItem
             .Register();
     }
 
-    public override void HoldItem(Player player)
-    {
-        KiTechniqueDefinition technique = player.GetModPlayer<KiPlayer>().CurrentTechnique;
-        Item.damage = technique.BaseDamage;
-        Item.useTime = technique.UseTime;
-        Item.useAnimation = technique.UseTime;
-        Item.knockBack = technique.Knockback;
-        Item.shootSpeed = technique.ShootSpeed;
-    }
-
     public override bool CanUseItem(Player player)
     {
         KiTechniqueDefinition technique = player.GetModPlayer<KiPlayer>().CurrentTechnique;
-        return player.GetModPlayer<KiPlayer>().TryConsumeKi(technique.KiCost);
+        return player.GetModPlayer<KiPlayer>().HasKi(technique.KiCost);
+    }
+
+    public override float UseSpeedMultiplier(Player player)
+    {
+        KiTechniqueDefinition technique = player.GetModPlayer<KiPlayer>().CurrentTechnique;
+        return Item.useTime / (float)Math.Max(1, technique.UseTime);
+    }
+
+    public override void ModifyShootStats(
+        Player player,
+        ref Vector2 position,
+        ref Vector2 velocity,
+        ref int type,
+        ref int damage,
+        ref float knockback)
+    {
+        KiTechniqueDefinition technique = player.GetModPlayer<KiPlayer>().CurrentTechnique;
+
+        if (velocity.LengthSquared() > 0f)
+        {
+            velocity = Vector2.Normalize(velocity) * technique.ShootSpeed;
+        }
+
+        type = ModContent.ProjectileType<KiTechniqueProjectile>();
+        damage = technique.BaseDamage;
+        knockback = technique.Knockback;
     }
 
     public override bool Shoot(
@@ -68,18 +84,18 @@ public class KiTrainingFocus : ModItem
         KiPlayer kiPlayer = player.GetModPlayer<KiPlayer>();
         KiTechniqueDefinition technique = kiPlayer.CurrentTechnique;
 
-        if (velocity.LengthSquared() > 0f)
+        if (!kiPlayer.TryConsumeKi(technique.KiCost))
         {
-            velocity = Vector2.Normalize(velocity) * technique.ShootSpeed;
+            return false;
         }
 
         int projectileIndex = Projectile.NewProjectile(
             source,
             position,
             velocity,
-            ModContent.ProjectileType<KiTechniqueProjectile>(),
-            Math.Max(damage, technique.BaseDamage),
-            technique.Knockback,
+            type,
+            damage,
+            knockback,
             player.whoAmI,
             (float)kiPlayer.SelectedTechniqueIndex);
 

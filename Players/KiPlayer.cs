@@ -257,13 +257,18 @@ public class KiPlayer : ModPlayer
 
     public bool TryConsumeKi(int amount)
     {
-        if (Ki < amount)
+        if (!HasKi(amount))
         {
             return false;
         }
 
         Ki -= amount;
         return true;
+    }
+
+    public bool HasKi(int amount)
+    {
+        return Ki >= amount;
     }
 
     public void AddExperience(int amount, bool announce)

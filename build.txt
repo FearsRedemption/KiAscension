@@ -1,6 +1,6 @@
 displayName = Ki Ascension
 author = FearsRedemption
 version = 0.1.0
-homepage = https://github.com/FearsRedemption/ki-ascension
+homepage = https://github.com/FearsRedemption/KiAscension
 buildIgnore = .git/, .github/, docs/, README.md, LICENSE, *.csproj, *.sln, bin/, obj/, .vs/
 
