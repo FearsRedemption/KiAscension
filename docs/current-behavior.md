@@ -22,9 +22,9 @@ Early mobs are scaled up compared to vanilla, but the starter spell, `Saiyan Str
 6. Hold `Z` to charge up into the highest unlocked Saiyan form; hold `X` to power down to Base Saiyan.
 7. Tap or hold `C`/`V` to raise or lower the separate Kaio-Ken level.
 
-The HUD is now a compact DBZ-style panel instead of plain debug text. It shows Kai Level, ki, net ki regeneration after active drains, active Saiyan form, active Kaio-Ken state, held spell, active training station, and the next ceiling. Long gate and spell lines wrap or clip inside the panel so they should not run across the screen. Locked held spells display their locked state and a readable requirement, for example `Held Spell: Spirit Bomb (Locked)` and `Reason: Requires Super Saiyan 3 + 14500 Ki Power`.
+The HUD is now a small scouter-style top-left panel instead of a bulky debug overlay. It uses compact modules for Kai Level, net ki flow, ki bar, current form badge, active Kaio-Ken badge, held spell, and next gate. Long gate and spell lines wrap or clip inside the panel so they should not run across the screen. Locked held spells display their locked state and a readable requirement, for example `Spell: Spirit Bomb [LOCKED]` and `Requires: Super Saiyan 3 + 14500 Ki Power`.
 
-Tap `B` to toggle a styled read-only stats panel with current form bonuses, Kaio-Ken strain, final damage/speed multipliers, ki economy, next gates, and held-spell cost details. Tap `N` to toggle a styled read-only dev inspection panel for synced player state while testing. These panels are intentionally still read-only; editable dev tools are planned later.
+Tap `B` to toggle a styled read-only stats panel with current form bonuses, Kaio-Ken strain, final damage/speed multipliers, ki economy, next gates, and held-spell cost details. Tap `N` to toggle a styled read-only dev inspection panel for synced player state while testing. These panels use grouped columns and section bands; they are intentionally still read-only because editable dev tools are planned later.
 
 ## Transformations
 

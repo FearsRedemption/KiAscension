@@ -29,7 +29,7 @@ Sources:
 - Terrain-aware beam range for sustained beams, while ultimate terrain-passing attacks remain supported
 - Guided/piercing Destructo Disk behavior
 - Kai Level, physical power, and ki power tracking per player
-- Styled on-screen ki/power/form/held-spell/next-ceiling HUD with wrapped long lines and locked-spell status
+- Compact scouter-style ki/power/form/held-spell/next-ceiling HUD with smaller text, wrapped long lines, badges, and locked-spell status
 - Power experience from combat, enemy kills, weight training, meditation, and gravity room training
 - Hotkeys:
   - tap `Z`: ascend one unlocked Saiyan form

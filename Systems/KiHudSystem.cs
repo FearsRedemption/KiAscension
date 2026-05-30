@@ -15,18 +15,25 @@ namespace KiAscension.Systems;
 
 public class KiHudSystem : ModSystem
 {
-    private const int HudWidth = 314;
-    private const int PanelWidth = 432;
-    private const int PanelPadding = 12;
-    private const int RowHeight = 19;
+    private const int HudWidth = 258;
+    private const int HudHeight = 168;
+    private const int PanelWidth = 408;
+    private const int PanelPadding = 10;
+    private const int RowHeight = 17;
+    private const float TinyTextScale = 0.58f;
+    private const float SmallTextScale = 0.64f;
+    private const float PanelTextScale = 0.68f;
 
-    private static readonly Color PanelOuter = new(255, 198, 76, 220);
-    private static readonly Color PanelInner = new(13, 16, 26, 232);
-    private static readonly Color PanelBand = new(31, 34, 49, 226);
-    private static readonly Color MutedText = new(175, 182, 202);
+    private static readonly Color PanelOuter = new(255, 198, 76, 185);
+    private static readonly Color PanelInner = new(7, 10, 18, 226);
+    private static readonly Color PanelBand = new(18, 22, 34, 218);
+    private static readonly Color ModuleFill = new(12, 18, 31, 218);
+    private static readonly Color ModuleEdge = new(70, 82, 112, 145);
+    private static readonly Color MutedText = new(152, 164, 188);
     private static readonly Color HeaderText = new(255, 228, 128);
-    private static readonly Color LockedText = new(255, 128, 112);
+    private static readonly Color LockedText = new(255, 112, 92);
     private static readonly Color KiBlue = new(82, 210, 255);
+    private static readonly Color GoodText = new(132, 255, 170);
 
     private static bool showStatsPanel;
     private static bool showDevPanel;
@@ -83,39 +90,56 @@ public class KiHudSystem : ModSystem
 
     private static void DrawMainHud(KiPlayer kiPlayer, KiResourceSnapshot resources)
     {
-        Rectangle panel = new(18, 84, HudWidth, 214);
-        DrawPanelShell(panel, "KI ASCENSION", kiPlayer.CurrentStage.AuraColor);
+        Rectangle panel = new(16, 78, HudWidth, HudHeight);
+        DrawPanelShell(panel, "KI // SCOUTER", kiPlayer.CurrentStage.AuraColor, compact: true);
 
-        int x = panel.X + PanelPadding;
-        int y = panel.Y + 34;
-        int width = panel.Width - PanelPadding * 2;
+        Rectangle content = GetContentArea(panel, compact: true);
+        int x = content.X;
+        int y = content.Y;
+        int width = content.Width;
+        int gap = 6;
+        int half = (width - gap) / 2;
 
-        DrawLabelValue("Kai Level", kiPlayer.KaiLevel.ToString(), new Vector2(x, y), width, HeaderText);
-        DrawBar(new Rectangle(x, y + 18, width, 8), kiPlayer.GetKaiLevelProgress(), new Color(255, 216, 76), new Color(94, 68, 22));
-        y += 32;
+        DrawMicroModule(new Rectangle(x, y, half, 24), "KAI", $"LV {kiPlayer.KaiLevel}", HeaderText);
+        DrawMicroModule(
+            new Rectangle(x + half + gap, y, half, 24),
+            "FLOW",
+            $"{FormatSigned(resources.NetRegenPerSecond)}/s",
+            resources.NetRegenPerSecond >= 0 ? GoodText : LockedText);
+        y += 30;
 
-        DrawLabelValue("Ki", $"{kiPlayer.Ki}/{resources.MaxKi}", new Vector2(x, y), width, KiBlue);
-        DrawBar(new Rectangle(x, y + 18, width, 10), kiPlayer.GetKiProgress(), KiBlue, new Color(19, 55, 72));
-        y += 34;
+        DrawKiBar(
+            new Rectangle(x, y, width, 23),
+            kiPlayer.GetKiProgress(),
+            $"KI {kiPlayer.Ki}/{resources.MaxKi}",
+            resources.PassiveDrainPerSecond > 0 ? $"DRN {resources.PassiveDrainPerSecond}/s" : "STABLE");
+        y += 30;
 
-        DrawLabelValue("Net", $"{FormatSigned(resources.NetRegenPerSecond)}/s", new Vector2(x, y), width / 2 - 4, resources.NetRegenPerSecond >= 0 ? new Color(132, 255, 170) : LockedText);
-        DrawLabelValue("Drain", $"{resources.PassiveDrainPerSecond}/s", new Vector2(x + width / 2 + 4, y), width / 2 - 4, resources.PassiveDrainPerSecond > 0 ? LockedText : MutedText);
-        y += 22;
+        DrawBadge(
+            new Rectangle(x, y, kiPlayer.IsKaioKenActive ? half : width, 20),
+            "FORM",
+            ShortFormName(kiPlayer.CurrentStage.DisplayName),
+            kiPlayer.CurrentStage.AuraColor);
+
+        if (kiPlayer.IsKaioKenActive)
+        {
+            DrawBadge(
+                new Rectangle(x + half + gap, y, half, 20),
+                "KK",
+                ShortKaioKenName(kiPlayer.CurrentKaioKenLevel.DisplayName),
+                GetKaioKenTextColor(kiPlayer));
+        }
+        y += 26;
+
+        y = DrawHeldSpellHud(new Rectangle(x, y, width, 36), kiPlayer);
+        y += 4;
 
         DrawDivider(new Rectangle(x, y, width, 1), kiPlayer.CurrentStage.AuraColor);
-        y += 8;
-
-        DrawCompactRow("Form", kiPlayer.CurrentStage.DisplayName, new Vector2(x, y), width, kiPlayer.CurrentStage.AuraColor);
-        y += RowHeight;
-        DrawCompactRow("Kaio-Ken", kiPlayer.CurrentKaioKenLevel.DisplayName, new Vector2(x, y), width, GetKaioKenTextColor(kiPlayer));
-        y += RowHeight;
-        DrawCompactRow("Held", GetHeldTechniqueName(kiPlayer), new Vector2(x, y), width, GetHeldTechniqueColor(kiPlayer));
-        y += RowHeight;
-        DrawCompactRow("Training", kiPlayer.ActiveTrainingDisplayName, new Vector2(x, y), width, kiPlayer.IsUsingTrainingStation ? new Color(150, 230, 255) : MutedText);
-        y += RowHeight;
+        y += 5;
 
         string gate = kiPlayer.GetNextCeilingText();
-        DrawWrappedText($"Next: {gate}", new Vector2(x, y), width, new Color(232, 234, 242), 0.72f, panel.Bottom - y - 6);
+        DrawText("GATE", new Vector2(x, y), MutedText, TinyTextScale);
+        DrawWrappedText(gate, new Vector2(x + 36, y), width - 36, new Color(226, 232, 242), TinyTextScale, panel.Bottom - y - 7);
     }
 
     private static void DrawStatsPanel(KiPlayer kiPlayer, KiResourceSnapshot resources)
@@ -210,7 +234,7 @@ public class KiHudSystem : ModSystem
         rightY = DrawMetric(rightX, rightY, columnWidth, "Plantera", FormatBool(NPC.downedPlantBoss), NPC.downedPlantBoss ? new Color(132, 255, 170) : LockedText);
 
         int noteY = Math.Max(leftY, rightY) + 8;
-        DrawWrappedText("Read-only testing view. Grant/reset buttons stay out until config-gated.", new Vector2(content.X, noteY), content.Width, MutedText, 0.74f, panel.Bottom - noteY - PanelPadding);
+        DrawWrappedText("Read-only testing view. Grant/reset buttons stay out until config-gated.", new Vector2(content.X, noteY), content.Width, MutedText, PanelTextScale, panel.Bottom - noteY - PanelPadding);
     }
 
     private static void DrawHeldSpellPanel(Rectangle area, KiPlayer kiPlayer)
@@ -225,18 +249,18 @@ public class KiHudSystem : ModSystem
 
         if (Main.LocalPlayer.HeldItem?.ModItem is not KiTechniqueItem techniqueItem)
         {
-            DrawWrappedText("Held Spell: none", new Vector2(area.X, y), area.Width, MutedText, 0.76f, area.Bottom - y);
+            DrawWrappedText("Spell: none", new Vector2(area.X, y), area.Width, MutedText, PanelTextScale, area.Bottom - y);
             return;
         }
 
         KiTechniqueDefinition technique = techniqueItem.TechniqueDefinition;
         bool unlocked = kiPlayer.IsTechniqueUnlocked(technique);
-        string name = $"Held Spell: {technique.DisplayName}{(unlocked ? string.Empty : " (Locked)")}";
+        string name = $"Spell: {technique.DisplayName}{(unlocked ? string.Empty : " [LOCKED]")}";
         y = DrawWrappedBlock(area.X, y, area.Width, name, unlocked ? technique.Color : LockedText, area.Bottom);
 
         if (!unlocked)
         {
-            DrawWrappedText($"Reason: {kiPlayer.GetTechniqueLockReason(technique)}", new Vector2(area.X, y + 2), area.Width, LockedText, 0.76f, area.Bottom - y - 2);
+            DrawWrappedText($"Requires: {kiPlayer.GetTechniqueLockReason(technique)}", new Vector2(area.X, y + 2), area.Width, LockedText, PanelTextScale, area.Bottom - y - 2);
             return;
         }
 
@@ -244,27 +268,95 @@ public class KiHudSystem : ModSystem
         string cost = technique.Behavior == KiTechniqueBehavior.Beam
             ? $"Cost: {kiPlayer.GetTechniqueInitialKiCost(technique)} start, {kiPlayer.GetTechniqueChannelKiCostPerSecond(technique)}/s"
             : $"Cost: {kiPlayer.GetTechniqueInitialKiCost(technique)}";
-        DrawWrappedText(cost, new Vector2(area.X, y + 2), area.Width, KiBlue, 0.76f, area.Bottom - y - 2);
+        DrawWrappedText(cost, new Vector2(area.X, y + 2), area.Width, KiBlue, PanelTextScale, area.Bottom - y - 2);
     }
 
-    private static Rectangle GetContentArea(Rectangle panel)
+    private static int DrawHeldSpellHud(Rectangle area, KiPlayer kiPlayer)
     {
-        return new Rectangle(panel.X + PanelPadding, panel.Y + 38, panel.Width - PanelPadding * 2, panel.Height - 50);
+        if (Main.LocalPlayer.HeldItem?.ModItem is not KiTechniqueItem techniqueItem)
+        {
+            DrawBadge(area, "SPELL", "none", MutedText);
+            return area.Bottom;
+        }
+
+        KiTechniqueDefinition technique = techniqueItem.TechniqueDefinition;
+        bool unlocked = kiPlayer.IsTechniqueUnlocked(technique);
+        Color color = unlocked ? technique.Color : LockedText;
+        string status = unlocked ? "READY" : "LOCKED";
+
+        DrawModuleBack(area, color);
+        DrawText("SPELL", new Vector2(area.X + 7, area.Y + 5), MutedText, TinyTextScale);
+        DrawClippedText(technique.DisplayName, new Vector2(area.X + 48, area.Y + 5), area.Width - 104, color, SmallTextScale);
+        DrawText(status, new Vector2(area.Right - 51, area.Y + 5), unlocked ? GoodText : LockedText, TinyTextScale);
+
+        string detail = unlocked
+            ? $"{technique.CategoryLabel} | {kiPlayer.GetTechniqueInitialKiCost(technique)} ki"
+            : $"Req: {kiPlayer.GetTechniqueLockReason(technique)}";
+        DrawClippedText(detail, new Vector2(area.X + 7, area.Y + 20), area.Width - 14, unlocked ? MutedText : new Color(255, 170, 124), TinyTextScale);
+        return area.Bottom;
     }
 
-    private static void DrawPanelShell(Rectangle panel, string title, Color accent)
+    private static void DrawMicroModule(Rectangle area, string label, string value, Color valueColor)
     {
-        Main.spriteBatch.Draw(TextureAssets.MagicPixel.Value, panel, new Color(5, 6, 12, 214));
-        DrawBorder(panel, PanelOuter);
+        DrawModuleBack(area, valueColor);
+        DrawText(label, new Vector2(area.X + 6, area.Y + 4), MutedText, TinyTextScale);
+        Vector2 valueSize = FontAssets.MouseText.Value.MeasureString(value) * SmallTextScale;
+        DrawText(value, new Vector2(area.Right - 7 - valueSize.X, area.Y + 4), valueColor, SmallTextScale);
+    }
+
+    private static void DrawBadge(Rectangle area, string label, string value, Color accent)
+    {
+        DrawModuleBack(area, accent);
+        DrawText(label, new Vector2(area.X + 7, area.Y + 4), MutedText, TinyTextScale);
+        DrawClippedText(value, new Vector2(area.X + 44, area.Y + 4), area.Width - 51, accent, SmallTextScale);
+    }
+
+    private static void DrawKiBar(Rectangle area, float progress, string label, string status)
+    {
+        DrawModuleBack(area, KiBlue);
+        Rectangle bar = new(area.X + 7, area.Y + 14, area.Width - 14, 5);
+        DrawBar(bar, progress, KiBlue, new Color(13, 46, 64));
+        DrawText(label, new Vector2(area.X + 7, area.Y + 3), KiBlue, SmallTextScale);
+        Vector2 statusSize = FontAssets.MouseText.Value.MeasureString(status) * TinyTextScale;
+        DrawText(status, new Vector2(area.Right - 7 - statusSize.X, area.Y + 4), status.Contains("DRN", StringComparison.Ordinal) ? LockedText : GoodText, TinyTextScale);
+    }
+
+    private static void DrawModuleBack(Rectangle area, Color accent)
+    {
+        Texture2D pixel = TextureAssets.MagicPixel.Value;
+        Main.spriteBatch.Draw(pixel, area, ModuleFill);
+        Main.spriteBatch.Draw(pixel, new Rectangle(area.X, area.Y, area.Width, 1), ModuleEdge);
+        Main.spriteBatch.Draw(pixel, new Rectangle(area.X, area.Bottom - 1, area.Width, 1), ModuleEdge * 0.7f);
+        Main.spriteBatch.Draw(pixel, new Rectangle(area.X, area.Y, 2, area.Height), accent * 0.72f);
+        Main.spriteBatch.Draw(pixel, new Rectangle(area.Right - 1, area.Y + 2, 1, area.Height - 4), accent * 0.2f);
+    }
+
+    private static Rectangle GetContentArea(Rectangle panel, bool compact = false)
+    {
+        int headerHeight = compact ? 26 : 34;
+        int bottomPadding = compact ? PanelPadding : PanelPadding + 4;
+        return new Rectangle(panel.X + PanelPadding, panel.Y + headerHeight, panel.Width - PanelPadding * 2, panel.Height - headerHeight - bottomPadding);
+    }
+
+    private static void DrawPanelShell(Rectangle panel, string title, Color accent, bool compact = false)
+    {
+        Texture2D pixel = TextureAssets.MagicPixel.Value;
+        Main.spriteBatch.Draw(pixel, new Rectangle(panel.X - 1, panel.Y - 1, panel.Width + 2, panel.Height + 2), accent * 0.18f);
+        Main.spriteBatch.Draw(pixel, panel, new Color(3, 5, 10, 220));
+        DrawBorder(panel, PanelOuter * 0.76f);
 
         Rectangle inner = new(panel.X + 2, panel.Y + 2, panel.Width - 4, panel.Height - 4);
-        Main.spriteBatch.Draw(TextureAssets.MagicPixel.Value, inner, PanelInner);
+        Main.spriteBatch.Draw(pixel, inner, PanelInner);
 
-        Rectangle header = new(panel.X + 3, panel.Y + 3, panel.Width - 6, 27);
-        Main.spriteBatch.Draw(TextureAssets.MagicPixel.Value, header, PanelBand);
-        Main.spriteBatch.Draw(TextureAssets.MagicPixel.Value, new Rectangle(header.X, header.Bottom - 2, header.Width, 2), accent * 0.9f);
+        int headerHeight = compact ? 20 : 25;
+        Rectangle header = new(panel.X + 3, panel.Y + 3, panel.Width - 6, headerHeight);
+        Main.spriteBatch.Draw(pixel, header, PanelBand);
+        Main.spriteBatch.Draw(pixel, new Rectangle(header.X, header.Bottom - 1, header.Width, 1), accent * 0.82f);
+        Main.spriteBatch.Draw(pixel, new Rectangle(panel.X + 4, panel.Y + 4, 2, panel.Height - 8), accent * 0.42f);
+        Main.spriteBatch.Draw(pixel, new Rectangle(header.Right - 42, header.Y + 5, 28, 1), accent * 0.5f);
+        Main.spriteBatch.Draw(pixel, new Rectangle(header.Right - 10, header.Y + 5, 4, 1), accent * 0.85f);
 
-        DrawText(title, new Vector2(panel.X + PanelPadding, panel.Y + 9), HeaderText, 0.82f);
+        DrawText(title, new Vector2(panel.X + PanelPadding, panel.Y + (compact ? 7 : 8)), HeaderText, compact ? 0.64f : 0.74f);
     }
 
     private static void DrawBorder(Rectangle area, Color color)
@@ -278,8 +370,12 @@ public class KiHudSystem : ModSystem
 
     private static int DrawSection(int x, int y, int width, string title, Color accent)
     {
-        DrawText(title.ToUpperInvariant(), new Vector2(x, y), accent, 0.74f);
-        DrawDivider(new Rectangle(x, y + 16, width, 1), accent);
+        Texture2D pixel = TextureAssets.MagicPixel.Value;
+        Rectangle band = new(x, y, width, 17);
+        Main.spriteBatch.Draw(pixel, band, ModuleFill * 0.72f);
+        Main.spriteBatch.Draw(pixel, new Rectangle(x, y, 2, band.Height), accent * 0.75f);
+        Main.spriteBatch.Draw(pixel, new Rectangle(x, band.Bottom - 1, width, 1), accent * 0.36f);
+        DrawText(title.ToUpperInvariant(), new Vector2(x + 6, y + 2), accent, SmallTextScale);
         return y + 22;
     }
 
@@ -291,28 +387,28 @@ public class KiHudSystem : ModSystem
         }
 
         int labelWidth = Math.Min(82, width / 2);
-        DrawText(label, new Vector2(x, y), MutedText, 0.72f);
-        DrawClippedText(value, new Vector2(x + labelWidth, y), width - labelWidth, valueColor, 0.72f);
+        DrawText(label, new Vector2(x, y), MutedText, PanelTextScale);
+        DrawClippedText(value, new Vector2(x + labelWidth, y), width - labelWidth, valueColor, PanelTextScale);
         return y + RowHeight;
     }
 
     private static void DrawLabelValue(string label, string value, Vector2 position, int width, Color valueColor)
     {
-        DrawText(label.ToUpperInvariant(), position, MutedText, 0.7f);
-        Vector2 valueSize = FontAssets.MouseText.Value.MeasureString(value) * 0.76f;
-        DrawText(value, new Vector2(position.X + width - valueSize.X, position.Y), valueColor, 0.76f);
+        DrawText(label.ToUpperInvariant(), position, MutedText, TinyTextScale);
+        Vector2 valueSize = FontAssets.MouseText.Value.MeasureString(value) * SmallTextScale;
+        DrawText(value, new Vector2(position.X + width - valueSize.X, position.Y), valueColor, SmallTextScale);
     }
 
     private static void DrawCompactRow(string label, string value, Vector2 position, int width, Color valueColor)
     {
-        DrawText(label, position, MutedText, 0.72f);
-        DrawClippedText(value, new Vector2(position.X + 72f, position.Y), width - 72, valueColor, 0.72f);
+        DrawText(label, position, MutedText, PanelTextScale);
+        DrawClippedText(value, new Vector2(position.X + 72f, position.Y), width - 72, valueColor, PanelTextScale);
     }
 
     private static int DrawWrappedBlock(int x, int y, int width, string text, Color color, int bottom)
     {
         int maxHeight = Math.Max(0, bottom - y);
-        return y + (int)DrawWrappedText(text, new Vector2(x, y), width, color, 0.72f, maxHeight) + 2;
+        return y + (int)DrawWrappedText(text, new Vector2(x, y), width, color, PanelTextScale, maxHeight) + 2;
     }
 
     private static float DrawWrappedText(string text, Vector2 position, int maxWidth, Color color, float scale, int maxHeight)
@@ -439,6 +535,34 @@ public class KiHudSystem : ModSystem
         return kiPlayer.IsTechniqueUnlocked(technique)
             ? technique.DisplayName
             : $"{technique.DisplayName} (Locked)";
+    }
+
+    private static string ShortFormName(string displayName)
+    {
+        return displayName switch
+        {
+            "Base Saiyan" => "Base",
+            "Awakened State" => "Awakened",
+            "Super Saiyan" => "SSJ",
+            "Super Saiyan 2" => "SSJ2",
+            "Super Saiyan 3" => "SSJ3",
+            "Super Saiyan God" => "God",
+            "Super Saiyan Blue" => "Blue",
+            "Ultra Instinct Sign" => "UI Sign",
+            "Ultra Instinct" => "UI",
+            _ => displayName
+        };
+    }
+
+    private static string ShortKaioKenName(string displayName)
+    {
+        return displayName switch
+        {
+            "Off" => "Off",
+            "Kaio-Ken" => "x1",
+            _ when displayName.StartsWith("Kaio-Ken ", StringComparison.Ordinal) => displayName["Kaio-Ken ".Length..],
+            _ => displayName
+        };
     }
 
     private static Color GetHeldTechniqueColor(KiPlayer kiPlayer)
