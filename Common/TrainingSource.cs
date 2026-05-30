@@ -4,5 +4,7 @@ public enum TrainingSource
 {
     MeditationFocus,
     WeightedGear,
+    WoodenWeightBench,
+    CopperWeightBench,
     GravityRoom
 }

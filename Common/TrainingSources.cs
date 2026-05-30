@@ -22,6 +22,22 @@ public static class TrainingSources
                 2200,
                 0,
                 "You have outgrown this level of weight training."),
+            TrainingSource.WoodenWeightBench => new(
+                source,
+                "Wooden Weight Bench",
+                2,
+                0,
+                1200,
+                0,
+                "This equipment can no longer push your limits."),
+            TrainingSource.CopperWeightBench => new(
+                source,
+                "Copper Weight Bench",
+                3,
+                0,
+                2600,
+                0,
+                "This equipment can no longer push your limits."),
             TrainingSource.GravityRoom => new(
                 source,
                 "Gravity Room",

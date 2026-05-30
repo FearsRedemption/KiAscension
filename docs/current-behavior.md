@@ -8,7 +8,7 @@ Ki Ascension is meant to become the main combat progression path, but vanilla an
 
 ## Starting A Character
 
-New characters start with `Ki Training Focus`, `Saiyan Strike`, and `Basic Ki Blast`. The focus is now a training tool, not a cycling weapon: using it meditates for a small amount of physical power and ki power. `Saiyan Strike` is a starter no-graphic punch/kick item that scales with physical power. If the focus or starter combat tools are lost, the mod tries to grant them again when entering a world.
+New characters start with `Ki Training Focus`, `Saiyan Strike`, and `Basic Ki Blast`. The focus is now a training tool, not a cycling weapon: using it meditates for a small amount of physical power and ki power. `Saiyan Strike` is a starter punch/kick item that scales with physical power and follows a simple quick punch, heavy punch, rising kick combo. If the focus or starter combat tools are lost, the mod tries to grant them again when entering a world.
 
 Early mobs are scaled up compared to vanilla, but the starter spell, `Saiyan Strike`, normal weapons, and early ki regeneration are tuned so the first slimes and zombies are not a wall.
 
@@ -22,9 +22,9 @@ Early mobs are scaled up compared to vanilla, but the starter spell, `Saiyan Str
 6. Hold `Z` to charge up into the highest unlocked Saiyan form; hold `X` to power down to Base Saiyan.
 7. Tap or hold `C`/`V` to raise or lower the separate Kaio-Ken level.
 
-The HUD shows Kai Level, physical power, ki power, ki, net ki regeneration after active drains, active Saiyan form, active Kaio-Ken state, held spell, and the next ceiling. Locked held spells display their locked state in the HUD, and the stats panel/tooltips show the readable requirement. Chat messages call out Kai Level increases, new techniques, unlocked forms, boss gates, Kaio-Ken unlocks, and witness-loss gates.
+The HUD is now a compact DBZ-style panel instead of plain debug text. It shows Kai Level, ki, net ki regeneration after active drains, active Saiyan form, active Kaio-Ken state, held spell, and the next ceiling. Long gate and spell lines wrap or clip inside the panel so they should not run across the screen. Locked held spells display their locked state and a readable requirement, for example `Held Spell: Spirit Bomb (Locked)` and `Reason: Requires Super Saiyan 3 + 14500 Ki Power`.
 
-Tap `B` to toggle a read-only stats panel with current form bonuses, Kaio-Ken strain, final damage/speed multipliers, ki economy, next gates, and held-spell cost details. Tap `N` to toggle a read-only dev inspection panel for synced player state while testing.
+Tap `B` to toggle a styled read-only stats panel with current form bonuses, Kaio-Ken strain, final damage/speed multipliers, ki economy, next gates, and held-spell cost details. Tap `N` to toggle a styled read-only dev inspection panel for synced player state while testing. These panels are intentionally still read-only; editable dev tools are planned later.
 
 ## Transformations
 
@@ -46,7 +46,11 @@ Technique fire, impact, beam fizzle, transformations, Kaio-Ken changes, and ki s
 
 ## Training
 
-Training sources now have simple caps so starter tools cannot carry the whole game. `Ki Training Focus` helps early physical power and ki power, `Weighted Training Bands` slow the player while equipped but build physical power while moving, and `Gravity Room Core` is a placeable 2x2 tile that creates a training field nearby for mixed physical/ki training. The training numbers are intentionally small so training helps without replacing boss progression.
+Training sources now have simple caps so starter tools cannot carry the whole game. `Ki Training Focus` helps early physical power and ki power, `Weighted Training Bands` slow the player while equipped but build physical power while moving, and `Gravity Room Core` is a placeable 2x2 tile that creates a training field nearby for mixed physical/ki training.
+
+The first tiered placeable station path is implemented with `Wooden Weight Bench` and `Copper Weight Bench`. Place a bench and right-click it to begin a short slow training window. Wooden benches train physical power to an early cap, while copper benches raise the cap. If the player has outgrown a bench, it says `This equipment can no longer push your limits.` Any multiplayer player can use a placed higher-tier bench; progression remains owned by that player, not the bench owner.
+
+The training numbers are intentionally small so training helps without replacing boss progression.
 
 Enemies and bosses can drop `Ki Fragment`, a starter material hook for later ascension crafting. The current build does not yet consume fragments in many recipes; it is a framework piece for the next item expansion.
 

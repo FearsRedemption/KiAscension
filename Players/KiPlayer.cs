@@ -32,6 +32,9 @@ public class KiPlayer : ModPlayer
     private const int BreakthroughBurstTicks = 120;
     private const int GravityRoomRadiusTiles = 18;
     private const int TrainingIntervalTicks = 120;
+    private const int StationTrainingDurationTicks = 360;
+    private const int StationTrainingIntervalTicks = 90;
+    private const float StationTrainingRangePixels = 108f;
 
     private int pendingAnnouncementStage = -1;
     private int highestAnnouncedTechniqueIndex;
@@ -49,6 +52,11 @@ public class KiPlayer : ModPlayer
     private int trainingOutgrownNoticeCooldown;
     private int meleeComboStep;
     private int meleeComboTicks;
+    private bool isUsingTrainingStation;
+    private TrainingSource activeTrainingStation;
+    private Point activeTrainingStationTile;
+    private int activeTrainingStationTicks;
+    private int activeTrainingStationIntervalTicks;
 
     public int PowerExperience { get; private set; }
 
@@ -71,6 +79,8 @@ public class KiPlayer : ModPlayer
     public bool IsWeightTraining { get; set; }
 
     public bool IsKiFlying { get; private set; }
+
+    public bool IsUsingTrainingStation => isUsingTrainingStation;
 
     public int TotalPowerExperience => PowerExperience + KiPowerExperience;
 
@@ -154,6 +164,16 @@ public class KiPlayer : ModPlayer
 
     public int MeleeComboStep => meleeComboStep;
 
+    public int NextMeleeComboStep => meleeComboTicks > 0 ? meleeComboStep % 3 + 1 : 1;
+
+    public string NextMeleeComboName => NextMeleeComboStep switch
+    {
+        1 => "Quick Punch",
+        2 => "Heavy Punch",
+        3 => "Rising Kick",
+        _ => "Strike"
+    };
+
     public int ExperienceForNextKaiLevel => KaiLevelExperienceFactor * KaiLevel * KaiLevel;
 
     public bool HasPendingWitnessBreakthrough =>
@@ -188,6 +208,11 @@ public class KiPlayer : ModPlayer
         trainingOutgrownNoticeCooldown = 0;
         meleeComboStep = 0;
         meleeComboTicks = 0;
+        isUsingTrainingStation = false;
+        activeTrainingStation = TrainingSource.MeditationFocus;
+        activeTrainingStationTile = Point.Zero;
+        activeTrainingStationTicks = 0;
+        activeTrainingStationIntervalTicks = 0;
         IsKiFlying = false;
     }
 
@@ -403,11 +428,6 @@ public class KiPlayer : ModPlayer
     public override void ModifyHitNPC(NPC target, ref NPC.HitModifiers modifiers)
     {
         modifiers.FinalDamage *= CombinedDamageMultiplier;
-
-        if (Player.HeldItem?.ModItem is SaiyanStrike)
-        {
-            modifiers.FinalDamage *= PhysicalDamageMultiplier;
-        }
     }
 
     public override void OnHitNPC(NPC target, NPC.HitInfo hit, int damageDone)
@@ -549,17 +569,51 @@ public class KiPlayer : ModPlayer
         AddTrainingExperience(physicalGain, kiGain, announce);
     }
 
-    public void RegisterSaiyanStrikeHit(int damageDone)
+    public void RequestTrainingStationUse(TrainingSource source, int tileX, int tileY)
     {
-        if (Main.netMode == NetmodeID.MultiplayerClient || damageDone <= 0)
+        if (!IsStationTrainingSource(source))
         {
             return;
         }
 
-        meleeComboStep = meleeComboStep % 3 + 1;
+        if (Main.netMode == NetmodeID.MultiplayerClient)
+        {
+            SendTrainingStationUse(source, tileX, tileY);
+            ShowTrainingStationStarted(source);
+            return;
+        }
+
+        BeginTrainingStation(source, tileX, tileY, true);
+    }
+
+    public float GetSaiyanStrikeComboDamageMultiplier()
+    {
+        return NextMeleeComboStep switch
+        {
+            2 => 1.12f,
+            3 => 1.32f,
+            _ => 1f
+        };
+    }
+
+    public float GetSaiyanStrikeComboKnockbackMultiplier()
+    {
+        return NextMeleeComboStep == 3 ? 1.35f : 1f;
+    }
+
+    public int RegisterSaiyanStrikeHit(int damageDone)
+    {
+        if (Main.netMode == NetmodeID.MultiplayerClient || damageDone <= 0)
+        {
+            return NextMeleeComboStep;
+        }
+
+        int landedComboStep = NextMeleeComboStep;
+        meleeComboStep = landedComboStep;
         meleeComboTicks = 75;
-        int comboBonus = meleeComboStep == 3 ? 2 : 0;
+        int comboBonus = landedComboStep == 3 ? 3 : 0;
         AddPowerExperience(Math.Max(1, damageDone / 12) + comboBonus, false);
+        return landedComboStep;
     }
 
     public int GetKiTechniqueDamage(KiTechniqueDefinition technique)
@@ -848,6 +902,15 @@ public class KiPlayer : ModPlayer
         CurrentKaioKenLevelIndex = Math.Clamp(requestedKaioKenLevelIndex, 0, UnlockedKaioKenLevelIndex);
     }
 
+    public void ReceiveTrainingStationUse(BinaryReader reader)
+    {
+        TrainingSource source = (TrainingSource)reader.ReadInt32();
+        int tileX = reader.ReadInt32();
+        int tileY = reader.ReadInt32();
+
+        BeginTrainingStation(source, tileX, tileY, false);
+    }
+
     private void WriteState(BinaryWriter writer)
     {
         writer.Write(PowerExperience);
@@ -973,6 +1036,17 @@ public class KiPlayer : ModPlayer
         packet.Write(CurrentStageIndex);
         packet.Write(SelectedTechniqueIndex);
         packet.Write(CurrentKaioKenLevelIndex);
+        packet.Send();
+    }
+
+    private void SendTrainingStationUse(TrainingSource source, int tileX, int tileY)
+    {
+        ModPacket packet = Mod.GetPacket();
+        packet.Write((byte)KiAscensionMessageType.TrainingStationUse);
+        packet.Write((byte)Player.whoAmI);
+        packet.Write((int)source);
+        packet.Write(tileX);
+        packet.Write(tileY);
         packet.Send();
     }
 
@@ -1407,6 +1481,8 @@ public class KiPlayer : ModPlayer
 
     private void HandleTraining()
     {
+        HandleActiveTrainingStation();
+
         bool inGravityRoom = IsNearGravityRoomCore();
 
         if (!IsWeightTraining && !inGravityRoom)
@@ -1440,6 +1516,114 @@ public class KiPlayer : ModPlayer
         {
             ApplyTrainingSource(TrainingSource.GravityRoom, false);
         }
+    }
+
+    private void BeginTrainingStation(TrainingSource source, int tileX, int tileY, bool announce)
+    {
+        if (!IsStationTrainingSource(source) || !IsTrainingStationTile(source, tileX, tileY))
+        {
+            return;
+        }
+
+        Vector2 stationCenter = new((tileX + 1f) * 16f, (tileY + 1f) * 16f);
+
+        if (Vector2.Distance(Player.Center, stationCenter) > StationTrainingRangePixels)
+        {
+            return;
+        }
+
+        isUsingTrainingStation = true;
+        activeTrainingStation = source;
+        activeTrainingStationTile = new Point(tileX, tileY);
+        activeTrainingStationTicks = StationTrainingDurationTicks;
+        activeTrainingStationIntervalTicks = 0;
+
+        if (announce)
+        {
+            ShowTrainingStationStarted(source);
+        }
+    }
+
+    private void HandleActiveTrainingStation()
+    {
+        if (!isUsingTrainingStation)
+        {
+            return;
+        }
+
+        if (Main.netMode == NetmodeID.MultiplayerClient)
+        {
+            return;
+        }
+
+        if (!IsTrainingStationTile(activeTrainingStation, activeTrainingStationTile.X, activeTrainingStationTile.Y))
+        {
+            StopTrainingStation();
+            return;
+        }
+
+        Vector2 stationCenter = new((activeTrainingStationTile.X + 1f) * 16f, (activeTrainingStationTile.Y + 1f) * 16f);
+
+        if (Vector2.Distance(Player.Center, stationCenter) > StationTrainingRangePixels)
+        {
+            StopTrainingStation();
+            return;
+        }
+
+        activeTrainingStationTicks--;
+        activeTrainingStationIntervalTicks++;
+
+        if (activeTrainingStationIntervalTicks >= StationTrainingIntervalTicks)
+        {
+            activeTrainingStationIntervalTicks = 0;
+            ApplyTrainingSource(activeTrainingStation, true);
+        }
+
+        if (activeTrainingStationTicks <= 0)
+        {
+            StopTrainingStation();
+        }
+    }
+
+    private void StopTrainingStation()
+    {
+        isUsingTrainingStation = false;
+        activeTrainingStationTicks = 0;
+        activeTrainingStationIntervalTicks = 0;
+    }
+
+    private void ShowTrainingStationStarted(TrainingSource source)
+    {
+        if (Player.whoAmI != Main.myPlayer)
+        {
+            return;
+        }
+
+        TrainingSourceDefinition definition = TrainingSources.Get(source);
+        Main.NewText($"Training: {definition.DisplayName}", new Color(210, 230, 255));
+    }
+
+    private static bool IsStationTrainingSource(TrainingSource source)
+    {
+        return source is TrainingSource.WoodenWeightBench or TrainingSource.CopperWeightBench;
+    }
+
+    private static bool IsTrainingStationTile(TrainingSource source, int tileX, int tileY)
+    {
+        int expectedTileType = source switch
+        {
+            TrainingSource.WoodenWeightBench => ModContent.TileType<WoodenWeightBenchTile>(),
+            TrainingSource.CopperWeightBench => ModContent.TileType<CopperWeightBenchTile>(),
+            _ => -1
+        };
+
+        if (expectedTileType < 0)
+        {
+            return false;
+        }
+
+        Tile tile = Framing.GetTileSafely(tileX, tileY);
+        return tile.HasTile && tile.TileType == expectedTileType;
     }
 
     private void HandleMeleeComboDecay()

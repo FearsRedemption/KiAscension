@@ -1,8 +1,8 @@
 # Ki Ascension
 
-A Dragon Ball Z style Terraria mod concept built as an original tModLoader mod foundation: train from a base ki fighter, gain power through combat, transform with hotkeys, and break major limits when an ally dies nearby.
+A DBZ fan-based Terraria mod for tModLoader: train from a base Saiyan, build physical power and ki power, unlock iconic transformations, throw ki techniques, push through boss gates, and break major limits through dramatic breakthrough moments.
 
-The repo intentionally uses original placeholder implementation and vanilla Terraria visuals only. Do not ship copyrighted Dragon Ball assets, music, sprites, or ripped names/logos without permission.
+The design target is a Terraria progression overhaul with Dragon Ball Z style combat fantasy: ki blasts, beams, transformations, Kaio-Ken strain, aura escalation, training arcs, and eventually DBZ-flavored original bosses and mobs.
 
 ## Current Version Context
 
@@ -19,7 +19,9 @@ Sources:
 - tModLoader releases: https://github.com/tModLoader/tModLoader/releases
 - tModLoader mod development docs: https://www.tmodloader.app/docs/mod-development.html
 
-## Implemented Foundation
+## Current Status
+
+### Implemented
 
 - Starting items: `Ki Training Focus`, `Saiyan Strike`, and `Basic Ki Blast`
 - Separate ki spell items, from basic blasts through Kamehameha, Destructo Disk, Galick Gun, Big Bang Attack, Final Flash, Spirit Bomb, God Kamehameha, and Ultra Instinct Barrage
@@ -27,7 +29,7 @@ Sources:
 - Terrain-aware beam range for sustained beams, while ultimate terrain-passing attacks remain supported
 - Guided/piercing Destructo Disk behavior
 - Kai Level, physical power, and ki power tracking per player
-- On-screen ki/power/form/held-spell/next-ceiling HUD
+- Styled on-screen ki/power/form/held-spell/next-ceiling HUD with wrapped long lines and locked-spell status
 - Power experience from combat, enemy kills, weight training, meditation, and gravity room training
 - Hotkeys:
   - tap `Z`: ascend one unlocked Saiyan form
@@ -41,7 +43,7 @@ Sources:
 - Ki technique costs and beam drains scale through a shared ki resource system, with ki-control efficiency from ki power and advanced forms
 - Spell tooltips show current ki costs, locked requirements, and beam sustain drain
 - HUD ki readout shows net ki per second after active transformation drain
-- Read-only inspection panels:
+- Styled read-only inspection panels:
   - tap `B`: toggle detailed ki stats, active drains, gates, and held-spell costs
   - tap `N`: toggle a dev inspection panel for synced player state
 - Form-gated ki flight starts at Super Saiyan and scales through later forms with different control and ki drain
@@ -54,8 +56,25 @@ Sources:
 - Boss and witness-loss gates for major emotional breakthroughs, with auto-breakthrough only when already at the previous form ceiling
 - Multiplayer-safe per-player power, ki power, Kai Level, Saiyan form unlocks, Kaio-Ken level, and ki
 - Custom Terraria-style `ModHair` sprites for Super Saiyan-style forms, with matching `_Alt` textures and natural-hair restore handling
-- `Weighted Training Bands`, capped training sources, and `Gravity Room Core` training tools
+- `Weighted Training Bands`, wooden/copper placeable weight benches, capped training sources, and `Gravity Room Core` training tools
 - Starter item/crafting framework docs, `Ki Fragment` material drops, and placeholder folders/docs for future bosses and mobs
+
+### Partially Implemented
+
+- UI polish: the main HUD and B/N panels are now styled and wrapped, but final art, interactive dev controls, and advanced combat UI are still planned.
+- Aura visuals: animated aura overlay support exists, but final aura art/shaders are not complete.
+- Hair visuals: custom `ModHair` placeholders and `_Alt` textures exist, but final animated transformation hair needs an art pass.
+- Melee: `Saiyan Strike` is playable and scales with physical power, but full punch/kick animations, charged strikes, dash strikes, and combo visuals are not complete.
+- Training: focus meditation, weighted gear, wooden/copper benches, and gravity training exist; more station types and full gravity chamber progression are still in progress.
+- Sounds: a central sound helper is wired with temporary legally usable energy sounds; final DBZ-style original audio is planned.
+
+### Planned
+
+- More tiered placeable training stations and upgraded gravity chamber path.
+- Expanded melee combo inputs and clearer punch/kick presentation.
+- More high-quality representative ki techniques before broad roster expansion.
+- DBZ-flavored original bosses and mobs, starting with one early encounter instead of the full roster.
+- Final sprite, aura, sound, and UI art pass.
 
 ## Progression
 
@@ -73,7 +92,7 @@ Implemented Saiyan form path:
 
 Kaio-Ken is implemented as a separate parallel track from `Off` through late-game fantasy levels such as `x20`, `x100`, and `x200`. The display names keep the anime flavor, while the actual multipliers are tuned for Terraria instead of literal numeric scaling.
 
-See [docs/progression.md](docs/progression.md) for the design pass that keeps it lore-inspired while still fitting Terraria pacing. See [docs/current-behavior.md](docs/current-behavior.md) for what the current prototype should feel like in game. See [docs/phase-audit.md](docs/phase-audit.md) for the phase-by-phase implementation audit. See [docs/ki-skills.md](docs/ki-skills.md) for the implemented technique metadata and planned roster buckets. See [docs/assets.md](docs/assets.md) for imported/placeholder asset notes. See [docs/items-framework.md](docs/items-framework.md) and [docs/bosses-and-mobs.md](docs/bosses-and-mobs.md) for expansion planning.
+See [docs/progression.md](docs/progression.md) for the design pass that keeps the DBZ progression fantasy aligned with Terraria pacing. See [docs/current-behavior.md](docs/current-behavior.md) for what the current prototype should feel like in game. See [docs/phase-audit.md](docs/phase-audit.md) for the phase-by-phase implementation audit. See [docs/ki-skills.md](docs/ki-skills.md) for implemented technique metadata and planned roster buckets. See [docs/asset-sources.md](docs/asset-sources.md) for imported/placeholder asset notes. See [docs/items-framework.md](docs/items-framework.md) and [docs/bosses-and-mobs.md](docs/bosses-and-mobs.md) for expansion planning.
 
 ## Development Setup
 
@@ -92,11 +111,11 @@ This repo does not vendor Terraria or tModLoader binaries. tModLoader supplies t
 
 ## Roadmap
 
-- Polish the current ki/EXP HUD into a themed full UI.
+- Expand the starter weight bench training pass into more station types.
 - Expand melee combo inputs beyond the starter `Saiyan Strike`.
 - Add a mentor/trainer town NPC for form tutorials and optional rituals.
 - Add branching late-game paths: Ultra Instinct, Ultra Ego, and Legendary Wrath.
-- Add proper original sprites, sounds, and aura shaders.
+- Add final original sprites, sounds, aura assets, and UI art.
 - Implement original DBZ-flavored boss encounters that fit the ascension ladder.
 - Rebalance enemy scaling with real playtest data.
 - Update target compatibility once tModLoader stable supports Terraria `1.4.5`.

@@ -40,6 +40,14 @@ public class KiAscension : Mod
                 }
 
                 break;
+
+            case KiAscensionMessageType.TrainingStationUse:
+                if (Main.netMode == NetmodeID.Server && playerIndex == whoAmI)
+                {
+                    kiPlayer.ReceiveTrainingStationUse(reader);
+                }
+
+                break;
         }
     }
 }

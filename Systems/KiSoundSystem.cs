@@ -67,9 +67,9 @@ public static class KiSoundSystem
         }, GetTechniqueImpactFallback(technique), position);
     }
 
-    public static void PlayMeleeImpact(Vector2 position)
+    public static void PlayMeleeImpact(Vector2 position, int comboStep = 1)
     {
-        Play(MeleeImpactSound, SoundID.Item10, position);
+        Play(comboStep >= 3 ? HeavyImpactSound : MeleeImpactSound, comboStep >= 3 ? SoundID.Item14 : SoundID.Item10, position);
     }
 
     private static SoundStyle CustomSound(string assetName, float volume, float pitchVariance, int maxInstances)

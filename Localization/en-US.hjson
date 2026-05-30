@@ -71,6 +71,16 @@ Mods: {
 				Tooltip: Slows movement, but moving under the weight builds physical power.
 			}
 
+			WoodenWeightBench: {
+				DisplayName: Wooden Weight Bench
+				Tooltip: Place it and right-click to slowly train physical power up to an early cap.
+			}
+
+			CopperWeightBench: {
+				DisplayName: Copper Weight Bench
+				Tooltip: A sturdier bench that raises the physical training cap beyond wood.
+			}
+
 			GravityRoomCore: {
 				DisplayName: Gravity Room Core
 				Tooltip: Place it to create a training field. Moving nearby builds physical power and ki power.
@@ -79,6 +89,8 @@ Mods: {
 
 		Projectiles.KiTechniqueProjectile.DisplayName: Ki Technique
 		Tiles.GravityRoomCoreTile.MapEntry: Gravity Room Core
+		Tiles.WoodenWeightBenchTile.MapEntry: Wooden Weight Bench
+		Tiles.CopperWeightBenchTile.MapEntry: Copper Weight Bench
 
 		Keybinds: {
 			"Ascend Form.DisplayName": Ascend Form
