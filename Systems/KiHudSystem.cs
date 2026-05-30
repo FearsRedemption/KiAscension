@@ -92,6 +92,7 @@ public class KiHudSystem : ModSystem
             ($"Ki Regen: {resources.RegenPerSecond}/s  Drain: {resources.PassiveDrainPerSecond}/s  Net: {FormatSigned(resources.NetRegenPerSecond)}/s", new Color(125, 225, 255)),
             ($"Technique Cost: {(resources.TechniqueCostMultiplier * 100f):0}% of base", new Color(180, 235, 255)),
             ($"Damage: x{kiPlayer.CombinedDamageMultiplier:0.00}  Speed: x{kiPlayer.CombinedSpeedMultiplier:0.00}", new Color(255, 220, 130)),
+            ($"Physical Strike: x{kiPlayer.PhysicalDamageMultiplier:0.00}  Combo: {kiPlayer.MeleeComboStep}", new Color(255, 205, 150)),
             ($"Defense: +{kiPlayer.CurrentStage.DefenseBonus}  HP Regen: +{kiPlayer.CurrentStage.LifeRegenBonus}/s", new Color(170, 255, 175)),
             (kiPlayer.GetFlightStatusText(), new Color(190, 210, 255)),
             (kiPlayer.GetNextCeilingText(), new Color(235, 235, 235)),

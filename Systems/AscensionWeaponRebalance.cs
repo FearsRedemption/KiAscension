@@ -1,5 +1,6 @@
 using System.Collections.Generic;
 using KiAscension.Items;
+using KiAscension.Items.Combat;
 using KiAscension.Items.Techniques;
 using Terraria;
 using Terraria.ModLoader;
@@ -34,6 +35,7 @@ public class AscensionWeaponRebalance : GlobalItem
     {
         return item.damage > 0
             && item.type != ModContent.ItemType<KiTrainingFocus>()
+            && item.ModItem is not SaiyanStrike
             && item.ModItem is not KiTechniqueItem
             && !item.accessory
             && !item.vanity;

@@ -8,7 +8,7 @@ Ki Ascension is meant to replace normal Terraria weapon progression. Vanilla and
 
 ## Starting A Character
 
-New characters start with `Ki Training Focus` and `Basic Ki Blast`. The focus is now a training tool, not a cycling weapon: using it meditates for a small amount of physical power and ki power. If it is lost, it can be remade from one Dirt Block as a safety valve.
+New characters start with `Ki Training Focus`, `Saiyan Strike`, and `Basic Ki Blast`. The focus is now a training tool, not a cycling weapon: using it meditates for a small amount of physical power and ki power. `Saiyan Strike` is a starter no-graphic punch/kick item that scales with physical power. If the focus or starter combat tools are lost, the mod tries to grant them again when entering a world.
 
 Early mobs are scaled up heavily compared to vanilla, but the starter spell and slow ki regeneration are tuned so the first slimes and zombies are not a wall.
 
@@ -46,7 +46,9 @@ Technique fire, impact, beam fizzle, transformations, Kaio-Ken changes, and ki s
 
 ## Training
 
-`Weighted Training Bands` slow the player while equipped, but moving and jumping under the extra load builds physical power. `Gravity Room Core` is a placeable 2x2 tile that creates a training field nearby; moving in its radius builds physical power and ki power. The training numbers are intentionally small so training helps without replacing boss progression.
+Training sources now have simple caps so starter tools cannot carry the whole game. `Ki Training Focus` helps early physical power and ki power, `Weighted Training Bands` slow the player while equipped but build physical power while moving, and `Gravity Room Core` is a placeable 2x2 tile that creates a training field nearby for mixed physical/ki training. The training numbers are intentionally small so training helps without replacing boss progression.
+
+Enemies and bosses can drop `Ki Fragment`, a starter material hook for later ascension crafting. The current build does not yet consume fragments in many recipes; it is a framework piece for the next item expansion.
 
 ## Multiplayer
 
@@ -80,8 +82,8 @@ When the player transforms, the mod applies custom Terraria-style `ModHair` spri
 - Super Saiyan Blue: custom spiky blue hair
 - Ultra Instinct: custom silver/white hair
 
-Aura behavior is now profile-driven per form, with separate dust type, light strength, dust intensity, secondary color, and electric-arc settings. Kaio-Ken remains a separate red overlay.
+Aura behavior is now profile-driven per form, with separate dust type, light strength, dust intensity, secondary color, and electric-arc settings. Hair behavior is also profile-driven so form hair selection stays separate from stat logic. Kaio-Ken remains a separate red overlay.
 
 ## Boss Direction
 
-The current repo does not add DBZ-flavored bosses yet. The progression is ready for them: future bosses should be original, Dragon Ball-inspired encounters that test the current ascension tier and reward meaningful EXP or breakthrough materials.
+The current repo does not add DBZ-flavored bosses yet. The progression is ready for them: future bosses should be original, Dragon Ball-inspired encounters that test the current ascension tier and reward meaningful EXP or breakthrough materials. Placeholder folders and planning docs now exist for future boss and enemy implementation.

@@ -52,6 +52,11 @@ public static class KiSoundSystem
         }, position);
     }
 
+    public static void PlayMeleeImpact(Vector2 position)
+    {
+        Play(SoundID.Item10, position);
+    }
+
     private static void Play(SoundStyle sound, Vector2 position)
     {
         if (Main.dedServ)

@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.IO;
 using KiAscension.Common;
 using KiAscension.Items;
+using KiAscension.Items.Combat;
 using KiAscension.Items.Techniques;
 using KiAscension.Systems;
 using KiAscension.Tiles;
@@ -45,6 +46,9 @@ public class KiPlayer : ModPlayer
     private int breakthroughBurstTicks;
     private float kiFlightDrainAccumulator;
     private int trainingTicks;
+    private int trainingOutgrownNoticeCooldown;
+    private int meleeComboStep;
+    private int meleeComboTicks;
 
     public int PowerExperience { get; private set; }
 
@@ -96,6 +100,8 @@ public class KiPlayer : ModPlayer
 
     public float CombinedSpeedMultiplier => CurrentStage.SpeedMultiplier * CurrentKaioKenLevel.SpeedMultiplier;
 
+    public float PhysicalDamageMultiplier => 1f + Math.Max(0, PhysicalPowerLevel - 1) * 0.045f;
+
     public int ActiveKiDrainPerSecond => CurrentStage.KiDrainPerSecond + CurrentKaioKenLevel.KiDrainPerSecond;
 
     public int ActiveLifeDrainPerSecond => CurrentKaioKenLevel.LifeDrainPerSecond;
@@ -132,6 +138,8 @@ public class KiPlayer : ModPlayer
 
     public KiTechniqueDefinition CurrentTechnique => KiTechniques.Get(Math.Clamp(SelectedTechniqueIndex, 0, HighestUnlockedTechniqueIndex));
 
+    public int MeleeComboStep => meleeComboStep;
+
     public int ExperienceForNextKaiLevel => KaiLevelExperienceFactor * KaiLevel * KaiLevel;
 
     public bool HasPendingWitnessBreakthrough =>
@@ -163,6 +171,9 @@ public class KiPlayer : ModPlayer
         breakthroughBurstTicks = 0;
         kiFlightDrainAccumulator = 0f;
         trainingTicks = 0;
+        trainingOutgrownNoticeCooldown = 0;
+        meleeComboStep = 0;
+        meleeComboTicks = 0;
         IsKiFlying = false;
     }
 
@@ -171,10 +182,13 @@ public class KiPlayer : ModPlayer
         Item focus = new();
         focus.SetDefaults(ModContent.ItemType<KiTrainingFocus>());
 
+        Item strike = new();
+        strike.SetDefaults(ModContent.ItemType<SaiyanStrike>());
+
         Item basicBlast = new();
         basicBlast.SetDefaults(ModContent.ItemType<BasicKiBlastSpell>());
 
-        return new[] { focus, basicBlast };
+        return new[] { focus, strike, basicBlast };
     }
 
     public override void SaveData(TagCompound tag)
@@ -229,6 +243,7 @@ public class KiPlayer : ModPlayer
         }
 
         EnsureInventoryItem(ModContent.ItemType<KiTrainingFocus>());
+        EnsureInventoryItem(ModContent.ItemType<SaiyanStrike>());
         EnsureInventoryItem(ModContent.ItemType<BasicKiBlastSpell>());
     }
 
@@ -328,6 +343,7 @@ public class KiPlayer : ModPlayer
         DrainActiveTransformations();
         HandleKiFlight();
         HandleTraining();
+        HandleMeleeComboDecay();
         RefreshTechniqueUnlocks(false);
         RefreshKaioKenUnlocks(false);
         ShowProgressionNoticeOnce();
@@ -345,6 +361,7 @@ public class KiPlayer : ModPlayer
         }
 
         breakthroughBurstTicks = Math.Max(0, breakthroughBurstTicks - 1);
+        trainingOutgrownNoticeCooldown = Math.Max(0, trainingOutgrownNoticeCooldown - 1);
 
         if (!Main.dedServ)
         {
@@ -357,6 +374,11 @@ public class KiPlayer : ModPlayer
     public override void ModifyHitNPC(NPC target, ref NPC.HitModifiers modifiers)
     {
         modifiers.FinalDamage *= CombinedDamageMultiplier;
+
+        if (Player.HeldItem?.ModItem is SaiyanStrike)
+        {
+            modifiers.FinalDamage *= PhysicalDamageMultiplier;
+        }
     }
 
     public override void OnHitNPC(NPC target, NPC.HitInfo hit, int damageDone)
@@ -366,7 +388,7 @@ public class KiPlayer : ModPlayer
             return;
         }
 
-        if (Player.HeldItem?.ModItem is KiTechniqueItem)
+        if (Player.HeldItem?.ModItem is KiTechniqueItem or SaiyanStrike)
         {
             return;
         }
@@ -449,6 +471,39 @@ public class KiPlayer : ModPlayer
     public void AddTrainingExperience(int powerAmount, int kiPowerAmount, bool announce)
     {
         AddProgress(powerAmount, kiPowerAmount, announce);
+    }
+
+    public void ApplyTrainingSource(TrainingSource source, bool announce)
+    {
+        if (Main.netMode == NetmodeID.MultiplayerClient)
+        {
+            return;
+        }
+
+        TrainingSourceDefinition definition = TrainingSources.Get(source);
+        int physicalGain = GetCappedTrainingGain(PowerExperience, definition.PhysicalPowerCap, definition.PhysicalPowerGain);
+        int kiGain = GetCappedTrainingGain(KiPowerExperience, definition.KiPowerCap, definition.KiPowerGain);
+
+        if (physicalGain <= 0 && kiGain <= 0)
+        {
+            AnnounceTrainingOutgrown(definition, announce);
+            return;
+        }
+
+        AddTrainingExperience(physicalGain, kiGain, announce);
+    }
+
+    public void RegisterSaiyanStrikeHit(int damageDone)
+    {
+        if (Main.netMode == NetmodeID.MultiplayerClient || damageDone <= 0)
+        {
+            return;
+        }
+
+        meleeComboStep = meleeComboStep % 3 + 1;
+        meleeComboTicks = 75;
+        int comboBonus = meleeComboStep == 3 ? 2 : 0;
+        AddPowerExperience(Math.Max(1, damageDone / 12) + comboBonus, false);
     }
 
     public int GetKiTechniqueDamage(KiTechniqueDefinition technique)
@@ -1319,16 +1374,48 @@ public class KiPlayer : ModPlayer
         }
 
         trainingTicks = 0;
-        int physicalPower = IsWeightTraining ? 3 : 0;
-        int kiPower = 0;
+
+        if (IsWeightTraining)
+        {
+            ApplyTrainingSource(TrainingSource.WeightedGear, false);
+        }
 
         if (inGravityRoom)
         {
-            physicalPower += 4;
-            kiPower += 3;
+            ApplyTrainingSource(TrainingSource.GravityRoom, false);
+        }
+    }
+
+    private void HandleMeleeComboDecay()
+    {
+        if (meleeComboTicks <= 0)
+        {
+            meleeComboStep = 0;
+            return;
         }
 
-        AddTrainingExperience(physicalPower, kiPower, false);
+        meleeComboTicks--;
+    }
+
+    private int GetCappedTrainingGain(int currentValue, int cap, int gain)
+    {
+        if (gain <= 0 || cap <= 0 || currentValue >= cap)
+        {
+            return 0;
+        }
+
+        return Math.Min(gain, cap - currentValue);
+    }
+
+    private void AnnounceTrainingOutgrown(TrainingSourceDefinition definition, bool announce)
+    {
+        if (!announce || trainingOutgrownNoticeCooldown > 0 || Player.whoAmI != Main.myPlayer)
+        {
+            return;
+        }
+
+        trainingOutgrownNoticeCooldown = 240;
+        Main.NewText(definition.OutgrownMessage, new Color(210, 210, 210));
     }
 
     private bool IsNearGravityRoomCore()

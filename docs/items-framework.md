@@ -1,0 +1,32 @@
+# Items And Crafting Framework
+
+This document keeps the item roadmap separate from implemented gameplay.
+
+## Implemented
+
+- `Ki Training Focus`: starter meditation/training item with an early cap.
+- `Saiyan Strike`: starter no-graphic punch/kick combat item that scales with physical power.
+- `Basic Ki Blast` and separate ki spell items.
+- `Weighted Training Bands`: starter accessory for movement-under-load training.
+- `Gravity Room Core`: placeable training tile for mixed physical/ki training.
+- `Ki Fragment`: starter combat material dropped from enemies and bosses for future ascension crafting.
+
+## Current Item Categories
+
+- Starter combat: basic physical strikes and basic ki blast.
+- Ki techniques: separate spell items with metadata-driven behavior.
+- Training gear: accessories and placeable stations.
+- Materials: combat-earned ki fragments.
+
+## Planned Categories
+
+- Scouter-style accessory.
+- Weighted clothing and higher-tier training gear.
+- Tiered weight bench, striking dummy, treadmill, meditation mat, and energy target range.
+- Gravity Orb and upgraded Gravity Chamber core.
+- Ki regeneration, form stabilization, Kaio-Ken tolerance, flight control, and ki amplification accessories.
+- Martial armor or Saiyan-inspired combat armor sets using original assets.
+
+## Crafting Direction
+
+Early training gear should use normal Terraria materials. Higher training caps should follow mining and boss progression. Boss and future DBZ-flavored enemies should drop materials for technique upgrades, armor, accessories, and gravity chamber progression.

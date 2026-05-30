@@ -5,6 +5,7 @@ The design goal is lore-inspired escalation without letting the player skip Terr
 ## Core Loops
 
 - Fight enemies to gain physical power and ki power.
+- Use `Saiyan Strike` for starter punch/kick combat while physical power grows.
 - Use separate ki spell items for attacks; use the `Ki Training Focus` for light meditation training.
 - Scale all combat around higher enemy health and damage, so training matters.
 - Unlock low forms through practice, then lock Super Saiyan-style jumps behind Terraria boss milestones.
@@ -94,10 +95,21 @@ Super Saiyan 2 and higher high-energy forms can emit electric arcs. God forms us
 
 ## Training Rooms
 
-The current training pass has two pieces:
+The current training pass has three capped sources:
 
+- `Ki Training Focus`: light starter meditation for early physical power and ki control.
 - `Weighted Training Bands`: accessory-based weight training for physical power.
 - `Gravity Room Core`: placeable training tile that rewards moving nearby with physical power and ki power.
+
+Caps are intentionally conservative. If a source stops helping, the player needs harder training, higher-tier future equipment, boss progression, or a gravity-room upgrade.
+
+## Starter Melee
+
+`Saiyan Strike` is the current melee foundation. It is a no-graphic punch/kick item, scales with physical power, and tracks a simple three-step combo counter for future animation and hitbox work. It is not a full combo system yet.
+
+## Materials
+
+`Ki Fragment` is a starter material hook dropped by enemies and bosses. It gives future crafting work a place to attach technique upgrades, accessories, training equipment, and boss materials without inventing the material layer later.
 
 ## Branches To Add
 

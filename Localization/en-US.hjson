@@ -5,50 +5,72 @@ Mods: {
 				DisplayName: Ki Training Focus
 				Tooltip: Meditate with it to build a little physical power and ki power.
 			}
+
+			SaiyanStrike: {
+				DisplayName: Saiyan Strike
+				Tooltip: Basic punch and kick strikes that scale with physical power.
+			}
+
+			KiFragment: {
+				DisplayName: Ki Fragment
+				Tooltip: A condensed shard of battle energy for future ascension crafting.
+			}
+
 			BasicKiBlastSpell: {
 				DisplayName: Basic Ki Blast
 				Tooltip: A simple starter ki shot.
 			}
+
 			KiBarrageSpell: {
 				DisplayName: Ki Barrage
 				Tooltip: Fires a fast spread of smaller ki blasts.
 			}
+
 			KamehamehaSpell: {
 				DisplayName: Kamehameha
 				Tooltip: Hold to channel a blue beam until your ki gives out.
 			}
+
 			DestructoDiskSpell: {
 				DisplayName: Destructo Disk
 				Tooltip: A sharp guided disk that pierces through enemies.
 			}
+
 			GalickGunSpell: {
 				DisplayName: Galick Gun
 				Tooltip: Hold to channel a focused purple beam.
 			}
+
 			BigBangAttackSpell: {
 				DisplayName: Big Bang Attack
 				Tooltip: A compact, heavy ki burst with big impact.
 			}
+
 			FinalFlashSpell: {
 				DisplayName: Final Flash
 				Tooltip: Hold to fire a long, costly golden beam.
 			}
+
 			SpiritBombSpell: {
 				DisplayName: Spirit Bomb
 				Tooltip: A slow boss-scale ki bomb.
 			}
+
 			GodKamehamehaSpell: {
 				DisplayName: God Kamehameha
 				Tooltip: Hold to channel a god-ki beam.
 			}
+
 			UltraInstinctBarrageSpell: {
 				DisplayName: Ultra Instinct Barrage
 				Tooltip: A rapid instinctive volley of ki shots.
 			}
+
 			WeightedTrainingBands: {
 				DisplayName: Weighted Training Bands
 				Tooltip: Slows movement, but moving under the weight builds physical power.
 			}
+
 			GravityRoomCore: {
 				DisplayName: Gravity Room Core
 				Tooltip: Place it to create a training field. Moving nearby builds physical power and ki power.
@@ -57,6 +79,7 @@ Mods: {
 
 		Projectiles.KiTechniqueProjectile.DisplayName: Ki Technique
 		Tiles.GravityRoomCoreTile.MapEntry: Gravity Room Core
+
 		Keybinds: {
 			"Ascend Form.DisplayName": Ascend Form
 			"Descend Form.DisplayName": Descend Form

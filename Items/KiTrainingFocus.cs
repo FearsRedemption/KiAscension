@@ -1,4 +1,5 @@
 using System;
+using KiAscension.Common;
 using KiAscension.Players;
 using Microsoft.Xna.Framework;
 using Terraria;
@@ -32,7 +33,7 @@ public class KiTrainingFocus : ModItem
     public override bool? UseItem(Player player)
     {
         KiPlayer kiPlayer = player.GetModPlayer<KiPlayer>();
-        kiPlayer.AddTrainingExperience(4, 3, true);
+        kiPlayer.ApplyTrainingSource(TrainingSource.MeditationFocus, true);
 
         if (!Main.dedServ)
         {

@@ -1,4 +1,5 @@
 using System;
+using KiAscension.Items.Materials;
 using KiAscension.Players;
 using Microsoft.Xna.Framework;
 using Terraria;
@@ -44,6 +45,7 @@ public class AscensionNpcScaling : GlobalNPC
         }
 
         int reward = CalculateReward(npc);
+        TryDropKiFragment(npc);
 
         for (int playerIndex = 0; playerIndex < Main.maxPlayers; playerIndex++)
         {
@@ -63,6 +65,19 @@ public class AscensionNpcScaling : GlobalNPC
             kiPlayer.AddPowerExperience(reward, npc.boss);
             kiPlayer.AddKiExperience(Math.Max(1, reward / 2), false);
         }
+    }
+
+    private static void TryDropKiFragment(NPC npc)
+    {
+        int dropChance = npc.boss ? 1 : 9;
+
+        if (!npc.boss && !Main.rand.NextBool(dropChance))
+        {
+            return;
+        }
+
+        int stack = npc.boss ? Math.Clamp(npc.lifeMax / 900, 3, 14) : 1;
+        Item.NewItem(npc.GetSource_Loot(), npc.getRect(), ModContent.ItemType<KiFragment>(), stack);
     }
 
     private static float GetWorldScale(NPC npc)
