@@ -3,32 +3,11 @@
 
 Items: {
 	KiTrainingFocus: {
-		DisplayName: Ki Training Focus
-		Tooltip: Meditate with it to build a little physical power and ki power.
 	}
-	BasicKiBlastSpell.DisplayName: Basic Ki Blast
-	KiBarrageSpell.DisplayName: Ki Barrage
-	KamehamehaSpell.DisplayName: Kamehameha
-	DestructoDiskSpell.DisplayName: Destructo Disk
-	GalickGunSpell.DisplayName: Galick Gun
-	BigBangAttackSpell.DisplayName: Big Bang Attack
-	FinalFlashSpell.DisplayName: Final Flash
-	SpiritBombSpell.DisplayName: Spirit Bomb
-	GodKamehamehaSpell.DisplayName: God Kamehameha
-	UltraInstinctBarrageSpell.DisplayName: Ultra Instinct Barrage
-	WeightedTrainingBands.DisplayName: Weighted Training Bands
-	GravityRoomCore.DisplayName: Gravity Room Core
 }
 
 Tiles: {
-	GravityRoomCoreTile.MapEntry: Gravity Room Core
 }
 
 Keybinds: {
-	"Descend Form.DisplayName": Descend Form
-	"Ascend Form.DisplayName": Ascend Form
-	"Kaio-Ken Power Up.DisplayName": Kaio-Ken Power Up
-	"Kaio-Ken Power Down.DisplayName": Kaio-Ken Power Down
-	"Toggle Ki Stats.DisplayName": Toggle Ki Stats
-	"Toggle Ki Dev Panel.DisplayName": Toggle Ki Dev Panel
 }

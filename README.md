@@ -73,7 +73,7 @@ Implemented Saiyan form path:
 
 Kaio-Ken is implemented as a separate parallel track from `Off` through late-game fantasy levels such as `x20`, `x100`, and `x200`. The display names keep the anime flavor, while the actual multipliers are tuned for Terraria instead of literal numeric scaling.
 
-See [docs/progression.md](docs/progression.md) for the design pass that keeps it lore-inspired while still fitting Terraria pacing. See [docs/current-behavior.md](docs/current-behavior.md) for what the current prototype should feel like in game. See [docs/ki-skills.md](docs/ki-skills.md) for the implemented technique metadata and planned roster buckets. See [docs/items-framework.md](docs/items-framework.md) and [docs/bosses-and-mobs.md](docs/bosses-and-mobs.md) for expansion planning.
+See [docs/progression.md](docs/progression.md) for the design pass that keeps it lore-inspired while still fitting Terraria pacing. See [docs/current-behavior.md](docs/current-behavior.md) for what the current prototype should feel like in game. See [docs/phase-audit.md](docs/phase-audit.md) for the phase-by-phase implementation audit. See [docs/ki-skills.md](docs/ki-skills.md) for the implemented technique metadata and planned roster buckets. See [docs/items-framework.md](docs/items-framework.md) and [docs/bosses-and-mobs.md](docs/bosses-and-mobs.md) for expansion planning.
 
 ## Development Setup
 
