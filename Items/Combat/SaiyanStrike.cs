@@ -12,14 +12,14 @@ public class SaiyanStrike : ModItem
 
     public override void SetDefaults()
     {
-        Item.damage = 13;
+        Item.damage = 18;
         Item.DamageType = DamageClass.Melee;
         Item.width = 24;
         Item.height = 24;
-        Item.useTime = 22;
-        Item.useAnimation = 22;
+        Item.useTime = 18;
+        Item.useAnimation = 18;
         Item.useStyle = ItemUseStyleID.Swing;
-        Item.knockBack = 3.5f;
+        Item.knockBack = 4f;
         Item.value = 0;
         Item.rare = ItemRarityID.White;
         Item.noUseGraphic = true;

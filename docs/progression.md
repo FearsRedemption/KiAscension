@@ -67,9 +67,9 @@ The technique ladder is ordered by a mix of lore chronology and Terraria combat 
 
 Physical power is earned from combat and weight training. Ki power is earned from ki technique hits, meditation, and gravity room training. Kai Level is based on combined power, while ki technique unlocks care about ki power specifically.
 
-Max ki and ki regeneration both rise with Kai Level, ki power, and later forms. Early regeneration is intentionally slow so the starter loop feels closer to weak Terraria gear, then gets smoother as training pays off.
+Max ki and ki regeneration both rise with Kai Level, ki power, and later forms. Early regeneration is intentionally modest, but it should still let `Basic Ki Blast` and `Saiyan Strike` carry early fights without long downtime.
 
-Effective ki costs use a shared resource formula. Ki power grants a modest control discount, and God/Ultra Instinct-style forms add a small efficiency bonus. The discount is capped so strong attacks and high transformation drains remain meaningful.
+Effective ki costs use a shared resource formula. Ki power grants a ki-control discount, and God/Ultra Instinct-style forms add an efficiency bonus. The discount is capped so strong attacks and high transformation drains remain meaningful.
 
 ## Flight Progression
 
@@ -134,7 +134,7 @@ When a Saiyan form unlocks, the current form changes only if the player was alre
 ## Balance Notes
 
 - Saiyan forms multiply final NPC hit damage, increase movement, add defense, add max ki, improve ki regeneration, and add light health regeneration.
-- Kaio-Ken adds a parallel damage/speed multiplier, but drains ki and HP while active.
+- Kaio-Ken adds a parallel damage/speed multiplier, but its early danger is mostly HP/body strain rather than ruining the ki economy.
 - Strong forms drain ki so the best play is charging up for bursts and powering down to recover.
 - Enemy scaling starts immediately and rises with boss progression.
 - Boss rewards are intentionally high because boss fights should feel like training arcs.

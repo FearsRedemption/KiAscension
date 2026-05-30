@@ -19,7 +19,7 @@ namespace KiAscension.Players;
 
 public class KiPlayer : ModPlayer
 {
-    private const int BaseMaxKi = 70;
+    private const int BaseMaxKi = 140;
     private const int KaiLevelExperienceFactor = 220;
     private const int WitnessRange = 1200;
     private const int TapInputThreshold = 12;
@@ -78,9 +78,9 @@ public class KiPlayer : ModPlayer
 
     public int KiPowerLevel => CalculateKaiLevel(KiPowerExperience);
 
-    public int MaxKi => BaseMaxKi + CurrentStage.MaxKiBonus + Math.Max(0, KaiLevel - 1) * 8 + Math.Max(0, KiPowerLevel - 1) * 6;
+    public int MaxKi => BaseMaxKi + CurrentStage.MaxKiBonus + Math.Max(0, KaiLevel - 1) * 10 + Math.Max(0, KiPowerLevel - 1) * 12;
 
-    public int KiRegenPerSecond => 1 + CurrentStage.KiRegenBonus + Math.Max(0, KaiLevel - 1) / 4 + Math.Max(0, KiPowerLevel - 1) / 5;
+    public int KiRegenPerSecond => 4 + CurrentStage.KiRegenBonus + Math.Max(0, KaiLevel - 1) / 3 + Math.Max(0, KiPowerLevel - 1) / 2;
 
     public KiResourceSnapshot KiResources => new(MaxKi, KiRegenPerSecond, ActiveKiDrainPerSecond, KiResourceMath.GetTechniqueCostMultiplier(KiPowerLevel, CurrentStage.Stage));
 
@@ -441,6 +441,33 @@ public class KiPlayer : ModPlayer
     public bool HasKiForTechnique(KiTechniqueDefinition technique)
     {
         return HasKi(GetTechniqueInitialKiCost(technique));
+    }
+
+    public bool IsTechniqueUnlocked(KiTechniqueDefinition technique)
+    {
+        return KiTechniques.IsUnlocked(technique, KiPowerExperience, UnlockedStageIndex);
+    }
+
+    public string GetTechniqueLockReason(KiTechniqueDefinition technique)
+    {
+        if (IsTechniqueUnlocked(technique))
+        {
+            return string.Empty;
+        }
+
+        List<string> requirements = new();
+
+        if (UnlockedStageIndex < (int)technique.RequiredStage)
+        {
+            requirements.Add(AscensionStages.Get((int)technique.RequiredStage).DisplayName);
+        }
+
+        if (KiPowerExperience < technique.RequiredKiPower)
+        {
+            requirements.Add($"{technique.RequiredKiPower} Ki Power");
+        }
+
+        return requirements.Count == 0 ? "Locked" : $"Requires {string.Join(" + ", requirements)}";
     }
 
     public bool TryConsumeTechniqueInitialKi(KiTechniqueDefinition technique)
@@ -1460,7 +1487,7 @@ public class KiPlayer : ModPlayer
         }
 
         shownProgressionNotice = true;
-        Main.NewText("Ki Ascension active: normal weapons are heavily weakened. Use ki spells and train with weights or gravity rooms.", new Color(255, 230, 130));
+        Main.NewText("Ki Ascension active: ki spells and Saiyan Strike are your main growth path, but normal weapons still work while the melee system grows.", new Color(255, 230, 130));
     }
 
     private void DrawAura()

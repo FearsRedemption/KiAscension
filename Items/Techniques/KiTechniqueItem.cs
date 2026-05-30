@@ -46,7 +46,7 @@ public abstract class KiTechniqueItem : ModItem
         KiPlayer kiPlayer = player.GetModPlayer<KiPlayer>();
         KiTechniqueDefinition technique = Definition;
 
-        if (!KiTechniques.IsUnlocked(technique, kiPlayer.KiPowerExperience, kiPlayer.UnlockedStageIndex))
+        if (!kiPlayer.IsTechniqueUnlocked(technique))
         {
             return false;
         }
@@ -98,6 +98,21 @@ public abstract class KiTechniqueItem : ModItem
         tooltips.Add(new TooltipLine(Mod, "KiAscensionKiCost", text));
         tooltips.Add(new TooltipLine(Mod, "KiAscensionTechniqueType", $"Type: {technique.CategoryLabel} | {technique.SourceLabel}"));
         tooltips.Add(new TooltipLine(Mod, "KiAscensionTechniqueCollision", $"Behavior: {technique.CollisionLabel}"));
+
+        if (!kiPlayer.IsTechniqueUnlocked(technique))
+        {
+            tooltips.Add(new TooltipLine(Mod, "KiAscensionTechniqueLocked", $"Locked: {kiPlayer.GetTechniqueLockReason(technique)}")
+            {
+                OverrideColor = new Color(255, 150, 130)
+            });
+        }
+        else if (!kiPlayer.HasKiForTechnique(technique))
+        {
+            tooltips.Add(new TooltipLine(Mod, "KiAscensionTechniqueLowKi", "Not enough ki to cast yet.")
+            {
+                OverrideColor = new Color(255, 190, 120)
+            });
+        }
     }
 
     public override bool Shoot(

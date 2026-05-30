@@ -4,13 +4,13 @@ namespace KiAscension.Common;
 
 public static class KiResourceMath
 {
-    private const float MinimumTechniqueCostMultiplier = 0.68f;
-    private const float GodKiEfficiencyBonus = 0.08f;
-    private const float UltraInstinctEfficiencyBonus = 0.12f;
+    private const float MinimumTechniqueCostMultiplier = 0.55f;
+    private const float GodKiEfficiencyBonus = 0.1f;
+    private const float UltraInstinctEfficiencyBonus = 0.16f;
 
     public static float GetTechniqueCostMultiplier(int kiPowerLevel, AscensionStage stage)
     {
-        float multiplier = 1f - Math.Max(0, kiPowerLevel - 1) * 0.012f;
+        float multiplier = 1f - Math.Max(0, kiPowerLevel - 1) * 0.02f;
 
         if (stage is AscensionStage.SuperSaiyanGod or AscensionStage.SuperSaiyanBlue)
         {

@@ -61,7 +61,7 @@ public class KiHudSystem : ModSystem
 
         DrawText($"Form: {kiPlayer.CurrentStage.DisplayName}", position + new Vector2(0f, 76f), kiPlayer.CurrentStage.AuraColor);
         DrawText($"Kaio-Ken: {kiPlayer.CurrentKaioKenLevel.DisplayName}", position + new Vector2(0f, 96f), kiPlayer.CurrentKaioKenLevel.AuraColor == Color.Transparent ? new Color(190, 190, 190) : kiPlayer.CurrentKaioKenLevel.AuraColor);
-        DrawText(GetHeldTechniqueText(), position + new Vector2(0f, 116f), new Color(180, 235, 255));
+        DrawText(GetHeldTechniqueText(kiPlayer), position + new Vector2(0f, 116f), new Color(180, 235, 255));
         DrawText(kiPlayer.GetNextCeilingText(), position + new Vector2(0f, 136f), new Color(235, 235, 235));
 
         if (showStatsPanel)
@@ -131,7 +131,16 @@ public class KiHudSystem : ModSystem
         }
 
         KiTechniqueDefinition technique = techniqueItem.TechniqueDefinition;
-        lines.Add(($"Held Spell: {technique.DisplayName}", technique.Color));
+        bool unlocked = kiPlayer.IsTechniqueUnlocked(technique);
+
+        lines.Add(($"Held Spell: {technique.DisplayName}{(unlocked ? string.Empty : " (Locked)")}", unlocked ? technique.Color : new Color(255, 150, 130)));
+
+        if (!unlocked)
+        {
+            lines.Add(($"Reason: {kiPlayer.GetTechniqueLockReason(technique)}", new Color(255, 150, 130)));
+            return;
+        }
+
         lines.Add(($"Held Type: {technique.CategoryLabel} | {technique.SourceLabel}", technique.Color));
         lines.Add(($"Held Behavior: {technique.CollisionLabel}", technique.Color));
         lines.Add(technique.Behavior == KiTechniqueBehavior.Beam
@@ -139,11 +148,17 @@ public class KiHudSystem : ModSystem
             : ($"Held Cost: {kiPlayer.GetTechniqueInitialKiCost(technique)}", technique.Color));
     }
 
-    private static string GetHeldTechniqueText()
+    private static string GetHeldTechniqueText(KiPlayer kiPlayer)
     {
-        return Main.LocalPlayer.HeldItem?.ModItem is KiTechniqueItem techniqueItem
-            ? $"Spell: {techniqueItem.DisplayName.Value}"
-            : "Spell: equip a ki technique";
+        if (Main.LocalPlayer.HeldItem?.ModItem is not KiTechniqueItem techniqueItem)
+        {
+            return "Spell: equip a ki technique";
+        }
+
+        KiTechniqueDefinition technique = techniqueItem.TechniqueDefinition;
+        return kiPlayer.IsTechniqueUnlocked(technique)
+            ? $"Spell: {technique.DisplayName}"
+            : $"Spell: {technique.DisplayName} (Locked)";
     }
 
     private static string FormatSigned(int value)

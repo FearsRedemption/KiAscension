@@ -9,11 +9,11 @@ namespace KiAscension.Systems;
 
 public class AscensionWeaponRebalance : GlobalItem
 {
-    private const float NonKiWeaponDamageMultiplier = 0.18f;
+    private const float NonKiWeaponDamageMultiplier = 1f;
 
     public override void ModifyWeaponDamage(Item item, Player player, ref StatModifier damage)
     {
-        if (!IsReplacedProgressionWeapon(item))
+        if (NonKiWeaponDamageMultiplier >= 1f || !IsReplacedProgressionWeapon(item))
         {
             return;
         }
@@ -23,12 +23,12 @@ public class AscensionWeaponRebalance : GlobalItem
 
     public override void ModifyTooltips(Item item, List<TooltipLine> tooltips)
     {
-        if (!IsReplacedProgressionWeapon(item))
+        if (NonKiWeaponDamageMultiplier >= 1f || !IsReplacedProgressionWeapon(item))
         {
             return;
         }
 
-        tooltips.Add(new TooltipLine(Mod, "KiAscensionReplacedProgression", "Ki Ascension progression heavily outscales normal weapon damage."));
+        tooltips.Add(new TooltipLine(Mod, "KiAscensionReplacedProgression", "Ki Ascension progression eventually outscales normal weapons, but they still work while training."));
     }
 
     private static bool IsReplacedProgressionWeapon(Item item)

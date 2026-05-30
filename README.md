@@ -38,8 +38,8 @@ Sources:
   - tap/hold `V`: lower Kaio-Ken one level or release it fully
 - Kaio-Ken is a separate parallel amplifier with HP/ki strain
 - Saiyan forms provide max ki, ki regeneration, defense, movement, damage, and light health regeneration hooks
-- Ki technique costs and beam drains scale through a shared ki resource system, with modest ki-control efficiency from ki power and advanced forms
-- Spell tooltips show current ki costs, including beam sustain drain
+- Ki technique costs and beam drains scale through a shared ki resource system, with ki-control efficiency from ki power and advanced forms
+- Spell tooltips show current ki costs, locked requirements, and beam sustain drain
 - HUD ki readout shows net ki per second after active transformation drain
 - Read-only inspection panels:
   - tap `B`: toggle detailed ki stats, active drains, gates, and held-spell costs
@@ -50,7 +50,7 @@ Sources:
 - Central ki sound helper wired to transformations, technique fire/impact, beam fizzle, and strain events using placeholder Terraria sounds
 - Aura profiles per Saiyan form for dust type, light strength, electric arcs, and visual notes
 - Enemy and boss stat scaling by world progression
-- Vanilla and non-ki weapons are heavily downscaled so Ki Ascension replaces normal Terraria weapon progression
+- Vanilla and non-ki weapons remain usable while the custom ki/melee systems are still growing, but Ki Ascension progression is intended to outscale them over time
 - Boss and witness-loss gates for major emotional breakthroughs, with auto-breakthrough only when already at the previous form ceiling
 - Multiplayer-safe per-player power, ki power, Kai Level, Saiyan form unlocks, Kaio-Ken level, and ki
 - Custom Terraria-style `ModHair` sprites for Super Saiyan-style forms
