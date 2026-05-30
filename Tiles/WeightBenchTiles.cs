@@ -15,7 +15,7 @@ public class WoodenWeightBenchTile : ModTile
 {
     public override void SetStaticDefaults()
     {
-        WeightBenchTileHelper.SetStaticDefaults(this, new Color(136, 92, 54), "Mods.KiAscension.Tiles.WoodenWeightBenchTile.MapEntry");
+        WeightBenchTileHelper.SetStaticDefaults(this, ModContent.ItemType<WoodenWeightBench>(), new Color(136, 92, 54), "Mods.KiAscension.Tiles.WoodenWeightBenchTile.MapEntry");
         DustType = DustID.WoodFurniture;
         HitSound = SoundID.Dig;
         MineResist = 1.2f;
@@ -36,7 +36,7 @@ public class CopperWeightBenchTile : ModTile
 {
     public override void SetStaticDefaults()
     {
-        WeightBenchTileHelper.SetStaticDefaults(this, new Color(185, 104, 66), "Mods.KiAscension.Tiles.CopperWeightBenchTile.MapEntry");
+        WeightBenchTileHelper.SetStaticDefaults(this, ModContent.ItemType<CopperWeightBench>(), new Color(185, 104, 66), "Mods.KiAscension.Tiles.CopperWeightBenchTile.MapEntry");
         DustType = DustID.CopperCoin;
         HitSound = SoundID.Tink;
         MineResist = 1.5f;
@@ -55,7 +55,7 @@ public class CopperWeightBenchTile : ModTile
 
 internal static class WeightBenchTileHelper
 {
-    public static void SetStaticDefaults(ModTile tile, Color mapColor, string mapKey)
+    public static void SetStaticDefaults(ModTile tile, int itemDropType, Color mapColor, string mapKey)
     {
         int type = tile.Type;
         Main.tileFrameImportant[type] = true;
@@ -66,6 +66,7 @@ internal static class WeightBenchTileHelper
         TileObjectData.newTile.Origin = new Point16(0, 1);
         TileObjectData.addTile(type);
 
+        tile.RegisterItemDrop(itemDropType);
         tile.AddMapEntry(mapColor, Language.GetText(mapKey));
     }
 

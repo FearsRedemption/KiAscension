@@ -576,6 +576,12 @@ public class KiPlayer : ModPlayer
             return;
         }
 
+        if (IsTrainingSourceOutgrown(source))
+        {
+            AnnounceTrainingOutgrown(TrainingSources.Get(source), true);
+            return;
+        }
+
         if (Main.netMode == NetmodeID.MultiplayerClient)
         {
             SendTrainingStationUse(source, tileX, tileY);
@@ -1532,6 +1538,12 @@ public class KiPlayer : ModPlayer
             return;
         }
 
+        if (IsTrainingSourceOutgrown(source))
+        {
+            AnnounceTrainingOutgrown(TrainingSources.Get(source), true);
+            return;
+        }
+
         isUsingTrainingStation = true;
         activeTrainingStation = source;
         activeTrainingStationTile = new Point(tileX, tileY);
@@ -1577,6 +1589,11 @@ public class KiPlayer : ModPlayer
         {
             activeTrainingStationIntervalTicks = 0;
             ApplyTrainingSource(activeTrainingStation, true);
+
+            if (IsTrainingSourceOutgrown(activeTrainingStation))
+            {
+                StopTrainingStation();
+            }
         }
 
         if (activeTrainingStationTicks <= 0)
@@ -1606,6 +1623,13 @@ public class KiPlayer : ModPlayer
     private static bool IsStationTrainingSource(TrainingSource source)
     {
         return source is TrainingSource.WoodenWeightBench or TrainingSource.CopperWeightBench;
+    }
+
+    private bool IsTrainingSourceOutgrown(TrainingSource source)
+    {
+        TrainingSourceDefinition definition = TrainingSources.Get(source);
+        return GetCappedTrainingGain(PowerExperience, definition.PhysicalPowerCap, definition.PhysicalPowerGain) <= 0
+            && GetCappedTrainingGain(KiPowerExperience, definition.KiPowerCap, definition.KiPowerGain) <= 0;
     }
 
     private static bool IsTrainingStationTile(TrainingSource source, int tileX, int tileY)
