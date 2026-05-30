@@ -21,9 +21,9 @@ The mod is buildable and now has foundations for every requested phase. Phases 1
 | 9. Ki skill architecture | Implemented foundation | Techniques carry category, source, collision style, terrain, pierce, tracking, and held-beam metadata. |
 | 10. Ki skill roster planning | Implemented as planning | `docs/ki-skills.md` lists implemented examples and future lore-inspired buckets. Full roster is not implemented. |
 | 11. Skill feel/terrain/sound/visual behavior | Partially implemented | Beams, disks, barrages, heavy blasts, terrain blocking, terrain-passing ultimates, and impact hooks exist. Advanced charge/cooldown/fatigue remains planned. |
-| 12. Sound architecture | Implemented foundation | `KiSoundSystem` centralizes placeholder sounds for transformations, fire, impact, fizzle, and melee. Original sound assets are not present. |
-| 13. Aura visuals by form | Implemented foundation | `AscensionAuraProfiles` drives form colors, dust, light, intensity, and electric arcs. Shader-level aura polish remains planned. |
-| 14. Hair transformation cleanup | Implemented foundation | Hair profiles are separated from stats, natural hair is restored for base, and tModLoader `_Alt` hair textures are tracked. |
+| 12. Sound architecture | Implemented foundation | `KiSoundSystem` centralizes temporary CC0 sounds for transformations, fire, impact, fizzle, and melee, with vanilla fallback. Final original audio remains planned. |
+| 13. Aura visuals by form | Implemented foundation | `AscensionAuraProfiles` drives form colors, dust, light, intensity, electric arcs, and an animated aura draw layer. Shader-level aura polish remains planned. |
+| 14. Hair transformation cleanup | Implemented foundation | Hair profiles are separated from stats, natural hair is saved/restored for base, and tModLoader `_Alt` hair textures are explicit. |
 | 15. Training/progression expansion | Partially implemented | Focus, weighted gear, gravity room, training caps, and outgrown messaging exist. Tiered stations/gravity upgrades are planned. |
 | 16. Items/accessories/crafting/training furniture | Partially implemented | Starter combat item, training items, `Ki Fragment`, and item framework docs exist. Full accessory/armor/furniture set is planned. |
 | 17. Melee punch/kick foundation | Implemented foundation | `Saiyan Strike` gives a starter no-graphic physical strike with scaling and combo hook. Full animations/hitboxes/chains are planned. |
@@ -32,7 +32,7 @@ The mod is buildable and now has foundations for every requested phase. Phases 1
 
 ## Highest Priority Remaining Work
 
-- Replace placeholder sounds with original audio assets through `KiSoundSystem`.
+- Replace temporary CC0 sounds with final original audio assets through `KiSoundSystem`.
 - Expand training into tiered placeable stations and gravity chamber upgrades.
 - Build real melee animations/hitboxes for `Saiyan Strike`.
 - Add the first original DBZ-inspired enemy or boss and wire its drops into progression.

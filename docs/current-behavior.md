@@ -42,7 +42,7 @@ Every ki technique has an initial ki cost, and beam techniques also have a per-s
 
 Technique definitions now include metadata for category, source label, collision style, held behavior, terrain behavior, piercing, and cursor tracking. This is the foundation for a larger lore-inspired roster without forcing every technique into custom one-off logic.
 
-Technique fire, impact, beam fizzle, transformations, Kaio-Ken changes, and ki strain now route through a central placeholder sound helper. The mod still uses vanilla Terraria sounds until original assets are added.
+Technique fire, impact, beam fizzle, transformations, Kaio-Ken changes, and ki strain now route through a central sound helper. The current build uses temporary CC0 energy/electric sounds where available and falls back to vanilla Terraria sounds through the helper if a custom sound cannot play.
 
 ## Training
 
@@ -72,7 +72,7 @@ Automatic breakthrough follows the current-form rule: if the player is already i
 
 ## Forms And Visuals
 
-When the player transforms, the mod applies custom Terraria-style `ModHair` sprites and stage colors:
+When the player transforms, the mod stores the player's natural hair once, then applies custom Terraria-style `ModHair` sprites and stage colors:
 
 - Kaio-Ken: separate red aura overlay, no Saiyan hair change
 - Awakened State: mostly natural hair with a light tint
@@ -80,9 +80,10 @@ When the player transforms, the mod applies custom Terraria-style `ModHair` spri
 - Super Saiyan 3: longer custom gold hair
 - Super Saiyan God: custom red-tinted compact hair
 - Super Saiyan Blue: custom spiky blue hair
+- Ultra Instinct Sign: custom darker/incomplete silver hair
 - Ultra Instinct: custom silver/white hair
 
-Aura behavior is now profile-driven per form, with separate dust type, light strength, dust intensity, secondary color, and electric-arc settings. Hair behavior is also profile-driven so form hair selection stays separate from stat logic. Kaio-Ken remains a separate red overlay.
+Powering down to Base restores the stored natural hair style and color. Kaio-Ken does not change hair style; it only adds a red aura layer. Aura behavior is profile-driven per form, with separate dust type, light strength, dust intensity, secondary color, electric-arc settings, and an animated aura draw-layer texture. Hair behavior is also profile-driven so form hair selection stays separate from stat logic.
 
 ## Boss Direction
 

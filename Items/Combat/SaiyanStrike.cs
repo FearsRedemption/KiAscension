@@ -24,7 +24,7 @@ public class SaiyanStrike : ModItem
         Item.rare = ItemRarityID.White;
         Item.noUseGraphic = true;
         Item.autoReuse = true;
-        Item.UseSound = SoundID.Item1;
+        Item.UseSound = null;
     }
 
     public override void ModifyWeaponDamage(Player player, ref StatModifier damage)

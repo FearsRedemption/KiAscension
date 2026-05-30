@@ -84,6 +84,20 @@ public class KiPlayer : ModPlayer
 
     public KiResourceSnapshot KiResources => new(MaxKi, KiRegenPerSecond, ActiveKiDrainPerSecond, KiResourceMath.GetTechniqueCostMultiplier(KiPowerLevel, CurrentStage.Stage));
 
+    public float SaiyanChargeIntensity => GetChargeIntensity(saiyanPowerUpTicks, GetSaiyanPowerUpDuration(Math.Max(CurrentStageIndex + 1, UnlockedStageIndex)));
+
+    public float SaiyanPowerDownIntensity => GetChargeIntensity(saiyanPowerDownTicks, SaiyanPowerDownChargeTicks);
+
+    public float BreakthroughIntensity => GetChargeIntensity(breakthroughBurstTicks, BreakthroughBurstTicks);
+
+    public float KaioKenChargeIntensity => GetChargeIntensity(kaioKenPowerUpTicks, GetKaioKenPowerUpDuration(Math.Max(CurrentKaioKenLevelIndex + 1, UnlockedKaioKenLevelIndex)));
+
+    public float KaioKenPowerDownIntensity => GetChargeIntensity(kaioKenPowerDownTicks, KaioKenPowerDownChargeTicks);
+
+    public bool HasVisibleSaiyanAura => CurrentStageIndex > 0 || SaiyanChargeIntensity > 0f || SaiyanPowerDownIntensity > 0f || BreakthroughIntensity > 0f;
+
+    public bool HasVisibleKaioKenAura => IsKaioKenActive || KaioKenChargeIntensity > 0f || KaioKenPowerDownIntensity > 0f;
+
     public StageDefinition CurrentStage => AscensionStages.Get(CurrentStageIndex);
 
     public StageDefinition NextStage => AscensionStages.Get(UnlockedStageIndex + 1);
@@ -203,6 +217,15 @@ public class KiPlayer : ModPlayer
         tag["Ki"] = Ki;
         tag["SelectedTechniqueIndex"] = SelectedTechniqueIndex;
         tag["HighestAnnouncedTechniqueIndex"] = highestAnnouncedTechniqueIndex;
+        tag["NaturalHairCaptured"] = naturalHairCaptured ? 1 : 0;
+
+        if (naturalHairCaptured)
+        {
+            tag["NaturalHairStyle"] = naturalHairStyle;
+            tag["NaturalHairColorR"] = (int)naturalHairColor.R;
+            tag["NaturalHairColorG"] = (int)naturalHairColor.G;
+            tag["NaturalHairColorB"] = (int)naturalHairColor.B;
+        }
     }
 
     public override void LoadData(TagCompound tag)
@@ -216,6 +239,11 @@ public class KiPlayer : ModPlayer
         UnlockedKaioKenLevelIndex = tag.ContainsKey("UnlockedKaioKenLevelIndex") ? tag.GetInt("UnlockedKaioKenLevelIndex") : 0;
         Ki = tag.ContainsKey("Ki") ? tag.GetInt("Ki") : BaseMaxKi;
         SelectedTechniqueIndex = tag.ContainsKey("SelectedTechniqueIndex") ? tag.GetInt("SelectedTechniqueIndex") : 0;
+        naturalHairCaptured = tag.ContainsKey("NaturalHairCaptured") && tag.GetInt("NaturalHairCaptured") == 1;
+        naturalHairStyle = tag.ContainsKey("NaturalHairStyle") ? tag.GetInt("NaturalHairStyle") : 0;
+        naturalHairColor = tag.ContainsKey("NaturalHairColorR")
+            ? new Color(tag.GetInt("NaturalHairColorR"), tag.GetInt("NaturalHairColorG"), tag.GetInt("NaturalHairColorB"))
+            : Color.White;
 
         UnlockedStageIndex = Math.Clamp(UnlockedStageIndex, 0, AscensionStages.MaxStageIndex);
         CurrentStageIndex = Math.Clamp(CurrentStageIndex, 0, UnlockedStageIndex);
@@ -242,6 +270,7 @@ public class KiPlayer : ModPlayer
             return;
         }
 
+        CaptureNaturalHairIfNeeded();
         EnsureInventoryItem(ModContent.ItemType<KiTrainingFocus>());
         EnsureInventoryItem(ModContent.ItemType<SaiyanStrike>());
         EnsureInventoryItem(ModContent.ItemType<BasicKiBlastSpell>());
@@ -1294,7 +1323,7 @@ public class KiPlayer : ModPlayer
             }
             else
             {
-                KiSoundSystem.PlayPowerUpStart(Player.Center);
+                KiSoundSystem.PlayKaioKenActivation(Player.Center);
             }
         }
 
@@ -1469,14 +1498,22 @@ public class KiPlayer : ModPlayer
 
     private void ApplyAscensionVisuals()
     {
-        if (!naturalHairCaptured || CurrentStageIndex == 0)
-        {
-            naturalHairStyle = Player.hair;
-            naturalHairColor = Player.hairColor;
-            naturalHairCaptured = true;
-        }
+        CaptureNaturalHairIfNeeded();
 
         AscensionVisuals.Apply(Player, CurrentStage, naturalHairStyle, naturalHairColor);
+    }
+
+    private void CaptureNaturalHairIfNeeded()
+    {
+        if (naturalHairCaptured)
+        {
+            return;
+        }
+
+        bool currentHairIsAscensionHair = AscensionVisuals.IsAscensionHairStyle(Player.hair);
+        naturalHairStyle = currentHairIsAscensionHair ? 0 : Player.hair;
+        naturalHairColor = currentHairIsAscensionHair ? Color.White : Player.hairColor;
+        naturalHairCaptured = true;
     }
 
     private void ShowProgressionNoticeOnce()
@@ -1499,9 +1536,9 @@ public class KiPlayer : ModPlayer
 
         StageDefinition stage = CurrentStage;
         AscensionAuraProfile auraProfile = AscensionAuraProfiles.Get(stage.Stage);
-        float saiyanChargeIntensity = GetChargeIntensity(saiyanPowerUpTicks, GetSaiyanPowerUpDuration(Math.Max(CurrentStageIndex + 1, UnlockedStageIndex)));
-        float powerDownIntensity = GetChargeIntensity(saiyanPowerDownTicks, SaiyanPowerDownChargeTicks);
-        float breakthroughIntensity = GetChargeIntensity(breakthroughBurstTicks, BreakthroughBurstTicks);
+        float saiyanChargeIntensity = SaiyanChargeIntensity;
+        float powerDownIntensity = SaiyanPowerDownIntensity;
+        float breakthroughIntensity = BreakthroughIntensity;
 
         if (CurrentStageIndex > 0 || saiyanChargeIntensity > 0f || powerDownIntensity > 0f || breakthroughIntensity > 0f)
         {
@@ -1537,7 +1574,7 @@ public class KiPlayer : ModPlayer
         if (IsKaioKenActive || kaioKenPowerUpTicks > 0 || kaioKenPowerDownTicks > 0)
         {
             KaioKenLevelDefinition kaioKen = CurrentKaioKenLevel;
-            float chargeIntensity = GetChargeIntensity(kaioKenPowerUpTicks, GetKaioKenPowerUpDuration(Math.Max(CurrentKaioKenLevelIndex + 1, UnlockedKaioKenLevelIndex)));
+            float chargeIntensity = KaioKenChargeIntensity;
             float scale = 1.1f + CurrentKaioKenLevelIndex * 0.05f + chargeIntensity * 0.8f;
             Lighting.AddLight(Player.Center, new Vector3(0.65f, 0.08f, 0.05f) * (0.25f + chargeIntensity * 0.4f));
 

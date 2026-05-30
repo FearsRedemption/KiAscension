@@ -24,6 +24,17 @@ public static class AscensionVisuals
         };
     }
 
+    public static bool IsAscensionHairStyle(int hairStyle)
+    {
+        return hairStyle == ModContent.GetInstance<SuperSaiyanHair>().Type
+            || hairStyle == ModContent.GetInstance<SuperSaiyan2Hair>().Type
+            || hairStyle == ModContent.GetInstance<SuperSaiyan3Hair>().Type
+            || hairStyle == ModContent.GetInstance<GodHair>().Type
+            || hairStyle == ModContent.GetInstance<SuperSaiyanBlueHair>().Type
+            || hairStyle == ModContent.GetInstance<UltraInstinctSignHair>().Type
+            || hairStyle == ModContent.GetInstance<UltraInstinctHair>().Type;
+    }
+
     public static Color GetHairColor(StageDefinition stage, Color naturalHairColor)
     {
         AscensionHairProfile profile = AscensionHairProfiles.Get(stage.Stage);

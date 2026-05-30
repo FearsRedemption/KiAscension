@@ -60,13 +60,15 @@ Add future techniques by choosing a bucket first, then tuning the Terraria behav
 
 ## Sound Hooks
 
-`Systems/KiSoundSystem.cs` is the central sound helper. It currently maps events to placeholder vanilla Terraria sounds:
+`Systems/KiSoundSystem.cs` is the central sound helper. It currently maps events to temporary CC0 energy/electric sounds and keeps vanilla Terraria fallback sounds inside the helper:
 
 - power-up start
 - transformation complete
 - power-down
+- Kaio-Ken activation
 - low-ki fizzle
 - technique fire
 - technique impact
+- melee impact
 
 Future original audio should swap through this helper instead of scattering sound calls across items, projectiles, and player code.

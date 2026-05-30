@@ -47,13 +47,13 @@ Sources:
 - Form-gated ki flight starts at Super Saiyan and scales through later forms with different control and ki drain
 - Hair/form visuals are routed through dedicated hair profiles separate from stat logic
 - Ki techniques have metadata for category, source label, collision style, terrain behavior, pierce, held-beam, and cursor-tracking behavior
-- Central ki sound helper wired to transformations, technique fire/impact, beam fizzle, and strain events using placeholder Terraria sounds
-- Aura profiles per Saiyan form for dust type, light strength, electric arcs, and visual notes
+- Central ki sound helper wired to transformations, technique fire/impact, beam fizzle, and strain events using imported CC0 temporary sounds with Terraria fallback
+- Aura profiles plus an animated aura draw layer per Saiyan form/Kaio-Ken overlay
 - Enemy and boss stat scaling by world progression
 - Vanilla and non-ki weapons remain usable while the custom ki/melee systems are still growing, but Ki Ascension progression is intended to outscale them over time
 - Boss and witness-loss gates for major emotional breakthroughs, with auto-breakthrough only when already at the previous form ceiling
 - Multiplayer-safe per-player power, ki power, Kai Level, Saiyan form unlocks, Kaio-Ken level, and ki
-- Custom Terraria-style `ModHair` sprites for Super Saiyan-style forms
+- Custom Terraria-style `ModHair` sprites for Super Saiyan-style forms, with matching `_Alt` textures and natural-hair restore handling
 - `Weighted Training Bands`, capped training sources, and `Gravity Room Core` training tools
 - Starter item/crafting framework docs, `Ki Fragment` material drops, and placeholder folders/docs for future bosses and mobs
 
@@ -73,7 +73,7 @@ Implemented Saiyan form path:
 
 Kaio-Ken is implemented as a separate parallel track from `Off` through late-game fantasy levels such as `x20`, `x100`, and `x200`. The display names keep the anime flavor, while the actual multipliers are tuned for Terraria instead of literal numeric scaling.
 
-See [docs/progression.md](docs/progression.md) for the design pass that keeps it lore-inspired while still fitting Terraria pacing. See [docs/current-behavior.md](docs/current-behavior.md) for what the current prototype should feel like in game. See [docs/phase-audit.md](docs/phase-audit.md) for the phase-by-phase implementation audit. See [docs/ki-skills.md](docs/ki-skills.md) for the implemented technique metadata and planned roster buckets. See [docs/items-framework.md](docs/items-framework.md) and [docs/bosses-and-mobs.md](docs/bosses-and-mobs.md) for expansion planning.
+See [docs/progression.md](docs/progression.md) for the design pass that keeps it lore-inspired while still fitting Terraria pacing. See [docs/current-behavior.md](docs/current-behavior.md) for what the current prototype should feel like in game. See [docs/phase-audit.md](docs/phase-audit.md) for the phase-by-phase implementation audit. See [docs/ki-skills.md](docs/ki-skills.md) for the implemented technique metadata and planned roster buckets. See [docs/assets.md](docs/assets.md) for imported/placeholder asset notes. See [docs/items-framework.md](docs/items-framework.md) and [docs/bosses-and-mobs.md](docs/bosses-and-mobs.md) for expansion planning.
 
 ## Development Setup
 

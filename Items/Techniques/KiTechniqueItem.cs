@@ -33,7 +33,7 @@ public abstract class KiTechniqueItem : ModItem
         Item.knockBack = technique.Knockback;
         Item.value = Item.buyPrice(silver: 1);
         Item.rare = GetRarity(technique.RequiredStage);
-        Item.UseSound = technique.Behavior == KiTechniqueBehavior.Beam ? SoundID.Item13 : SoundID.Item20;
+        Item.UseSound = null;
         Item.autoReuse = technique.Behavior != KiTechniqueBehavior.Beam;
         Item.channel = technique.Behavior == KiTechniqueBehavior.Beam;
         Item.noMelee = true;
