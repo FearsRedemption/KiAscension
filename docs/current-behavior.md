@@ -30,6 +30,8 @@ Tap `B` to toggle a styled read-only stats panel with current form bonuses, Kaio
 
 Saiyan forms and Kaio-Ken are separate systems. Saiyan forms provide the main transformation bonuses: max ki, ki regeneration, damage, defense, movement, light health regeneration, ki drain, and a placeholder flight-control multiplier for later flight work.
 
+Saiyan form ceilings are revalidated against the current world's boss flags. Super Saiyan requires enough total power, Eye of Cthulhu defeated in the current world, and the witness-loss breakthrough. If the player loads the same character into a fresh world where Eye of Cthulhu has not been defeated, Super Saiyan is not available until that world's gate is satisfied. The HUD/dev panel shows the current blocker, such as `Super Saiyan locked: defeat the Eye of Cthulhu`.
+
 Kaio-Ken can run alongside the current Saiyan form. It adds extra damage and movement, but it primarily strains HP/body endurance while adding only light early ki pressure. Releasing Kaio-Ken returns only the Kaio-Ken level to `Off`; it does not change the active Saiyan form.
 
 True ki flight is available only while an active Saiyan form is Super Saiyan or higher. Hold jump/up/down to engage flight movement. Early forms drain more ki and feel heavier, while God and Ultra Instinct tiers are more efficient and responsive. Flight does not replace wings or mounts permanently; it is a transformation movement layer.
@@ -39,6 +41,8 @@ True ki flight is available only while an active Saiyan form is Super Saiyan or 
 Techniques are now separate spell items. Basic blasts and barrages behave like fast projectile pressure. Masenko is an early focused impact blast. Kamehameha, Galick Gun, Special Beam Cannon, Final Flash, and God Kamehameha are held beams that drain ki over time. Death Beam is a fast precision shot. Destructo Disk pierces multiple enemies and steers toward the mouse while it flies. Big Bang Attack and Spirit Bomb are heavier projectile attacks.
 
 Every ki technique has an initial ki cost, and beam techniques also have a per-second sustain drain. Current ki power and advanced forms apply a ki-control discount through shared resource math, so training can make lower techniques smoother without making high forms free too early. Spell tooltips show the current effective costs for the local player and explain locked spell requirements. Sustained beams now stop at solid terrain, while techniques marked as terrain-passing, such as Spirit Bomb, can still use special terrain behavior.
+
+Enemy kills now grant modest training based on the last hit source. Ki technique kills grant mostly Ki Power and some Physical Power, Saiyan Strike or melee kills grant mostly Physical Power and some Ki Power, and vanilla weapon kills grant smaller Physical Power. Boss kills give a noticeable training bump, but they do not bypass form gates.
 
 Technique definitions now include metadata for category, source label, collision style, held behavior, terrain behavior, piercing, and cursor tracking. This is the foundation for a larger lore-inspired roster without forcing every technique into custom one-off logic.
 
@@ -69,6 +73,8 @@ Each player has their own saved and synced:
 - ki
 
 In multiplayer, the server owns EXP, ki power, training, and unlock progression so clients should not double-award themselves. Clients send selected Saiyan form and Kaio-Ken level to the server; the server clamps those choices to what that player has unlocked and broadcasts the result.
+
+Saved form and Kaio-Ken unlocks are clamped by the current world's boss progression flags when loaded or synced, so a character cannot carry a boss-gated form into a world where that boss gate is still false.
 
 Nearby players can still trigger witness-loss breakthroughs for each other. If one player has enough EXP for a witness-gated form and another player dies close enough, the waiting player should break through.
 

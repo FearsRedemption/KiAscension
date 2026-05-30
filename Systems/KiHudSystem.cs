@@ -169,7 +169,7 @@ public class KiHudSystem : ModSystem
     {
         int width = PanelWidth;
         int x = Math.Max(350, Main.screenWidth - width - 18);
-        int y = showStatsPanel ? Math.Min(Main.screenHeight - 254, 486) : 84;
+        int y = showStatsPanel ? Math.Min(Main.screenHeight - 334, 486) : 84;
 
         if (showStatsPanel && y < 486)
         {
@@ -177,7 +177,7 @@ public class KiHudSystem : ModSystem
             y = 84;
         }
 
-        Rectangle panel = new(x, Math.Max(84, y), width, 238);
+        Rectangle panel = new(x, Math.Max(84, y), width, 318);
         DrawPanelShell(panel, "DEV INSPECTOR", new Color(255, 168, 76));
 
         Rectangle content = GetContentArea(panel);
@@ -198,6 +198,16 @@ public class KiHudSystem : ModSystem
         rightY = DrawMetric(rightX, rightY, columnWidth, "Kaio-Ken", $"{kiPlayer.CurrentKaioKenLevelIndex}/{kiPlayer.UnlockedKaioKenLevelIndex}", GetKaioKenTextColor(kiPlayer));
         rightY = DrawMetric(rightX, rightY, columnWidth, "Technique", $"{kiPlayer.SelectedTechniqueIndex}/{kiPlayer.HighestUnlockedTechniqueIndex}", KiBlue);
         rightY = DrawMetric(rightX, rightY, columnWidth, "Ki", $"{resources.MaxKi} max, {resources.RegenPerSecond}/s", KiBlue);
+
+        leftY = DrawSection(content.X, leftY + 8, columnWidth, "World Gates", new Color(255, 168, 76));
+        leftY = DrawMetric(content.X, leftY, columnWidth, "Eye defeated", FormatBool(NPC.downedBoss1), NPC.downedBoss1 ? new Color(132, 255, 170) : LockedText);
+        leftY = DrawMetric(content.X, leftY, columnWidth, "Evil boss", FormatBool(NPC.downedBoss2), NPC.downedBoss2 ? new Color(132, 255, 170) : LockedText);
+        leftY = DrawMetric(content.X, leftY, columnWidth, "Skeletron", FormatBool(NPC.downedBoss3), NPC.downedBoss3 ? new Color(132, 255, 170) : LockedText);
+
+        rightY = DrawSection(rightX, rightY + 8, columnWidth, "World Gates", new Color(255, 168, 76));
+        rightY = DrawMetric(rightX, rightY, columnWidth, "Hardmode", FormatBool(Main.hardMode), Main.hardMode ? new Color(132, 255, 170) : LockedText);
+        rightY = DrawMetric(rightX, rightY, columnWidth, "Mech boss", FormatBool(NPC.downedMechBossAny), NPC.downedMechBossAny ? new Color(132, 255, 170) : LockedText);
+        rightY = DrawMetric(rightX, rightY, columnWidth, "Plantera", FormatBool(NPC.downedPlantBoss), NPC.downedPlantBoss ? new Color(132, 255, 170) : LockedText);
 
         int noteY = Math.Max(leftY, rightY) + 8;
         DrawWrappedText("Read-only testing view. Grant/reset buttons stay out until config-gated.", new Vector2(content.X, noteY), content.Width, MutedText, 0.74f, panel.Bottom - noteY - PanelPadding);
@@ -445,6 +455,11 @@ public class KiHudSystem : ModSystem
     private static string FormatSigned(int value)
     {
         return value > 0 ? $"+{value}" : value.ToString();
+    }
+
+    private static string FormatBool(bool value)
+    {
+        return value ? "true" : "false";
     }
 
     private static string GetNetModeName()

@@ -1,6 +1,9 @@
 using System;
+using KiAscension.Items.Combat;
 using KiAscension.Items.Materials;
+using KiAscension.Items.Techniques;
 using KiAscension.Players;
+using KiAscension.Projectiles;
 using Microsoft.Xna.Framework;
 using Terraria;
 using Terraria.ID;
@@ -12,6 +15,10 @@ public class AscensionNpcScaling : GlobalNPC
 {
     private const int RewardRange = 2400;
     private const int WitnessRange = 1200;
+    private KillTrainingSource lastTrainingSource = KillTrainingSource.Environment;
+    private int lastPlayerHitIndex = -1;
+
+    public override bool InstancePerEntity => true;
 
     public override void SetDefaults(NPC npc)
     {
@@ -46,6 +53,7 @@ public class AscensionNpcScaling : GlobalNPC
 
         int reward = CalculateReward(npc);
         TryDropKiFragment(npc);
+        GetTrainingRewardSplit(npc, reward, out int physicalReward, out int kiReward);
 
         for (int playerIndex = 0; playerIndex < Main.maxPlayers; playerIndex++)
         {
@@ -62,9 +70,50 @@ public class AscensionNpcScaling : GlobalNPC
             }
 
             KiPlayer kiPlayer = player.GetModPlayer<KiPlayer>();
-            kiPlayer.AddPowerExperience(reward, npc.boss);
-            kiPlayer.AddKiExperience(Math.Max(1, reward / 2), false);
+            bool primaryKiller = playerIndex == lastPlayerHitIndex || lastPlayerHitIndex < 0 || npc.boss;
+            int playerPhysicalReward = primaryKiller ? physicalReward : Math.Max(0, physicalReward / 2);
+            int playerKiReward = primaryKiller ? kiReward : Math.Max(0, kiReward / 2);
+            kiPlayer.AddTrainingExperience(playerPhysicalReward, playerKiReward, npc.boss && primaryKiller);
         }
+    }
+
+    public override void OnHitByItem(NPC npc, Player player, Item item, NPC.HitInfo hit, int damageDone)
+    {
+        if (player is null || !player.active || damageDone <= 0)
+        {
+            return;
+        }
+
+        lastPlayerHitIndex = player.whoAmI;
+        lastTrainingSource = item.ModItem is SaiyanStrike
+            ? KillTrainingSource.SaiyanStrike
+            : item.ModItem is KiTechniqueItem
+                ? KillTrainingSource.KiTechnique
+                : IsMeleeDamage(item.DamageType)
+                    ? KillTrainingSource.Melee
+                    : KillTrainingSource.VanillaWeapon;
+    }
+
+    public override void OnHitByProjectile(NPC npc, Projectile projectile, NPC.HitInfo hit, int damageDone)
+    {
+        if (damageDone <= 0 || projectile.owner < 0 || projectile.owner >= Main.maxPlayers)
+        {
+            return;
+        }
+
+        Player player = Main.player[projectile.owner];
+
+        if (player is null || !player.active)
+        {
+            return;
+        }
+
+        lastPlayerHitIndex = player.whoAmI;
+        lastTrainingSource = projectile.ModProjectile is KiTechniqueProjectile
+            ? KillTrainingSource.KiTechnique
+            : IsMeleeDamage(projectile.DamageType)
+                ? KillTrainingSource.Melee
+                : KillTrainingSource.VanillaWeapon;
     }
 
     private static void TryDropKiFragment(NPC npc)
@@ -129,6 +178,11 @@ public class AscensionNpcScaling : GlobalNPC
 
     private static int CalculateReward(NPC npc)
     {
+        if (!npc.boss && npc.lifeMax < 25 && npc.value <= 0f)
+        {
+            return 0;
+        }
+
         int reward = Math.Max(10, npc.lifeMax / 12);
 
         if (npc.boss)
@@ -141,6 +195,48 @@ public class AscensionNpcScaling : GlobalNPC
         }
 
         return Math.Clamp(reward, 10, npc.boss ? 1800 : 220);
+    }
+
+    private void GetTrainingRewardSplit(NPC npc, int reward, out int physicalReward, out int kiReward)
+    {
+        physicalReward = 0;
+        kiReward = 0;
+
+        if (reward <= 0)
+        {
+            return;
+        }
+
+        switch (lastTrainingSource)
+        {
+            case KillTrainingSource.KiTechnique:
+                kiReward = reward;
+                physicalReward = Math.Max(1, reward / 5);
+                break;
+            case KillTrainingSource.SaiyanStrike:
+            case KillTrainingSource.Melee:
+                physicalReward = reward;
+                kiReward = Math.Max(1, reward / 5);
+                break;
+            case KillTrainingSource.VanillaWeapon:
+                physicalReward = Math.Max(1, reward / 3);
+                break;
+            default:
+                physicalReward = Math.Max(1, reward / 4);
+                kiReward = Math.Max(1, reward / 4);
+                break;
+        }
+
+        if (npc.boss)
+        {
+            physicalReward += lastTrainingSource == KillTrainingSource.KiTechnique ? reward / 4 : reward / 2;
+            kiReward += lastTrainingSource is KillTrainingSource.SaiyanStrike or KillTrainingSource.Melee ? reward / 4 : reward / 2;
+        }
+    }
+
+    private static bool IsMeleeDamage(DamageClass damageClass)
+    {
+        return damageClass == DamageClass.Melee || damageClass.CountsAsClass(DamageClass.Melee);
     }
 
     private static void NotifyWitnesses(Vector2 lossPosition, string source)
@@ -161,5 +257,14 @@ public class AscensionNpcScaling : GlobalNPC
 
             player.GetModPlayer<KiPlayer>().WitnessLoss(lossPosition, source);
         }
+    }
+
+    private enum KillTrainingSource
+    {
+        Environment,
+        VanillaWeapon,
+        Melee,
+        SaiyanStrike,
+        KiTechnique
     }
 }

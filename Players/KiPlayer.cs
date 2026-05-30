@@ -42,6 +42,7 @@ public class KiPlayer : ModPlayer
     private Color naturalHairColor;
     private bool naturalHairCaptured;
     private bool shownProgressionNotice;
+    private int highestWitnessedStageIndex;
     private int saiyanPowerUpTicks;
     private int saiyanPowerDownTicks;
     private int kaioKenPowerUpTicks;
@@ -162,7 +163,7 @@ public class KiPlayer : ModPlayer
 
             return AscensionStages.IsGateSatisfied(next.RequiredGate)
                 ? $"Next Kaio-Ken ready: {next.DisplayName}"
-                : $"Next Kaio-Ken: {next.DisplayName}; {AscensionStages.GetGateText(next.RequiredGate)}";
+                : $"{next.DisplayName} locked: {AscensionStages.GetGateText(next.RequiredGate)}";
         }
     }
 
@@ -188,7 +189,8 @@ public class KiPlayer : ModPlayer
         UnlockedStageIndex < AscensionStages.MaxStageIndex
         && TotalPowerExperience >= NextStage.RequiredExperience
         && AscensionStages.IsGateSatisfied(NextStage)
-        && NextStage.RequiresWitnessLoss;
+        && NextStage.RequiresWitnessLoss
+        && highestWitnessedStageIndex < UnlockedStageIndex + 1;
 
     public override void Initialize()
     {
@@ -202,6 +204,7 @@ public class KiPlayer : ModPlayer
         Ki = BaseMaxKi;
         SelectedTechniqueIndex = 0;
         highestAnnouncedTechniqueIndex = 0;
+        highestWitnessedStageIndex = 0;
         naturalHairStyle = 0;
         naturalHairColor = Color.White;
         naturalHairCaptured = false;
@@ -250,6 +253,7 @@ public class KiPlayer : ModPlayer
         tag["Ki"] = Ki;
         tag["SelectedTechniqueIndex"] = SelectedTechniqueIndex;
         tag["HighestAnnouncedTechniqueIndex"] = highestAnnouncedTechniqueIndex;
+        tag["HighestWitnessedStageIndex"] = highestWitnessedStageIndex;
         tag["NaturalHairCaptured"] = naturalHairCaptured ? 1 : 0;
 
         if (naturalHairCaptured)
@@ -268,6 +272,9 @@ public class KiPlayer : ModPlayer
         KaiLevel = tag.ContainsKey("KaiLevel") ? tag.GetInt("KaiLevel") : CalculateKaiLevel(TotalPowerExperience);
         CurrentStageIndex = tag.ContainsKey("CurrentStageIndex") ? tag.GetInt("CurrentStageIndex") : 0;
         UnlockedStageIndex = tag.ContainsKey("UnlockedStageIndex") ? tag.GetInt("UnlockedStageIndex") : 0;
+        highestWitnessedStageIndex = tag.ContainsKey("HighestWitnessedStageIndex")
+            ? tag.GetInt("HighestWitnessedStageIndex")
+            : InferWitnessedStageIndex(UnlockedStageIndex);
         CurrentKaioKenLevelIndex = tag.ContainsKey("CurrentKaioKenLevelIndex") ? tag.GetInt("CurrentKaioKenLevelIndex") : 0;
         UnlockedKaioKenLevelIndex = tag.ContainsKey("UnlockedKaioKenLevelIndex") ? tag.GetInt("UnlockedKaioKenLevelIndex") : 0;
         Ki = tag.ContainsKey("Ki") ? tag.GetInt("Ki") : BaseMaxKi;
@@ -278,13 +285,9 @@ public class KiPlayer : ModPlayer
             ? new Color(tag.GetInt("NaturalHairColorR"), tag.GetInt("NaturalHairColorG"), tag.GetInt("NaturalHairColorB"))
             : Color.White;
 
-        UnlockedStageIndex = Math.Clamp(UnlockedStageIndex, 0, AscensionStages.MaxStageIndex);
-        CurrentStageIndex = Math.Clamp(CurrentStageIndex, 0, UnlockedStageIndex);
-        UnlockedKaioKenLevelIndex = Math.Clamp(Math.Max(UnlockedKaioKenLevelIndex, KaioKenLevels.GetHighestUnlockedIndex(TotalPowerExperience)), 0, KaioKenLevels.MaxLevelIndex);
-        CurrentKaioKenLevelIndex = Math.Clamp(CurrentKaioKenLevelIndex, 0, UnlockedKaioKenLevelIndex);
+        highestWitnessedStageIndex = Math.Clamp(Math.Max(highestWitnessedStageIndex, InferWitnessedStageIndex(UnlockedStageIndex)), 0, AscensionStages.MaxStageIndex);
         KaiLevel = Math.Max(1, CalculateKaiLevel(TotalPowerExperience));
-        Ki = Math.Clamp(Ki, 0, MaxKi);
-        SelectedTechniqueIndex = Math.Clamp(SelectedTechniqueIndex, 0, HighestUnlockedTechniqueIndex);
+        RevalidateProgressionAgainstCurrentWorld();
         highestAnnouncedTechniqueIndex = tag.ContainsKey("HighestAnnouncedTechniqueIndex")
             ? Math.Clamp(tag.GetInt("HighestAnnouncedTechniqueIndex"), 0, HighestUnlockedTechniqueIndex)
             : HighestUnlockedTechniqueIndex;
@@ -303,6 +306,7 @@ public class KiPlayer : ModPlayer
             return;
         }
 
+        RevalidateProgressionAgainstCurrentWorld();
         CaptureNaturalHairIfNeeded();
         EnsureInventoryItem(ModContent.ItemType<KiTrainingFocus>());
         EnsureInventoryItem(ModContent.ItemType<SaiyanStrike>());
@@ -342,6 +346,7 @@ public class KiPlayer : ModPlayer
         clone.Ki = Ki;
         clone.SelectedTechniqueIndex = SelectedTechniqueIndex;
         clone.highestAnnouncedTechniqueIndex = highestAnnouncedTechniqueIndex;
+        clone.highestWitnessedStageIndex = highestWitnessedStageIndex;
         clone.breakthroughBurstTicks = breakthroughBurstTicks;
         clone.IsKiFlying = IsKiFlying;
     }
@@ -741,10 +746,19 @@ public class KiPlayer : ModPlayer
                 return unlockedAnyStage;
             }
 
-            if (next.RequiresWitnessLoss && !witnessedLoss)
+            bool witnessSatisfied = !next.RequiresWitnessLoss
+                || witnessedLoss
+                || highestWitnessedStageIndex >= UnlockedStageIndex + 1;
+
+            if (!witnessSatisfied)
             {
                 AnnouncePendingBreakthrough();
                 return unlockedAnyStage;
+            }
+
+            if (next.RequiresWitnessLoss && witnessedLoss)
+            {
+                highestWitnessedStageIndex = Math.Max(highestWitnessedStageIndex, UnlockedStageIndex + 1);
             }
 
             bool shouldBreakthrough = previousCurrentStageIndex == previousUnlockedStageIndex;
@@ -812,7 +826,7 @@ public class KiPlayer : ModPlayer
 
         if (Player.whoAmI == Main.myPlayer && pendingAnnouncementStage != gateAnnouncementMarker)
         {
-            Main.NewText($"{stage.DisplayName} needs one more trial: {AscensionStages.GetGateText(stage.RequiredGate)}.", new Color(255, 180, 120));
+            Main.NewText($"{stage.DisplayName} locked: {AscensionStages.GetGateText(stage.RequiredGate)}.", new Color(255, 180, 120));
         }
 
         pendingAnnouncementStage = gateAnnouncementMarker;
@@ -829,7 +843,7 @@ public class KiPlayer : ModPlayer
 
         if (Player.whoAmI == Main.myPlayer && pendingAnnouncementStage != nextStageIndex)
         {
-            Main.NewText($"{NextStage.DisplayName} is within reach, but you need a breaking point.", new Color(255, 150, 110));
+            Main.NewText($"{NextStage.DisplayName} ready, but requires witness-loss breakthrough.", new Color(255, 150, 110));
         }
 
         pendingAnnouncementStage = nextStageIndex;
@@ -866,11 +880,13 @@ public class KiPlayer : ModPlayer
         {
             if (!AscensionStages.IsGateSatisfied(next))
             {
-                return $"Ceiling ready: {next.DisplayName}; {AscensionStages.GetGateText(next.RequiredGate)}";
+                return $"{next.DisplayName} locked: {AscensionStages.GetGateText(next.RequiredGate)}";
             }
 
             return next.RequiresWitnessLoss
-                ? $"Ceiling ready: {next.DisplayName} needs a breaking point"
+                ? highestWitnessedStageIndex >= UnlockedStageIndex + 1
+                    ? $"Ceiling ready: {next.DisplayName}"
+                    : $"{next.DisplayName} ready, but requires witness-loss breakthrough"
                 : $"Ceiling ready: {next.DisplayName}";
         }
 
@@ -939,6 +955,7 @@ public class KiPlayer : ModPlayer
         writer.Write(Ki);
         writer.Write(SelectedTechniqueIndex);
         writer.Write(highestAnnouncedTechniqueIndex);
+        writer.Write(highestWitnessedStageIndex);
         writer.Write(breakthroughBurstTicks);
         writer.Write(IsKiFlying);
     }
@@ -955,16 +972,13 @@ public class KiPlayer : ModPlayer
         Ki = reader.ReadInt32();
         SelectedTechniqueIndex = reader.ReadInt32();
         highestAnnouncedTechniqueIndex = reader.ReadInt32();
+        highestWitnessedStageIndex = reader.ReadInt32();
         breakthroughBurstTicks = reader.ReadInt32();
         IsKiFlying = reader.ReadBoolean();
 
-        UnlockedStageIndex = Math.Clamp(UnlockedStageIndex, 0, AscensionStages.MaxStageIndex);
-        CurrentStageIndex = Math.Clamp(CurrentStageIndex, 0, UnlockedStageIndex);
-        UnlockedKaioKenLevelIndex = Math.Clamp(Math.Max(UnlockedKaioKenLevelIndex, KaioKenLevels.GetHighestUnlockedIndex(TotalPowerExperience)), 0, KaioKenLevels.MaxLevelIndex);
-        CurrentKaioKenLevelIndex = Math.Clamp(CurrentKaioKenLevelIndex, 0, UnlockedKaioKenLevelIndex);
+        highestWitnessedStageIndex = Math.Clamp(Math.Max(highestWitnessedStageIndex, InferWitnessedStageIndex(UnlockedStageIndex)), 0, AscensionStages.MaxStageIndex);
         KaiLevel = Math.Max(1, CalculateKaiLevel(TotalPowerExperience));
-        Ki = Math.Clamp(Ki, 0, MaxKi);
-        SelectedTechniqueIndex = Math.Clamp(SelectedTechniqueIndex, 0, HighestUnlockedTechniqueIndex);
+        RevalidateProgressionAgainstCurrentWorld();
         highestAnnouncedTechniqueIndex = Math.Clamp(highestAnnouncedTechniqueIndex, 0, HighestUnlockedTechniqueIndex);
         breakthroughBurstTicks = Math.Clamp(breakthroughBurstTicks, 0, BreakthroughBurstTicks);
         IsKiFlying = IsKiFlying && CurrentFlightProfile.AllowsTrueFlight;
@@ -1087,6 +1101,56 @@ public class KiPlayer : ModPlayer
         return Math.Max(1, 1 + (int)Math.Sqrt(Math.Max(0, powerExperience) / (float)KaiLevelExperienceFactor));
     }
 
+    private void RevalidateProgressionAgainstCurrentWorld()
+    {
+        highestWitnessedStageIndex = Math.Clamp(highestWitnessedStageIndex, 0, AscensionStages.MaxStageIndex);
+        UnlockedStageIndex = GetHighestStageAllowedInCurrentWorld();
+        CurrentStageIndex = Math.Clamp(CurrentStageIndex, 0, UnlockedStageIndex);
+        UnlockedKaioKenLevelIndex = Math.Clamp(KaioKenLevels.GetHighestUnlockedIndex(TotalPowerExperience), 0, KaioKenLevels.MaxLevelIndex);
+        CurrentKaioKenLevelIndex = Math.Clamp(CurrentKaioKenLevelIndex, 0, UnlockedKaioKenLevelIndex);
+        Ki = Math.Clamp(Ki, 0, MaxKi);
+        SelectedTechniqueIndex = Math.Clamp(SelectedTechniqueIndex, 0, HighestUnlockedTechniqueIndex);
+    }
+
+    private int GetHighestStageAllowedInCurrentWorld()
+    {
+        int highest = 0;
+
+        for (int stageIndex = 1; stageIndex <= AscensionStages.MaxStageIndex; stageIndex++)
+        {
+            StageDefinition stage = AscensionStages.Get(stageIndex);
+
+            if (TotalPowerExperience < stage.RequiredExperience || !AscensionStages.IsGateSatisfied(stage))
+            {
+                break;
+            }
+
+            if (stage.RequiresWitnessLoss && highestWitnessedStageIndex < stageIndex)
+            {
+                break;
+            }
+
+            highest = stageIndex;
+        }
+
+        return highest;
+    }
+
+    private static int InferWitnessedStageIndex(int unlockedStageIndex)
+    {
+        int witnessedStageIndex = 0;
+
+        for (int stageIndex = 1; stageIndex <= Math.Clamp(unlockedStageIndex, 0, AscensionStages.MaxStageIndex); stageIndex++)
+        {
+            if (AscensionStages.Get(stageIndex).RequiresWitnessLoss)
+            {
+                witnessedStageIndex = stageIndex;
+            }
+        }
+
+        return witnessedStageIndex;
+    }
+
     private void RefreshTechniqueUnlocks(bool announce)
     {
         int highestUnlocked = HighestUnlockedTechniqueIndex;
@@ -1103,7 +1167,7 @@ public class KiPlayer : ModPlayer
     private void RefreshKaioKenUnlocks(bool announce)
     {
         int highestUnlocked = KaioKenLevels.GetHighestUnlockedIndex(TotalPowerExperience);
-        UnlockedKaioKenLevelIndex = Math.Max(UnlockedKaioKenLevelIndex, highestUnlocked);
+        UnlockedKaioKenLevelIndex = highestUnlocked;
         CurrentKaioKenLevelIndex = Math.Clamp(CurrentKaioKenLevelIndex, 0, UnlockedKaioKenLevelIndex);
     }
 

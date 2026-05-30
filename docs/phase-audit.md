@@ -13,10 +13,10 @@ The mod is buildable and now has foundations for every requested phase. Phases 1
 | 1. Audit current behavior vs docs | Implemented | `README.md`, `docs/current-behavior.md`, and this audit describe actual behavior and remaining gaps. |
 | 2. Charged Saiyan power-up/down | Implemented | `Z`/`X` support tap stepping and held charge/power-down behavior in `KiPlayer`. |
 | 3. Separate Kaio-Ken | Implemented | Kaio-Ken is separate from Saiyan forms, has own keybinds, levels, drain, and sync. |
-| 4. Core transformation stats/hooks | Implemented | Saiyan forms and Kaio-Ken feed max ki, regen, drain, damage, defense, speed, HP regen, and flight hooks. |
+| 4. Core transformation stats/hooks | Implemented | Saiyan forms and Kaio-Ken feed max ki, regen, drain, damage, defense, speed, HP regen, and flight hooks. Form and Kaio-Ken unlocks are clamped against current-world gates on load/sync. |
 | 5. Ki mana/spell economy | Implemented | Ki costs, beam sustain drain, fizzle behavior, ki-control discounts, and tooltip costs are centralized. |
 | 6. Ki UI/stats/dev inspection | Implemented foundation | Styled HUD plus read-only stats/dev panels exist, including wrapped long lines and locked-spell reasons. Final UI art and editable dev tools are planned. |
-| 7. Breakthrough behavior | Implemented | Unlocks auto-transform only when the player was already in their previous highest form. |
+| 7. Breakthrough behavior | Implemented | Unlocks auto-transform only when the player was already in their previous highest form, and witness-loss forms remain blocked until power, world boss gate, and witness requirements are all satisfied. |
 | 8. Flight progression | Implemented foundation | Super Saiyan+ ki flight exists with form-scaled control and drain. Full flight polish/trails remain planned. |
 | 9. Ki skill architecture | Implemented foundation | Techniques carry category, source, collision style, terrain, pierce, tracking, and held-beam metadata. |
 | 10. Ki skill roster | Partially implemented gameplay | The implemented roster now includes starter blasts, Masenko, Kamehameha, Death Beam, Destructo Disk, Galick Gun, Special Beam Cannon, Big Bang Attack, Final Flash, Spirit Bomb, God Kamehameha, and Ultra Instinct Barrage. Full roster is not implemented. |
