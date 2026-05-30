@@ -2,6 +2,8 @@
 
 This file tracks art and audio source status separately from gameplay design docs.
 
+No official Dragon Ball, Dragon Ball Z, Dragon Ball Super, Terraria, or third-party copyrighted fan assets are intentionally bundled here. Current visual assets are either original temporary placeholders generated for this mod or imported CC0 audio files listed below.
+
 ## Hair Sprites
 
 Status: improved original temporary placeholder.
@@ -9,6 +11,12 @@ Status: improved original temporary placeholder.
 The current `ModHair` sheets in `Hairs/` were generated for this mod as simple Terraria-format placeholders. They are 40x784 PNGs, matching 14 frames of 40x56 hair data. Each hair has a matching `_Alt.png` file because tModLoader expects alternate hair textures when head equipment changes how hair is drawn. The current pass regenerated every base and `_Alt` sheet together so they remain paired.
 
 These are not final art. They now use different silhouettes for Super Saiyan, Super Saiyan 2, Super Saiyan 3, God, Blue, Ultra Instinct Sign, and Ultra Instinct, with a transparent face cutout so the hair should not cover the player face. ModHair itself remains static; the animation energy is handled through aura overlays for now.
+
+Replacement TODOs:
+
+- Draw or commission final Terraria-proportioned form hair sheets.
+- Keep every final sheet paired with a matching `_Alt.png`.
+- Re-test face alignment, head equipment behavior, power-down restore, and save/reload after replacing art.
 
 Researched but not imported:
 
@@ -19,6 +27,12 @@ Researched but not imported:
 Status: improved original temporary placeholder.
 
 `Assets/Effects/KiAura.png` is an original eight-frame white aura sheet generated for this mod and tinted in code per form. `Assets/Effects/KiAuraElectric.png` is an original eight-frame electric arc sheet used for Super Saiyan 2-style arcs, unstable breakthroughs, and Kaio-Ken aggression. Together they give the mod a real animated aura foundation without depending on unverified anime assets.
+
+Replacement TODOs:
+
+- Replace the generic white-tinted sheet with form-specific aura sheets or a stronger procedural renderer.
+- Add dedicated flight trails once the flight pass gets a visual polish pass.
+- Re-test visibility behind the player so aura art does not hide the character silhouette.
 
 Researched but not imported:
 
@@ -32,6 +46,12 @@ Status: original temporary placeholder.
 `Assets/Effects/KiBeamSegment.png`, `KiBeamHead.png`, `KiBeamImpact.png`, `KiChargeOrb.png`, `KiOrbProjectile.png`, and `KiDisk.png` were generated for this mod as small grayscale/white-alpha effect textures. The renderer tints them per technique, so the same legal placeholder sheets can support Kamehameha blue, Galick Gun purple, Final Flash yellow, Special Beam Cannon drill accents, Spirit Bomb white/blue, and Destructo Disk cutting visuals.
 
 These are not final art. They exist to replace plain rectangle beams and generic projectiles with readable gameplay silhouettes while the final projectile art direction is developed.
+
+Replacement TODOs:
+
+- Give Kamehameha, Galick Gun, Final Flash, Special Beam Cannon, Death Beam, Destructo Disk, Big Bang Attack, Spirit Bomb, and God Kamehameha their own final silhouettes.
+- Keep shared renderer support so final art can still use charge orbs, stream segments, heads, impact flares, and projectile bodies.
+- Re-test terrain impact, beam length, disk steering, and Spirit Bomb charge size after replacing sheets.
 
 Researched but not imported:
 
@@ -61,6 +81,12 @@ Source URLs:
 - https://opengameart.org/content/electricity-game-sound-pack
 
 These are not final DBZ-style audio. They are legally usable temporary energy/electric sound effects to move away from pure built-in Terraria placeholders while the final sound direction is developed.
+
+Replacement TODOs:
+
+- Produce or source final original anime-ki-style sounds for each major technique and transformation event.
+- Keep all calls routed through `KiSoundSystem` so replacement assets remain centralized.
+- Re-test missing-asset fallback behavior after any rename or asset swap.
 
 ## Training Station Sprites
 

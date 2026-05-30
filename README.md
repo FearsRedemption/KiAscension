@@ -21,15 +21,17 @@ Sources:
 
 ## Current Status
 
+The current build is playable prototype gameplay, not final content. Core progression, ki resource behavior, transformations, starter training, starter enemy pressure, and representative techniques exist. Final art, final audio, full boss content, higher training tiers, advanced melee, and final UI polish are still planned.
+
 ### Implemented
 
 - Starting items: `Ki Training Focus`, `Saiyan Strike`, and `Basic Ki Blast`
 - Separate ki spell items, from basic blasts through Masenko, Kamehameha, Death Beam, Destructo Disk, Galick Gun, Special Beam Cannon, Big Bang Attack, Final Flash, Spirit Bomb, God Kamehameha, and Ultra Instinct Barrage
-- Held beam behavior for Kamehameha-style techniques, using placeholder charge orbs, animated beam streams, beam heads, and impact flares instead of plain bars
+- Held beam behavior for Kamehameha-style techniques, using temporary charge orbs, animated beam streams, beam heads, and impact flares instead of plain bars
 - Terrain-aware beam range for sustained beams, while ultimate terrain-passing attacks remain supported
 - Guided/piercing Destructo Disk behavior
 - Kai Level, physical power, and ki power tracking per player
-- Compact scouter-style ki/power/form/held-spell/next-ceiling HUD with smaller text, wrapped long lines, badges, and locked-spell status
+- Compact scouter-style ki/power/form/held-spell/next-ceiling HUD foundation with smaller text, wrapped long lines, badges, and locked-spell status
 - Power experience from combat, enemy kills, weight training, meditation, and gravity room training
 - Hotkeys:
   - tap `Z`: ascend one unlocked Saiyan form
@@ -50,7 +52,7 @@ Sources:
 - Hair/form visuals are routed through dedicated hair profiles separate from stat logic
 - Ki techniques have metadata for category, source label, collision style, terrain behavior, pierce, held-beam, and cursor-tracking behavior
 - Central ki sound helper wired to transformations, technique charge/release/sustain, fire/impact, beam fizzle, and strain events using imported CC0 temporary sounds with Terraria fallback
-- Aura profiles plus an animated aura draw layer, electric arc overlay, charge-up flare, and power-down collapse per Saiyan form/Kaio-Ken overlay
+- Aura profiles plus a temporary animated aura draw layer, electric arc overlay, charge-up flare, and power-down collapse per Saiyan form/Kaio-Ken overlay
 - Enemy and boss stat scaling by world progression
 - Vanilla and non-ki weapons remain usable while the custom ki/melee systems are still growing, but Ki Ascension progression is intended to outscale them over time
 - Boss and witness-loss gates for major emotional breakthroughs, with auto-breakthrough only when already at the previous form ceiling
@@ -62,12 +64,13 @@ Sources:
 
 ### Partially Implemented
 
-- UI polish: the main HUD and B/N panels are now styled and wrapped, but final art, interactive dev controls, and advanced combat UI are still planned.
-- Aura visuals: animated aura overlay support exists, but final aura art/shaders are not complete.
+- UI polish: the main HUD and B/N panels are now styled and wrapped, but final UI art, advanced combat UI, and editable/config-gated dev controls are still planned.
+- Aura visuals: animated aura overlay support exists with temporary generated sheets, but final aura art/shaders are not complete.
 - Hair visuals: custom `ModHair` placeholders and `_Alt` textures exist with cleaner silhouettes/face cutouts, but final animated transformation hair needs an art pass.
 - Melee: `Saiyan Strike` is playable and scales with physical power, but full punch/kick animations, charged strikes, dash strikes, and combo visuals are not complete.
 - Training: focus meditation, weighted gear, wooden/copper benches, wooden training bag, meditation mat, and gravity training exist; higher station tiers and full gravity chamber progression are still in progress.
 - Sounds: a central sound helper is wired with temporary legally usable energy sounds; final DBZ-style original audio is planned.
+- Bosses/mobs: `Saiba Sprout` is implemented as the first enemy; custom boss encounters are still planned.
 
 ### Planned
 

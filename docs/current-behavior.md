@@ -1,6 +1,6 @@
 # Current Gameplay Behavior
 
-This is the intended behavior of the current prototype when loaded through tModLoader.
+This is the behavior represented by the current buildable prototype when loaded through tModLoader. Balance and presentation still need more live playtesting, so this file describes implemented systems without treating temporary art/audio/UI as final.
 
 ## On Install
 
@@ -22,7 +22,7 @@ Early mobs are scaled up compared to vanilla, but the starter spell, `Saiyan Str
 6. Hold `Z` to charge up into the highest unlocked Saiyan form; hold `X` to power down to Base Saiyan.
 7. Tap or hold `C`/`V` to raise or lower the separate Kaio-Ken level.
 
-The HUD is now a small scouter-style top-left panel instead of a bulky debug overlay. It uses compact modules for Kai Level, net ki flow, ki bar, current form badge, active Kaio-Ken badge, held spell, and next gate. Long gate and spell lines wrap or clip inside the panel so they should not run across the screen. Locked held spells display their locked state and a readable requirement, for example `Spell: Spirit Bomb [LOCKED]` and `Requires: Super Saiyan 3 + 14500 Ki Power`.
+The HUD is now a small scouter-style top-left panel instead of a bulky debug overlay. It uses compact modules for Kai Level, net ki flow, ki bar, current form badge, active Kaio-Ken badge, held spell, and next gate. Long gate and spell lines wrap or clip inside the panel so they should not run across the screen. Locked held spells display their locked state and a readable requirement, for example `Spell: Spirit Bomb [LOCKED]` and `Requires: Super Saiyan 3 + 14500 Ki Power`. This is a cleaner HUD foundation, not final UI art.
 
 Tap `B` to toggle a styled read-only stats panel with current form bonuses, Kaio-Ken strain, final damage/speed multipliers, ki economy, next gates, and held-spell cost details. Tap `N` to toggle a styled read-only dev inspection panel for synced player state while testing. These panels use grouped columns and section bands; they are intentionally still read-only because editable dev tools are planned later.
 
@@ -50,7 +50,7 @@ Enemy kills now grant modest training based on the last hit source. Ki technique
 
 Technique definitions now include metadata for category, source label, collision style, held behavior, terrain behavior, piercing, and cursor tracking. This is the foundation for a larger lore-inspired roster without forcing every technique into custom one-off logic.
 
-Technique charge, release, sustain, fire, impact, beam fizzle, transformations, Kaio-Ken changes, and ki strain now route through a central sound helper. The current build uses temporary CC0 energy/electric sounds where available and falls back to distinct vanilla Terraria sounds through the helper if a custom sound cannot play.
+Technique charge, release, sustain, fire, impact, beam fizzle, transformations, Kaio-Ken changes, and ki strain now route through a central sound helper. The current build uses temporary CC0 energy/electric sounds where available and falls back to distinct vanilla Terraria sounds through the helper if a custom sound cannot play. These sounds are usable placeholders, not final DBZ-style original audio.
 
 ## Training
 
@@ -106,3 +106,7 @@ Current custom hair is still placeholder art, but each transformed form now has 
 The current repo now includes `Saiba Sprout`, an early surface enemy that chases the player and fires a simple hostile ki shot. It gives the early world a small DBZ-flavored combat pressure source instead of keeping mobs entirely theoretical.
 
 The current repo does not add DBZ-flavored bosses yet. The progression is ready for them: future bosses should be original, Dragon Ball-inspired encounters that test the current ascension tier and reward meaningful EXP or breakthrough materials.
+
+## Verification Notes
+
+This documentation pass was checked against the current source files and a local `dotnet build`. It does not mean every UI scale, multiplayer case, balance number, or in-game reload path has received exhaustive playtesting yet.

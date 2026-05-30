@@ -54,9 +54,12 @@ The technique ladder is ordered by a mix of lore chronology and Terraria combat 
 | --- | ---: | --- | --- |
 | Basic Ki Blast | 0 | Base Saiyan | Starter projectile pressure |
 | Ki Barrage | 260 | Base Saiyan | Multiple quick blasts |
+| Masenko | 520 | Awakened State | Early focused yellow impact blast |
 | Kamehameha | 800 | Awakened State | Held blue beam that drains ki |
+| Death Beam | 1150 | Awakened State | Fast thin precision poke |
 | Destructo Disk | 1600 | Awakened State | Guided piercing disk |
 | Galick Gun | 2200 | Awakened State | Held purple rival beam |
+| Special Beam Cannon | 2900 | Awakened State | Narrow committed piercing-style beam |
 | Big Bang Attack | 3600 | Super Saiyan | Heavy compact burst |
 | Final Flash | 7600 | Super Saiyan 2 | Expensive long golden beam |
 | Spirit Bomb | 14500 | Super Saiyan 3 | Slow boss-scale projectile |
@@ -95,17 +98,21 @@ Super Saiyan 2 and higher high-energy forms can emit electric arcs. God forms us
 
 ## Training Rooms
 
-The current training pass has three capped sources:
+The current training pass has several capped sources:
 
 - `Ki Training Focus`: light starter meditation for early physical power and ki control.
 - `Weighted Training Bands`: accessory-based weight training for physical power.
+- `Wooden Weight Bench`: hand-crafted starter physical training station.
+- `Copper Weight Bench`: copper-bar upgrade with a higher physical training cap.
+- `Wooden Training Bag`: starter striking station for physical power and a little ki control.
+- `Meditation Mat`: starter station for ki power and control.
 - `Gravity Room Core`: placeable training tile that rewards moving nearby with physical power and ki power.
 
 Caps are intentionally conservative. If a source stops helping, the player needs harder training, higher-tier future equipment, boss progression, or a gravity-room upgrade.
 
 ## Starter Melee
 
-`Saiyan Strike` is the current melee foundation. It is a no-graphic punch/kick item, scales with physical power, and tracks a simple three-step combo counter for future animation and hitbox work. It is not a full combo system yet.
+`Saiyan Strike` is the current melee foundation. It is a starter punch/kick item, scales with physical power, plays simple hit effects/sounds, and tracks a quick punch, heavy punch, rising kick combo. It is still not a full custom melee animation or hitbox system.
 
 ## Materials
 
