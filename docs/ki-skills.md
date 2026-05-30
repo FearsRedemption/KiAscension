@@ -20,7 +20,7 @@ Each implemented ki technique now carries:
 
 The current metadata lives in `Common/KiTechniques.cs` and is exposed in item tooltips and the stats panel.
 
-Projectile behavior now reads this metadata for terrain collision and impact feel. Sustained beams trace forward until solid terrain blocks them. Terrain-passing ultimates keep their special behavior, and guided piercing techniques remain terrain-free for now.
+Projectile behavior now reads this metadata for terrain collision and impact feel. Sustained beams trace forward until solid terrain blocks them and use a shared renderer with charge orb, core, glow, animated stream segments, head, and impact flare. Terrain-passing ultimates keep their special behavior, and guided piercing techniques remain terrain-free for now.
 
 ## Implemented Techniques
 
@@ -36,7 +36,7 @@ Projectile behavior now reads this metadata for terrain collision and impact fee
 | Special Beam Cannon | Continuous beam | Namekian | Sustained line | Narrow committed beam for boss pressure. |
 | Big Bang Attack | Heavy blast | Vegeta line | Heavy impact | Compact charged impact projectile. |
 | Final Flash | Continuous beam | Vegeta line | Sustained line | Higher-drain committed beam. |
-| Spirit Bomb | Ultimate | Turtle School | Terrain-passing ultimate | Slow boss-scale projectile. |
+| Spirit Bomb | Ultimate | Turtle School | Terrain-passing ultimate | Held charge grows above the player, drains ki heavily, then launches slowly. |
 | God Kamehameha | Continuous beam | God ki | Sustained line | God-tier held beam. |
 | Ultra Instinct Barrage | Barrage | Ultra Instinct | Terrain blocked | Endgame rapid pressure. |
 
@@ -55,7 +55,7 @@ Add future techniques by choosing a bucket first, then tuning the Terraria behav
 ## Implementation Rules
 
 - Do not add a technique without a clear category and collision style.
-- Beams should use held/channel behavior and drain ki continuously.
+- Beams should use held/channel behavior, charge briefly when appropriate, and drain ki continuously after release.
 - Standard sustained beams should stop at solid terrain unless explicitly marked as terrain-passing or piercing.
 - Disks should not behave like normal balls; basic disks pierce, special variants may track.
 - Ultimate attacks should have charge, commitment, high ki cost, and longer cooldown/fatigue later.
@@ -70,6 +70,9 @@ Add future techniques by choosing a bucket first, then tuning the Terraria behav
 - power-down
 - Kaio-Ken activation
 - low-ki fizzle
+- technique charge start
+- technique charge/release
+- technique sustain
 - technique fire
 - technique impact
 - melee impact

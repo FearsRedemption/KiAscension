@@ -40,13 +40,17 @@ True ki flight is available only while an active Saiyan form is Super Saiyan or 
 
 Techniques are now separate spell items. Basic blasts and barrages behave like fast projectile pressure. Masenko is an early focused impact blast. Kamehameha, Galick Gun, Special Beam Cannon, Final Flash, and God Kamehameha are held beams that drain ki over time. Death Beam is a fast precision shot. Destructo Disk pierces multiple enemies and steers toward the mouse while it flies. Big Bang Attack and Spirit Bomb are heavier projectile attacks.
 
+Held beams now use a real placeholder beam renderer instead of a plain stretched bar. The renderer draws a hand charge orb, tinted core, outer glow, animated stream segments, beam head, and terrain impact flare. Beams have technique-specific width, charge time, reach, tick cadence, and stream speed: Kamehameha is a stable blue/white sustained beam, Galick Gun is sharper purple pressure, Final Flash charges longer and fires a wider yellow beam, Special Beam Cannon is narrow and piercing, and God Kamehameha reaches farther as a late-game beam.
+
 Every ki technique has an initial ki cost, and beam techniques also have a per-second sustain drain. Current ki power and advanced forms apply a ki-control discount through shared resource math, so training can make lower techniques smoother without making high forms free too early. Spell tooltips show the current effective costs for the local player and explain locked spell requirements. Sustained beams now stop at solid terrain, while techniques marked as terrain-passing, such as Spirit Bomb, can still use special terrain behavior.
+
+Spirit Bomb is now a held charge ultimate instead of a normal fired ball. Holding the item raises a growing energy sphere above the player, drains ki heavily over time, and launches a slow terrain-passing projectile when released or fully charged. Big Bang Attack uses a heavier orb impact identity, Death Beam draws as a fast thin precision shot, and Destructo Disk uses a spinning disk visual.
 
 Enemy kills now grant modest training based on the last hit source. Ki technique kills grant mostly Ki Power and some Physical Power, Saiyan Strike or melee kills grant mostly Physical Power and some Ki Power, and vanilla weapon kills grant smaller Physical Power. Boss kills give a noticeable training bump, but they do not bypass form gates.
 
 Technique definitions now include metadata for category, source label, collision style, held behavior, terrain behavior, piercing, and cursor tracking. This is the foundation for a larger lore-inspired roster without forcing every technique into custom one-off logic.
 
-Technique fire, impact, beam fizzle, transformations, Kaio-Ken changes, and ki strain now route through a central sound helper. The current build uses temporary CC0 energy/electric sounds where available and falls back to vanilla Terraria sounds through the helper if a custom sound cannot play.
+Technique charge, release, sustain, fire, impact, beam fizzle, transformations, Kaio-Ken changes, and ki strain now route through a central sound helper. The current build uses temporary CC0 energy/electric sounds where available and falls back to distinct vanilla Terraria sounds through the helper if a custom sound cannot play.
 
 ## Training
 

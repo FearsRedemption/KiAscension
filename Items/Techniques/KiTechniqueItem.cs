@@ -34,8 +34,8 @@ public abstract class KiTechniqueItem : ModItem
         Item.value = Item.buyPrice(silver: 1);
         Item.rare = GetRarity(technique.RequiredStage);
         Item.UseSound = null;
-        Item.autoReuse = technique.Behavior != KiTechniqueBehavior.Beam;
-        Item.channel = technique.Behavior == KiTechniqueBehavior.Beam;
+        Item.autoReuse = technique.Behavior != KiTechniqueBehavior.Beam && technique.Technique != KiTechnique.SpiritBomb;
+        Item.channel = technique.Behavior == KiTechniqueBehavior.Beam || technique.Technique == KiTechnique.SpiritBomb;
         Item.noMelee = true;
         Item.shoot = ModContent.ProjectileType<KiTechniqueProjectile>();
         Item.shootSpeed = technique.ShootSpeed;
@@ -56,7 +56,8 @@ public abstract class KiTechniqueItem : ModItem
             return false;
         }
 
-        return technique.Behavior != KiTechniqueBehavior.Beam || !HasOwnedBeam(player);
+        return (technique.Behavior != KiTechniqueBehavior.Beam && technique.Technique != KiTechnique.SpiritBomb)
+            || !HasOwnedTechniqueProjectile(player, technique.Technique);
     }
 
     public override float UseSpeedMultiplier(Player player)
@@ -91,7 +92,7 @@ public abstract class KiTechniqueItem : ModItem
         KiTechniqueDefinition technique = Definition;
         int initialCost = kiPlayer.GetTechniqueInitialKiCost(technique);
 
-        string text = technique.Behavior == KiTechniqueBehavior.Beam
+        string text = technique.Behavior == KiTechniqueBehavior.Beam || technique.Technique == KiTechnique.SpiritBomb
             ? $"Ki cost: {initialCost} start, {kiPlayer.GetTechniqueChannelKiCostPerSecond(technique)}/s while held"
             : $"Ki cost: {initialCost}";
 
@@ -132,7 +133,14 @@ public abstract class KiTechniqueItem : ModItem
             return false;
         }
 
-        KiSoundSystem.PlayTechniqueFire(position, technique);
+        if (technique.Behavior == KiTechniqueBehavior.Beam || technique.Technique == KiTechnique.SpiritBomb)
+        {
+            KiSoundSystem.PlayTechniqueChargeStart(position, technique);
+        }
+        else
+        {
+            KiSoundSystem.PlayTechniqueFire(position, technique);
+        }
 
         if (technique.Behavior == KiTechniqueBehavior.Barrage)
         {
@@ -140,7 +148,8 @@ public abstract class KiTechniqueItem : ModItem
             return false;
         }
 
-        SpawnTechniqueProjectile(player, source, position, velocity, type, damage, knockback, technique, 0f);
+        float extraAi = technique.Technique == KiTechnique.SpiritBomb ? velocity.ToRotation() : 0f;
+        SpawnTechniqueProjectile(player, source, position, velocity, type, damage, knockback, technique, extraAi);
         return false;
     }
 
@@ -224,13 +233,21 @@ public abstract class KiTechniqueItem : ModItem
             projectile.penetrate = -1;
         }
 
+        if (technique.Technique == KiTechnique.SpiritBomb)
+        {
+            projectile.tileCollide = false;
+            projectile.penetrate = 3;
+            projectile.width = 28;
+            projectile.height = 28;
+        }
+
         if (technique.IgnoresTerrain)
         {
             projectile.tileCollide = false;
         }
     }
 
-    private bool HasOwnedBeam(Player player)
+    private bool HasOwnedTechniqueProjectile(Player player, KiTechnique technique)
     {
         int projectileType = ModContent.ProjectileType<KiTechniqueProjectile>();
 
@@ -243,7 +260,7 @@ public abstract class KiTechniqueItem : ModItem
                 continue;
             }
 
-            if ((KiTechnique)(int)projectile.ai[0] == Technique)
+            if ((KiTechnique)(int)projectile.ai[0] == technique)
             {
                 return true;
             }

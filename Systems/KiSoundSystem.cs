@@ -55,6 +55,21 @@ public static class KiSoundSystem
         }, GetTechniqueFireFallback(technique), position);
     }
 
+    public static void PlayTechniqueChargeStart(Vector2 position, KiTechniqueDefinition technique)
+    {
+        Play(GetTechniqueChargeSound(technique), GetTechniqueChargeFallback(technique), position);
+    }
+
+    public static void PlayTechniqueRelease(Vector2 position, KiTechniqueDefinition technique)
+    {
+        Play(GetTechniqueReleaseSound(technique), GetTechniqueReleaseFallback(technique), position);
+    }
+
+    public static void PlayTechniqueSustain(Vector2 position, KiTechniqueDefinition technique)
+    {
+        Play(GetTechniqueSustainSound(technique), GetTechniqueSustainFallback(technique), position);
+    }
+
     public static void PlayTechniqueImpact(Vector2 position, KiTechniqueDefinition technique)
     {
         Play(technique.Category switch
@@ -92,6 +107,72 @@ public static class KiSoundSystem
             KiTechniqueBehavior.HeavyBlast => SoundID.Item20,
             KiTechniqueBehavior.Barrage => SoundID.Item33,
             _ => SoundID.Item20
+        };
+    }
+
+    private static SoundStyle GetTechniqueChargeSound(KiTechniqueDefinition technique)
+    {
+        return technique.Technique switch
+        {
+            KiTechnique.FinalFlash or KiTechnique.SpiritBomb => TransformationCompleteSound,
+            KiTechnique.GalickGun or KiTechnique.SpecialBeamCannon => KaioKenActivationSound,
+            KiTechnique.DestructoDisk => ElectricSustainSound,
+            _ => PowerUpStartSound
+        };
+    }
+
+    private static SoundStyle GetTechniqueReleaseSound(KiTechniqueDefinition technique)
+    {
+        return technique.Technique switch
+        {
+            KiTechnique.FinalFlash or KiTechnique.BigBangAttack or KiTechnique.SpiritBomb => HeavyImpactSound,
+            KiTechnique.DeathBeam => KiBlastSound,
+            KiTechnique.DestructoDisk or KiTechnique.SpecialBeamCannon => ElectricSustainSound,
+            _ => KiBlastSound
+        };
+    }
+
+    private static SoundStyle GetTechniqueSustainSound(KiTechniqueDefinition technique)
+    {
+        return technique.Technique switch
+        {
+            KiTechnique.FinalFlash or KiTechnique.GodKamehameha => TransformationCompleteSound,
+            KiTechnique.SpecialBeamCannon or KiTechnique.GalickGun => ElectricSustainSound,
+            _ => KiBlastSound
+        };
+    }
+
+    private static SoundStyle GetTechniqueChargeFallback(KiTechniqueDefinition technique)
+    {
+        return technique.Technique switch
+        {
+            KiTechnique.FinalFlash or KiTechnique.SpiritBomb => SoundID.Item29,
+            KiTechnique.GalickGun => SoundID.Item103,
+            KiTechnique.SpecialBeamCannon => SoundID.Item93,
+            _ => SoundID.Item13
+        };
+    }
+
+    private static SoundStyle GetTechniqueReleaseFallback(KiTechniqueDefinition technique)
+    {
+        return technique.Technique switch
+        {
+            KiTechnique.FinalFlash or KiTechnique.SpiritBomb => SoundID.Item14,
+            KiTechnique.DeathBeam => SoundID.Item12,
+            KiTechnique.SpecialBeamCannon => SoundID.Item93,
+            KiTechnique.GalickGun => SoundID.Item103,
+            _ => SoundID.Item20
+        };
+    }
+
+    private static SoundStyle GetTechniqueSustainFallback(KiTechniqueDefinition technique)
+    {
+        return technique.Technique switch
+        {
+            KiTechnique.SpecialBeamCannon => SoundID.Item93,
+            KiTechnique.GalickGun => SoundID.Item15,
+            KiTechnique.FinalFlash => SoundID.Item122,
+            _ => SoundID.Item13
         };
     }
 

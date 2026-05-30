@@ -25,7 +25,7 @@ Sources:
 
 - Starting items: `Ki Training Focus`, `Saiyan Strike`, and `Basic Ki Blast`
 - Separate ki spell items, from basic blasts through Masenko, Kamehameha, Death Beam, Destructo Disk, Galick Gun, Special Beam Cannon, Big Bang Attack, Final Flash, Spirit Bomb, God Kamehameha, and Ultra Instinct Barrage
-- Held beam behavior for Kamehameha-style techniques
+- Held beam behavior for Kamehameha-style techniques, using placeholder charge orbs, animated beam streams, beam heads, and impact flares instead of plain bars
 - Terrain-aware beam range for sustained beams, while ultimate terrain-passing attacks remain supported
 - Guided/piercing Destructo Disk behavior
 - Kai Level, physical power, and ki power tracking per player
@@ -49,7 +49,7 @@ Sources:
 - Form-gated ki flight starts at Super Saiyan and scales through later forms with different control and ki drain
 - Hair/form visuals are routed through dedicated hair profiles separate from stat logic
 - Ki techniques have metadata for category, source label, collision style, terrain behavior, pierce, held-beam, and cursor-tracking behavior
-- Central ki sound helper wired to transformations, technique fire/impact, beam fizzle, and strain events using imported CC0 temporary sounds with Terraria fallback
+- Central ki sound helper wired to transformations, technique charge/release/sustain, fire/impact, beam fizzle, and strain events using imported CC0 temporary sounds with Terraria fallback
 - Aura profiles plus an animated aura draw layer per Saiyan form/Kaio-Ken overlay
 - Enemy and boss stat scaling by world progression
 - Vanilla and non-ki weapons remain usable while the custom ki/melee systems are still growing, but Ki Ascension progression is intended to outscale them over time
@@ -73,7 +73,7 @@ Sources:
 
 - Higher-tier placeable training stations and upgraded gravity chamber path.
 - Expanded melee combo inputs and clearer punch/kick presentation.
-- More high-quality representative ki techniques and better per-technique visual/audio identity.
+- More high-quality representative ki techniques and final per-technique visual/audio identity.
 - More DBZ-flavored original bosses and mobs, building outward from the first implemented early enemy.
 - Final sprite, aura, sound, and UI art pass.
 

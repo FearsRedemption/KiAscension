@@ -25,11 +25,24 @@ Researched but not imported:
 - OpenGameArt `Auras` by Kutejnikov is listed as CC0 and contains animated 512x512 aura renders, but the archive is large and not Terraria-proportioned.
 - OpenGameArt `Energy Sprite Sheets` by fzeeshan is listed as CC0 and contains transparent energy effects, but the sheets are much larger than needed for this pass.
 
+## Beam And Projectile Effects
+
+Status: original temporary placeholder.
+
+`Assets/Effects/KiBeamSegment.png`, `KiBeamHead.png`, `KiBeamImpact.png`, `KiChargeOrb.png`, `KiOrbProjectile.png`, and `KiDisk.png` were generated for this mod as small grayscale/white-alpha effect textures. The renderer tints them per technique, so the same legal placeholder sheets can support Kamehameha blue, Galick Gun purple, Final Flash yellow, Special Beam Cannon drill accents, Spirit Bomb white/blue, and Destructo Disk cutting visuals.
+
+These are not final art. They exist to replace plain rectangle beams and generic projectiles with readable gameplay silhouettes while the final projectile art direction is developed.
+
+Researched but not imported:
+
+- OpenGameArt searches for CC0 energy beams, laser sheets, projectile sheets, and anime-style energy effects found useful references, but nothing was imported in this pass because the best matches were either not Terraria-proportioned, visually inconsistent with the current placeholder style, or required more license/source review before bundling.
+- Existing researched aura packs remain possible later reference material, but the current build uses original generated textures to avoid asset uncertainty.
+
 ## Sound Effects
 
 Status: imported CC0 temporary sounds.
 
-All imported sounds are routed through `Systems/KiSoundSystem.cs`. If a custom sound cannot be played, the helper falls back to a vanilla Terraria sound instead of scattering fallback behavior across gameplay files.
+All imported sounds are routed through `Systems/KiSoundSystem.cs`. If a custom sound cannot be played, the helper falls back to a vanilla Terraria sound instead of scattering fallback behavior across gameplay files. Technique charge start, charge loop, release, sustain, impact, and fizzle hooks now have per-technique mappings even where the current sound is still a temporary shared placeholder.
 
 | File | Source | Author | License | Use |
 | --- | --- | --- | --- | --- |
