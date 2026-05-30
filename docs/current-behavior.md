@@ -97,7 +97,9 @@ When the player transforms, the mod stores the player's natural hair once, then 
 - Ultra Instinct Sign: custom darker/incomplete silver hair
 - Ultra Instinct: custom silver/white hair
 
-Powering down to Base restores the stored natural hair style and color. Kaio-Ken does not change hair style; it only adds a red aura layer. Aura behavior is profile-driven per form, with separate dust type, light strength, dust intensity, secondary color, electric-arc settings, and an animated aura draw-layer texture. Hair behavior is also profile-driven so form hair selection stays separate from stat logic.
+Powering down to Base explicitly restores the stored natural hair style and color. Kaio-Ken does not change hair style; it only adds a red aura layer. Aura behavior is profile-driven per form, with separate dust type, light strength, dust intensity, secondary color, electric-arc settings, an eight-frame animated aura sheet, and a separate electric-arc sheet. Holding power-up intensifies and widens the aura, breakthroughs flare harder, and holding power-down collapses/fades the aura toward the player.
+
+Current custom hair is still placeholder art, but each transformed form now has a separate silhouette and transparent face cutout. True animated hair overlays remain planned; the current build sells motion through the aura layers instead of trying to animate `ModHair` directly.
 
 ## Enemies And Boss Direction
 

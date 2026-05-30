@@ -4,11 +4,11 @@ This file tracks art and audio source status separately from gameplay design doc
 
 ## Hair Sprites
 
-Status: original temporary placeholder.
+Status: improved original temporary placeholder.
 
-The current `ModHair` sheets in `Hairs/` were generated for this mod as simple Terraria-format placeholders. They are 40x784 PNGs, matching 14 frames of 40x56 hair data. Each hair has a matching `_Alt.png` file because tModLoader expects alternate hair textures when head equipment changes how hair is drawn.
+The current `ModHair` sheets in `Hairs/` were generated for this mod as simple Terraria-format placeholders. They are 40x784 PNGs, matching 14 frames of 40x56 hair data. Each hair has a matching `_Alt.png` file because tModLoader expects alternate hair textures when head equipment changes how hair is drawn. The current pass regenerated every base and `_Alt` sheet together so they remain paired.
 
-These are not final art. They are tighter around the top and sides of the player head than the earliest prototype sheets so they should not cover the face as aggressively. True transformation hair animation remains a later art pass.
+These are not final art. They now use different silhouettes for Super Saiyan, Super Saiyan 2, Super Saiyan 3, God, Blue, Ultra Instinct Sign, and Ultra Instinct, with a transparent face cutout so the hair should not cover the player face. ModHair itself remains static; the animation energy is handled through aura overlays for now.
 
 Researched but not imported:
 
@@ -16,14 +16,14 @@ Researched but not imported:
 
 ## Aura Visuals
 
-Status: original temporary placeholder.
+Status: improved original temporary placeholder.
 
-`Assets/Effects/KiAura.png` is an original six-frame white aura sheet generated for this mod and tinted in code per form. It gives the mod a real animated aura foundation without depending on unverified anime assets.
+`Assets/Effects/KiAura.png` is an original eight-frame white aura sheet generated for this mod and tinted in code per form. `Assets/Effects/KiAuraElectric.png` is an original eight-frame electric arc sheet used for Super Saiyan 2-style arcs, unstable breakthroughs, and Kaio-Ken aggression. Together they give the mod a real animated aura foundation without depending on unverified anime assets.
 
 Researched but not imported:
 
-- OpenGameArt `Auras` by Kutejnikov is listed as CC0 and contains animated 512x512 aura renders, but the archive is large and not Terraria-proportioned.
-- OpenGameArt `Energy Sprite Sheets` by fzeeshan is listed as CC0 and contains transparent energy effects, but the sheets are much larger than needed for this pass.
+- OpenGameArt `Auras` by Kutejnikov is listed as CC0 and contains animated 512x512 aura renders, but the archives are large and not Terraria-proportioned: https://opengameart.org/content/auras
+- OpenGameArt `Energy Sprite Sheets` by fzeeshan is listed as CC0 and contains transparent energy effects, but the sheets are much larger than needed for this pass: https://opengameart.org/content/energy-sprite-sheets
 
 ## Beam And Projectile Effects
 

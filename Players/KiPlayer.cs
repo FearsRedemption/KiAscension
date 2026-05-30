@@ -1811,6 +1811,12 @@ public class KiPlayer : ModPlayer
     {
         CaptureNaturalHairIfNeeded();
 
+        if (CurrentStageIndex <= 0)
+        {
+            RestoreNaturalHair();
+            return;
+        }
+
         AscensionVisuals.Apply(Player, CurrentStage, naturalHairStyle, naturalHairColor);
     }
 
@@ -1825,6 +1831,17 @@ public class KiPlayer : ModPlayer
         naturalHairStyle = currentHairIsAscensionHair ? 0 : Player.hair;
         naturalHairColor = currentHairIsAscensionHair ? Color.White : Player.hairColor;
         naturalHairCaptured = true;
+    }
+
+    private void RestoreNaturalHair()
+    {
+        if (!naturalHairCaptured)
+        {
+            CaptureNaturalHairIfNeeded();
+        }
+
+        Player.hair = naturalHairStyle;
+        Player.hairColor = naturalHairColor;
     }
 
     private void ShowProgressionNoticeOnce()
