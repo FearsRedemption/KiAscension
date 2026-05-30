@@ -83,7 +83,7 @@ public class KiHudSystem : ModSystem
 
     private static void DrawMainHud(KiPlayer kiPlayer, KiResourceSnapshot resources)
     {
-        Rectangle panel = new(18, 84, HudWidth, 194);
+        Rectangle panel = new(18, 84, HudWidth, 214);
         DrawPanelShell(panel, "KI ASCENSION", kiPlayer.CurrentStage.AuraColor);
 
         int x = panel.X + PanelPadding;
@@ -110,6 +110,8 @@ public class KiHudSystem : ModSystem
         DrawCompactRow("Kaio-Ken", kiPlayer.CurrentKaioKenLevel.DisplayName, new Vector2(x, y), width, GetKaioKenTextColor(kiPlayer));
         y += RowHeight;
         DrawCompactRow("Held", GetHeldTechniqueName(kiPlayer), new Vector2(x, y), width, GetHeldTechniqueColor(kiPlayer));
+        y += RowHeight;
+        DrawCompactRow("Training", kiPlayer.ActiveTrainingDisplayName, new Vector2(x, y), width, kiPlayer.IsUsingTrainingStation ? new Color(150, 230, 255) : MutedText);
         y += RowHeight;
 
         string gate = kiPlayer.GetNextCeilingText();
@@ -147,6 +149,7 @@ public class KiHudSystem : ModSystem
         rightY = DrawMetric(rightX, rightY, columnWidth, "Damage", $"x{kiPlayer.CombinedDamageMultiplier:0.00}", new Color(255, 220, 130));
         rightY = DrawMetric(rightX, rightY, columnWidth, "Speed", $"x{kiPlayer.CombinedSpeedMultiplier:0.00}", new Color(255, 220, 130));
         rightY = DrawMetric(rightX, rightY, columnWidth, "Strike", $"x{kiPlayer.PhysicalDamageMultiplier:0.00}  C{kiPlayer.MeleeComboStep}", new Color(255, 205, 150));
+        rightY = DrawMetric(rightX, rightY, columnWidth, "Training", kiPlayer.ActiveTrainingDisplayName, kiPlayer.IsUsingTrainingStation ? new Color(150, 230, 255) : MutedText);
         rightY = DrawMetric(rightX, rightY, columnWidth, "Defense", $"+{kiPlayer.CurrentStage.DefenseBonus}", new Color(170, 255, 175));
         rightY = DrawMetric(rightX, rightY, columnWidth, "HP Regen", $"+{kiPlayer.CurrentStage.LifeRegenBonus}/s", new Color(170, 255, 175));
         rightY = DrawWrappedBlock(rightX, rightY + 4, columnWidth, kiPlayer.GetFlightStatusText(), new Color(190, 210, 255), panel.Bottom - PanelPadding);

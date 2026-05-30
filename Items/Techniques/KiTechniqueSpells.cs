@@ -14,9 +14,19 @@ public class KiBarrageSpell : KiTechniqueItem
     protected override KiTechnique Technique => KiTechnique.KiBarrage;
 }
 
+public class MasenkoSpell : KiTechniqueItem
+{
+    protected override KiTechnique Technique => KiTechnique.Masenko;
+}
+
 public class KamehamehaSpell : KiTechniqueItem
 {
     protected override KiTechnique Technique => KiTechnique.Kamehameha;
+}
+
+public class DeathBeamSpell : KiTechniqueItem
+{
+    protected override KiTechnique Technique => KiTechnique.DeathBeam;
 }
 
 public class DestructoDiskSpell : KiTechniqueItem
@@ -27,6 +37,16 @@ public class DestructoDiskSpell : KiTechniqueItem
 public class GalickGunSpell : KiTechniqueItem
 {
     protected override KiTechnique Technique => KiTechnique.GalickGun;
+}
+
+public class SpecialBeamCannonSpell : KiTechniqueItem
+{
+    protected override KiTechnique Technique => KiTechnique.SpecialBeamCannon;
+
+    protected override void AddTechniqueRecipe(Recipe recipe)
+    {
+        recipe.AddIngredient(ItemID.Stinger, 4);
+    }
 }
 
 public class BigBangAttackSpell : KiTechniqueItem

@@ -6,5 +6,7 @@ public enum TrainingSource
     WeightedGear,
     WoodenWeightBench,
     CopperWeightBench,
+    WoodenTrainingBag,
+    MeditationMat,
     GravityRoom
 }

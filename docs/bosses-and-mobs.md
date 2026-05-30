@@ -1,8 +1,14 @@
-# Bosses And Mobs Plan
+# Bosses And Mobs
 
-The current mod does not implement DBZ-flavored NPCs yet. This document records the intended direction and keeps future NPC work grounded in Terraria pacing.
+The current mod now has one implemented DBZ-flavored starter enemy and keeps future boss work grounded in Terraria pacing.
 
-## Planned Enemy Buckets
+## Implemented
+
+| NPC | Status | Behavior |
+| --- | --- | --- |
+| Saiba Sprout | Implemented starter enemy | Early surface enemy that chases the player and fires a simple hostile ki shot. |
+
+## Next Enemy Buckets
 
 - Saibamen-style plant warriors for early training pressure.
 - Alien scout and soldier enemies for invasion-style events.
@@ -29,4 +35,4 @@ The current mod does not implement DBZ-flavored NPCs yet. This document records 
 
 ## Folder Direction
 
-`NPCs/Bosses` and `NPCs/Enemies` are reserved for future implementation classes. Keep boss materials and drops aligned with `docs/items-framework.md`.
+`NPCs/Enemies` now contains the first starter enemy. `NPCs/Bosses` remains reserved for the first original boss implementation. Keep boss materials and drops aligned with `docs/items-framework.md`.

@@ -390,6 +390,9 @@ public class KiTechniqueProjectile : ModProjectile
             KiTechnique.GalickGun => DustID.GemAmethyst,
             KiTechnique.DestructoDisk or KiTechnique.FinalFlash => DustID.GemTopaz,
             KiTechnique.SpiritBomb or KiTechnique.UltraInstinctBarrage => DustID.GemDiamond,
+            KiTechnique.DeathBeam => DustID.PinkTorch,
+            KiTechnique.SpecialBeamCannon => DustID.GreenTorch,
+            KiTechnique.Masenko => DustID.YellowTorch,
             KiTechnique.BigBangAttack => DustID.Electric,
             _ => DustID.GemTopaz
         };

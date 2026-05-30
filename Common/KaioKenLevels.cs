@@ -8,15 +8,15 @@ public static class KaioKenLevels
     public static readonly KaioKenLevelDefinition[] Definitions =
     {
         new("Off", 0, AscensionProgressionGate.None, 1f, 1f, 0, 0, Color.Transparent),
-        new("Kaio-Ken", 700, AscensionProgressionGate.None, 1.1f, 1.06f, 0, 2, new Color(255, 70, 55)),
-        new("Kaio-Ken x2", 1100, AscensionProgressionGate.None, 1.16f, 1.08f, 1, 3, new Color(255, 65, 55)),
-        new("Kaio-Ken x3", 1800, AscensionProgressionGate.EyeOfCthulhu, 1.24f, 1.1f, 1, 4, new Color(255, 55, 50)),
-        new("Kaio-Ken x5", 3400, AscensionProgressionGate.WorldEvilBoss, 1.36f, 1.14f, 2, 6, new Color(255, 45, 45)),
-        new("Kaio-Ken x10", 6500, AscensionProgressionGate.Skeletron, 1.55f, 1.2f, 3, 8, new Color(255, 40, 40)),
-        new("Kaio-Ken x20", 12000, AscensionProgressionGate.WallOfFlesh, 1.8f, 1.26f, 5, 11, new Color(255, 35, 35)),
-        new("Kaio-Ken x50", 24000, AscensionProgressionGate.MechanicalBoss, 2.1f, 1.34f, 8, 16, new Color(255, 30, 35)),
-        new("Kaio-Ken x100", 42000, AscensionProgressionGate.Plantera, 2.45f, 1.42f, 11, 22, new Color(255, 25, 35)),
-        new("Kaio-Ken x200", 72000, AscensionProgressionGate.MoonLord, 2.9f, 1.52f, 15, 32, new Color(255, 20, 35))
+        new("Kaio-Ken", 700, AscensionProgressionGate.None, 1.14f, 1.07f, 0, 2, new Color(255, 70, 55)),
+        new("Kaio-Ken x2", 1100, AscensionProgressionGate.None, 1.24f, 1.11f, 0, 4, new Color(255, 65, 55)),
+        new("Kaio-Ken x3", 1800, AscensionProgressionGate.EyeOfCthulhu, 1.34f, 1.14f, 1, 6, new Color(255, 55, 50)),
+        new("Kaio-Ken x5", 3400, AscensionProgressionGate.WorldEvilBoss, 1.5f, 1.18f, 2, 8, new Color(255, 45, 45)),
+        new("Kaio-Ken x10", 6500, AscensionProgressionGate.Skeletron, 1.7f, 1.24f, 3, 11, new Color(255, 40, 40)),
+        new("Kaio-Ken x20", 12000, AscensionProgressionGate.WallOfFlesh, 1.95f, 1.31f, 5, 15, new Color(255, 35, 35)),
+        new("Kaio-Ken x50", 24000, AscensionProgressionGate.MechanicalBoss, 2.25f, 1.4f, 8, 21, new Color(255, 30, 35)),
+        new("Kaio-Ken x100", 42000, AscensionProgressionGate.Plantera, 2.6f, 1.5f, 11, 29, new Color(255, 25, 35)),
+        new("Kaio-Ken x200", 72000, AscensionProgressionGate.MoonLord, 3.05f, 1.62f, 15, 42, new Color(255, 20, 35))
     };
 
     public static int MaxLevelIndex => Definitions.Length - 1;

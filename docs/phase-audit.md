@@ -4,7 +4,7 @@ This audit maps the large phase request to the current repo state. It separates 
 
 ## Summary
 
-The mod is buildable and now has foundations for every requested phase. Phases 1-8, 11-14, and 19 have concrete implementation. Phases 9-10 and 15-17 have working starter hooks plus planning/framework docs, but they are not full content-complete expansions yet. Phase 18 remains planning only.
+The mod is buildable and now has foundations for every requested phase. Phases 1-8, 11-17, and 19 have concrete implementation. Phase 18 has its first implemented enemy, but boss work is still not content-complete.
 
 ## Phase Status
 
@@ -19,21 +19,21 @@ The mod is buildable and now has foundations for every requested phase. Phases 1
 | 7. Breakthrough behavior | Implemented | Unlocks auto-transform only when the player was already in their previous highest form. |
 | 8. Flight progression | Implemented foundation | Super Saiyan+ ki flight exists with form-scaled control and drain. Full flight polish/trails remain planned. |
 | 9. Ki skill architecture | Implemented foundation | Techniques carry category, source, collision style, terrain, pierce, tracking, and held-beam metadata. |
-| 10. Ki skill roster planning | Implemented as planning | `docs/ki-skills.md` lists implemented examples and future lore-inspired buckets. Full roster is not implemented. |
+| 10. Ki skill roster | Partially implemented gameplay | The implemented roster now includes starter blasts, Masenko, Kamehameha, Death Beam, Destructo Disk, Galick Gun, Special Beam Cannon, Big Bang Attack, Final Flash, Spirit Bomb, God Kamehameha, and Ultra Instinct Barrage. Full roster is not implemented. |
 | 11. Skill feel/terrain/sound/visual behavior | Partially implemented | Beams, disks, barrages, heavy blasts, terrain blocking, terrain-passing ultimates, and impact hooks exist. Advanced charge/cooldown/fatigue remains planned. |
 | 12. Sound architecture | Implemented foundation | `KiSoundSystem` centralizes temporary CC0 sounds for transformations, fire, impact, fizzle, and melee, with vanilla fallback. Final original audio remains planned. |
 | 13. Aura visuals by form | Implemented foundation | `AscensionAuraProfiles` drives form colors, dust, light, intensity, electric arcs, and an animated aura draw layer. Shader-level aura polish remains planned. |
 | 14. Hair transformation cleanup | Implemented foundation | Hair profiles are separated from stats, natural hair is saved/restored for base, and tModLoader `_Alt` hair textures are explicit. |
-| 15. Training/progression expansion | Partially implemented | Focus, weighted gear, wooden/copper weight benches, gravity room, training caps, and outgrown messaging exist. More station types and gravity upgrades are planned. |
-| 16. Items/accessories/crafting/training furniture | Partially implemented | Starter combat item, training items, wooden/copper placeable benches, `Ki Fragment`, and item framework docs exist. Full accessory/armor/furniture set is planned. |
+| 15. Training/progression expansion | Partially implemented gameplay | Focus, weighted gear, wooden/copper weight benches, wooden training bag, meditation mat, gravity room, training caps, and outgrown messaging exist. Higher station tiers and gravity upgrades are planned. |
+| 16. Items/accessories/crafting/training furniture | Partially implemented gameplay | Starter combat item, training items, starter placeable stations, `Ki Fragment`, and item framework docs exist. Full accessory/armor/furniture set is planned. |
 | 17. Melee punch/kick foundation | Implemented foundation | `Saiyan Strike` gives a starter quick punch, heavy punch, rising kick combo with scaling, hit effects, and sound hooks. Full animations, custom hitboxes, charged strikes, and dash strikes are planned. |
-| 18. Future bosses/mobs | Planning only | Placeholder folders and `docs/bosses-and-mobs.md` exist. No custom NPCs are implemented yet. |
+| 18. Future bosses/mobs | Partially implemented gameplay | `Saiba Sprout` exists as the first early enemy. Bosses remain planned and should start with one early encounter. |
 | 19. Documentation update | Implemented | Docs were updated to distinguish implemented, partial, placeholder, and planned behavior. |
 
 ## Highest Priority Remaining Work
 
 - Replace temporary CC0 sounds with final original audio assets through `KiSoundSystem`.
-- Expand training beyond the starter wooden/copper benches into more station types and gravity chamber upgrades.
+- Expand training into higher station tiers and gravity chamber upgrades.
 - Build real melee animations, custom hitboxes, charged strikes, and dash strikes for `Saiyan Strike`.
-- Add the first original DBZ-inspired enemy or boss and wire its drops into progression.
-- Add more high-quality representative ki techniques before expanding the full roster.
+- Add the first original DBZ-inspired boss and wire its drops into progression.
+- Add more high-quality representative ki techniques with distinct gameplay behavior before expanding the full roster.

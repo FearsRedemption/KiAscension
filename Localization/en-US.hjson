@@ -26,9 +26,19 @@ Mods: {
 				Tooltip: Fires a fast spread of smaller ki blasts.
 			}
 
+			MasenkoSpell: {
+				DisplayName: Masenko
+				Tooltip: A focused yellow palm-wave with stronger impact than a basic blast.
+			}
+
 			KamehamehaSpell: {
 				DisplayName: Kamehameha
 				Tooltip: Hold to channel a blue beam until your ki gives out.
+			}
+
+			DeathBeamSpell: {
+				DisplayName: Death Beam
+				Tooltip: A fast precision finger beam for single-target pressure.
 			}
 
 			DestructoDiskSpell: {
@@ -39,6 +49,11 @@ Mods: {
 			GalickGunSpell: {
 				DisplayName: Galick Gun
 				Tooltip: Hold to channel a focused purple beam.
+			}
+
+			SpecialBeamCannonSpell: {
+				DisplayName: Special Beam Cannon
+				Tooltip: Hold to channel a narrow high-pressure beam.
 			}
 
 			BigBangAttackSpell: {
@@ -81,6 +96,16 @@ Mods: {
 				Tooltip: A sturdier bench that raises the physical training cap beyond wood.
 			}
 
+			WoodenTrainingBag: {
+				DisplayName: Wooden Training Bag
+				Tooltip: Place it and right-click to train striking power and a little ki control.
+			}
+
+			MeditationMat: {
+				DisplayName: Meditation Mat
+				Tooltip: Place it and right-click to slowly train ki power and control.
+			}
+
 			GravityRoomCore: {
 				DisplayName: Gravity Room Core
 				Tooltip: Place it to create a training field. Moving nearby builds physical power and ki power.
@@ -88,9 +113,12 @@ Mods: {
 		}
 
 		Projectiles.KiTechniqueProjectile.DisplayName: Ki Technique
+		NPCs.SaibaSprout.DisplayName: Saiba Sprout
 		Tiles.GravityRoomCoreTile.MapEntry: Gravity Room Core
 		Tiles.WoodenWeightBenchTile.MapEntry: Wooden Weight Bench
 		Tiles.CopperWeightBenchTile.MapEntry: Copper Weight Bench
+		Tiles.WoodenTrainingBagTile.MapEntry: Wooden Training Bag
+		Tiles.MeditationMatTile.MapEntry: Meditation Mat
 
 		Keybinds: {
 			"Ascend Form.DisplayName": Ascend Form

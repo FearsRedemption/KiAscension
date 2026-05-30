@@ -53,6 +53,18 @@ These are not final DBZ-style audio. They are legally usable temporary energy/el
 
 Status: original temporary placeholder.
 
-`Items/Training/WoodenWeightBench.png`, `Items/Training/CopperWeightBench.png`, `Tiles/WoodenWeightBenchTile.png`, and `Tiles/CopperWeightBenchTile.png` were generated as original simple pixel placeholders for the first tiered training station pass. The tile sheets are 36x36 to match tModLoader 2x2 tile framing, while the item icons are 32x32.
+`Items/Training/WoodenWeightBench.png`, `Items/Training/CopperWeightBench.png`, `Items/Training/WoodenTrainingBag.png`, `Items/Training/MeditationMat.png`, `Tiles/WoodenWeightBenchTile.png`, `Tiles/CopperWeightBenchTile.png`, `Tiles/WoodenTrainingBagTile.png`, and `Tiles/MeditationMatTile.png` were generated as original simple pixel placeholders for the first training station passes. The tile sheets are 36x36 to match tModLoader 2x2 tile framing, while the item icons are 32x32.
 
 These are not final furniture sprites. Later training stations should get a cohesive art pass once the station roster settles.
+
+## Technique Item Sprites
+
+Status: original temporary placeholder.
+
+The added technique icons, including `MasenkoSpell.png`, `DeathBeamSpell.png`, and `SpecialBeamCannonSpell.png`, are original simple 28x28 placeholder item sprites generated for this mod. They are visual identifiers for gameplay testing, not final spell art.
+
+## Enemy Sprites
+
+Status: original temporary placeholder.
+
+`NPCs/Enemies/SaibaSprout.png` is an original simple placeholder sprite for the first implemented early enemy. It is meant to prove the spawn/combat/drop loop before a cohesive enemy art pass.

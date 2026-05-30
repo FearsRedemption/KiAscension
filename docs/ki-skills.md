@@ -28,9 +28,12 @@ Projectile behavior now reads this metadata for terrain collision and impact fee
 | --- | --- | --- | --- | --- |
 | Basic Ki Blast | Basic ki blast | General ki | Terrain blocked | Starter ranged pressure. |
 | Ki Barrage | Barrage | General ki | Terrain blocked | Early rapid-fire pressure. |
+| Masenko | Heavy blast | Gohan line | Heavy impact | Early focused impact wave after basic control. |
 | Kamehameha | Continuous beam | Turtle School | Sustained line | Held beam with ongoing ki drain. |
+| Death Beam | Basic ki blast | Frieza line | Terrain blocked | Fast precision single-target shot. |
 | Destructo Disk | Cutting disk | Earthling tactical | Guided piercing | Cursor-guided piercing disk. |
 | Galick Gun | Continuous beam | Vegeta line | Sustained line | Rival beam with higher burst profile. |
+| Special Beam Cannon | Continuous beam | Namekian | Sustained line | Narrow committed beam for boss pressure. |
 | Big Bang Attack | Heavy blast | Vegeta line | Heavy impact | Compact charged impact projectile. |
 | Final Flash | Continuous beam | Vegeta line | Sustained line | Higher-drain committed beam. |
 | Spirit Bomb | Ultimate | Turtle School | Terrain-passing ultimate | Slow boss-scale projectile. |

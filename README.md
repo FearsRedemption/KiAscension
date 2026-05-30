@@ -24,7 +24,7 @@ Sources:
 ### Implemented
 
 - Starting items: `Ki Training Focus`, `Saiyan Strike`, and `Basic Ki Blast`
-- Separate ki spell items, from basic blasts through Kamehameha, Destructo Disk, Galick Gun, Big Bang Attack, Final Flash, Spirit Bomb, God Kamehameha, and Ultra Instinct Barrage
+- Separate ki spell items, from basic blasts through Masenko, Kamehameha, Death Beam, Destructo Disk, Galick Gun, Special Beam Cannon, Big Bang Attack, Final Flash, Spirit Bomb, God Kamehameha, and Ultra Instinct Barrage
 - Held beam behavior for Kamehameha-style techniques
 - Terrain-aware beam range for sustained beams, while ultimate terrain-passing attacks remain supported
 - Guided/piercing Destructo Disk behavior
@@ -56,8 +56,9 @@ Sources:
 - Boss and witness-loss gates for major emotional breakthroughs, with auto-breakthrough only when already at the previous form ceiling
 - Multiplayer-safe per-player power, ki power, Kai Level, Saiyan form unlocks, Kaio-Ken level, and ki
 - Custom Terraria-style `ModHair` sprites for Super Saiyan-style forms, with matching `_Alt` textures and natural-hair restore handling
-- `Weighted Training Bands`, wooden/copper placeable weight benches, capped training sources, and `Gravity Room Core` training tools
-- Starter item/crafting framework docs, `Ki Fragment` material drops, and placeholder folders/docs for future bosses and mobs
+- `Weighted Training Bands`, wooden/copper placeable weight benches, wooden training bag, meditation mat, capped training sources, and `Gravity Room Core` training tools
+- `Saiba Sprout`, an early hostile ki-trained plant enemy that appears on the surface and fires simple ki shots
+- Starter item/crafting framework docs, `Ki Fragment` material drops, and implementation folders for future bosses and mobs
 
 ### Partially Implemented
 
@@ -65,15 +66,15 @@ Sources:
 - Aura visuals: animated aura overlay support exists, but final aura art/shaders are not complete.
 - Hair visuals: custom `ModHair` placeholders and `_Alt` textures exist, but final animated transformation hair needs an art pass.
 - Melee: `Saiyan Strike` is playable and scales with physical power, but full punch/kick animations, charged strikes, dash strikes, and combo visuals are not complete.
-- Training: focus meditation, weighted gear, wooden/copper benches, and gravity training exist; more station types and full gravity chamber progression are still in progress.
+- Training: focus meditation, weighted gear, wooden/copper benches, wooden training bag, meditation mat, and gravity training exist; higher station tiers and full gravity chamber progression are still in progress.
 - Sounds: a central sound helper is wired with temporary legally usable energy sounds; final DBZ-style original audio is planned.
 
 ### Planned
 
-- More tiered placeable training stations and upgraded gravity chamber path.
+- Higher-tier placeable training stations and upgraded gravity chamber path.
 - Expanded melee combo inputs and clearer punch/kick presentation.
-- More high-quality representative ki techniques before broad roster expansion.
-- DBZ-flavored original bosses and mobs, starting with one early encounter instead of the full roster.
+- More high-quality representative ki techniques and better per-technique visual/audio identity.
+- More DBZ-flavored original bosses and mobs, building outward from the first implemented early enemy.
 - Final sprite, aura, sound, and UI art pass.
 
 ## Progression
@@ -111,7 +112,7 @@ This repo does not vendor Terraria or tModLoader binaries. tModLoader supplies t
 
 ## Roadmap
 
-- Expand the starter weight bench training pass into more station types.
+- Expand the starter training stations into higher tiers.
 - Expand melee combo inputs beyond the starter `Saiyan Strike`.
 - Add a mentor/trainer town NPC for form tutorials and optional rituals.
 - Add branching late-game paths: Ultra Instinct, Ultra Ego, and Legendary Wrath.

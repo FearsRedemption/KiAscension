@@ -22,7 +22,7 @@ Early mobs are scaled up compared to vanilla, but the starter spell, `Saiyan Str
 6. Hold `Z` to charge up into the highest unlocked Saiyan form; hold `X` to power down to Base Saiyan.
 7. Tap or hold `C`/`V` to raise or lower the separate Kaio-Ken level.
 
-The HUD is now a compact DBZ-style panel instead of plain debug text. It shows Kai Level, ki, net ki regeneration after active drains, active Saiyan form, active Kaio-Ken state, held spell, and the next ceiling. Long gate and spell lines wrap or clip inside the panel so they should not run across the screen. Locked held spells display their locked state and a readable requirement, for example `Held Spell: Spirit Bomb (Locked)` and `Reason: Requires Super Saiyan 3 + 14500 Ki Power`.
+The HUD is now a compact DBZ-style panel instead of plain debug text. It shows Kai Level, ki, net ki regeneration after active drains, active Saiyan form, active Kaio-Ken state, held spell, active training station, and the next ceiling. Long gate and spell lines wrap or clip inside the panel so they should not run across the screen. Locked held spells display their locked state and a readable requirement, for example `Held Spell: Spirit Bomb (Locked)` and `Reason: Requires Super Saiyan 3 + 14500 Ki Power`.
 
 Tap `B` to toggle a styled read-only stats panel with current form bonuses, Kaio-Ken strain, final damage/speed multipliers, ki economy, next gates, and held-spell cost details. Tap `N` to toggle a styled read-only dev inspection panel for synced player state while testing. These panels are intentionally still read-only; editable dev tools are planned later.
 
@@ -36,7 +36,7 @@ True ki flight is available only while an active Saiyan form is Super Saiyan or 
 
 ## Technique Feel
 
-Techniques are now separate spell items. Basic blasts and barrages behave like fast projectile pressure. Kamehameha, Galick Gun, Final Flash, and God Kamehameha are held beams that drain ki over time. Destructo Disk pierces multiple enemies and steers toward the mouse while it flies. Big Bang Attack and Spirit Bomb are heavier projectile attacks.
+Techniques are now separate spell items. Basic blasts and barrages behave like fast projectile pressure. Masenko is an early focused impact blast. Kamehameha, Galick Gun, Special Beam Cannon, Final Flash, and God Kamehameha are held beams that drain ki over time. Death Beam is a fast precision shot. Destructo Disk pierces multiple enemies and steers toward the mouse while it flies. Big Bang Attack and Spirit Bomb are heavier projectile attacks.
 
 Every ki technique has an initial ki cost, and beam techniques also have a per-second sustain drain. Current ki power and advanced forms apply a ki-control discount through shared resource math, so training can make lower techniques smoother without making high forms free too early. Spell tooltips show the current effective costs for the local player and explain locked spell requirements. Sustained beams now stop at solid terrain, while techniques marked as terrain-passing, such as Spirit Bomb, can still use special terrain behavior.
 
@@ -48,7 +48,7 @@ Technique fire, impact, beam fizzle, transformations, Kaio-Ken changes, and ki s
 
 Training sources now have simple caps so starter tools cannot carry the whole game. `Ki Training Focus` helps early physical power and ki power, `Weighted Training Bands` slow the player while equipped but build physical power while moving, and `Gravity Room Core` is a placeable 2x2 tile that creates a training field nearby for mixed physical/ki training.
 
-The first tiered placeable station path is implemented with `Wooden Weight Bench` and `Copper Weight Bench`. Place a bench and right-click it to begin a short slow training window. Wooden benches train physical power to an early cap, while copper benches raise the cap. If the player has outgrown a bench, it says `This equipment can no longer push your limits.` Any multiplayer player can use a placed higher-tier bench; progression remains owned by that player, not the bench owner.
+The first placeable station set is implemented with `Wooden Weight Bench`, `Copper Weight Bench`, `Wooden Training Bag`, and `Meditation Mat`. Place a station and right-click it to begin a short slow training window. Benches train physical power, the training bag trains striking power plus a little ki control, and the meditation mat trains ki power. If the player has outgrown a station, it says `This equipment can no longer push your limits.` Any multiplayer player can use a placed higher-tier station; progression remains owned by that player, not the station owner.
 
 The training numbers are intentionally small so training helps without replacing boss progression.
 
@@ -89,6 +89,8 @@ When the player transforms, the mod stores the player's natural hair once, then 
 
 Powering down to Base restores the stored natural hair style and color. Kaio-Ken does not change hair style; it only adds a red aura layer. Aura behavior is profile-driven per form, with separate dust type, light strength, dust intensity, secondary color, electric-arc settings, and an animated aura draw-layer texture. Hair behavior is also profile-driven so form hair selection stays separate from stat logic.
 
-## Boss Direction
+## Enemies And Boss Direction
 
-The current repo does not add DBZ-flavored bosses yet. The progression is ready for them: future bosses should be original, Dragon Ball-inspired encounters that test the current ascension tier and reward meaningful EXP or breakthrough materials. Placeholder folders and planning docs now exist for future boss and enemy implementation.
+The current repo now includes `Saiba Sprout`, an early surface enemy that chases the player and fires a simple hostile ki shot. It gives the early world a small DBZ-flavored combat pressure source instead of keeping mobs entirely theoretical.
+
+The current repo does not add DBZ-flavored bosses yet. The progression is ready for them: future bosses should be original, Dragon Ball-inspired encounters that test the current ascension tier and reward meaningful EXP or breakthrough materials.

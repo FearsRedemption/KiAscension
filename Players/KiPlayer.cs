@@ -82,6 +82,14 @@ public class KiPlayer : ModPlayer
 
     public bool IsUsingTrainingStation => isUsingTrainingStation;
 
+    public string ActiveTrainingDisplayName => isUsingTrainingStation
+        ? TrainingSources.Get(activeTrainingStation).DisplayName
+        : "none";
+
+    public float ActiveTrainingProgress => isUsingTrainingStation
+        ? MathHelper.Clamp(activeTrainingStationTicks / (float)StationTrainingDurationTicks, 0f, 1f)
+        : 0f;
+
     public int TotalPowerExperience => PowerExperience + KiPowerExperience;
 
     public int PhysicalPowerLevel => CalculateKaiLevel(PowerExperience);
@@ -299,6 +307,7 @@ public class KiPlayer : ModPlayer
         EnsureInventoryItem(ModContent.ItemType<KiTrainingFocus>());
         EnsureInventoryItem(ModContent.ItemType<SaiyanStrike>());
         EnsureInventoryItem(ModContent.ItemType<BasicKiBlastSpell>());
+        EnsureUnlockedTechniqueItems();
     }
 
     public void NetSend(BinaryWriter writer)
@@ -584,6 +593,7 @@ public class KiPlayer : ModPlayer
 
         if (Main.netMode == NetmodeID.MultiplayerClient)
         {
+            SetTrainingStationDisplay(source, tileX, tileY);
             SendTrainingStationUse(source, tileX, tileY);
             ShowTrainingStationStarted(source);
             return;
@@ -1014,6 +1024,14 @@ public class KiPlayer : ModPlayer
         int itemType = KiTechniques.GetItemType(technique.Technique);
 
         EnsureInventoryItem(itemType);
+    }
+
+    private void EnsureUnlockedTechniqueItems()
+    {
+        for (int techniqueIndex = 0; techniqueIndex <= HighestUnlockedTechniqueIndex; techniqueIndex++)
+        {
+            GrantTechniqueItem(KiTechniques.Get(techniqueIndex));
+        }
     }
 
     private void EnsureInventoryItem(int itemType)
@@ -1565,6 +1583,13 @@ public class KiPlayer : ModPlayer
 
         if (Main.netMode == NetmodeID.MultiplayerClient)
         {
+            activeTrainingStationTicks--;
+
+            if (activeTrainingStationTicks <= 0)
+            {
+                StopTrainingStation();
+            }
+
             return;
         }
 
@@ -1609,6 +1634,15 @@ public class KiPlayer : ModPlayer
         activeTrainingStationIntervalTicks = 0;
     }
 
+    private void SetTrainingStationDisplay(TrainingSource source, int tileX, int tileY)
+    {
+        isUsingTrainingStation = true;
+        activeTrainingStation = source;
+        activeTrainingStationTile = new Point(tileX, tileY);
+        activeTrainingStationTicks = StationTrainingDurationTicks;
+        activeTrainingStationIntervalTicks = 0;
+    }
+
     private void ShowTrainingStationStarted(TrainingSource source)
     {
         if (Player.whoAmI != Main.myPlayer)
@@ -1622,7 +1656,10 @@ public class KiPlayer : ModPlayer
 
     private static bool IsStationTrainingSource(TrainingSource source)
     {
-        return source is TrainingSource.WoodenWeightBench or TrainingSource.CopperWeightBench;
+        return source is TrainingSource.WoodenWeightBench
+            or TrainingSource.CopperWeightBench
+            or TrainingSource.WoodenTrainingBag
+            or TrainingSource.MeditationMat;
     }
 
     private bool IsTrainingSourceOutgrown(TrainingSource source)
@@ -1638,6 +1675,8 @@ public class KiPlayer : ModPlayer
         {
             TrainingSource.WoodenWeightBench => ModContent.TileType<WoodenWeightBenchTile>(),
             TrainingSource.CopperWeightBench => ModContent.TileType<CopperWeightBenchTile>(),
+            TrainingSource.WoodenTrainingBag => ModContent.TileType<WoodenTrainingBagTile>(),
+            TrainingSource.MeditationMat => ModContent.TileType<MeditationMatTile>(),
             _ => -1
         };
 

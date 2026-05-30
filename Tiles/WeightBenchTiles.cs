@@ -53,6 +53,48 @@ public class CopperWeightBenchTile : ModTile
     }
 }
 
+public class WoodenTrainingBagTile : ModTile
+{
+    public override void SetStaticDefaults()
+    {
+        WeightBenchTileHelper.SetStaticDefaults(this, ModContent.ItemType<WoodenTrainingBag>(), new Color(142, 92, 60), "Mods.KiAscension.Tiles.WoodenTrainingBagTile.MapEntry");
+        DustType = DustID.WoodFurniture;
+        HitSound = SoundID.Dig;
+        MineResist = 1.2f;
+    }
+
+    public override bool RightClick(int i, int j)
+    {
+        return WeightBenchTileHelper.StartTraining(i, j, TrainingSource.WoodenTrainingBag);
+    }
+
+    public override void MouseOver(int i, int j)
+    {
+        WeightBenchTileHelper.ShowMouseOver(ModContent.ItemType<WoodenTrainingBag>());
+    }
+}
+
+public class MeditationMatTile : ModTile
+{
+    public override void SetStaticDefaults()
+    {
+        WeightBenchTileHelper.SetStaticDefaults(this, ModContent.ItemType<MeditationMat>(), new Color(70, 150, 190), "Mods.KiAscension.Tiles.MeditationMatTile.MapEntry");
+        DustType = DustID.GemSapphire;
+        HitSound = SoundID.Item4;
+        MineResist = 1f;
+    }
+
+    public override bool RightClick(int i, int j)
+    {
+        return WeightBenchTileHelper.StartTraining(i, j, TrainingSource.MeditationMat);
+    }
+
+    public override void MouseOver(int i, int j)
+    {
+        WeightBenchTileHelper.ShowMouseOver(ModContent.ItemType<MeditationMat>());
+    }
+}
+
 internal static class WeightBenchTileHelper
 {
     public static void SetStaticDefaults(ModTile tile, int itemDropType, Color mapColor, string mapKey)

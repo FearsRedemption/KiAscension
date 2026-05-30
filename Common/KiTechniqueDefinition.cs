@@ -108,8 +108,11 @@ public readonly struct KiTechniqueDefinition
     {
         KiTechniqueSourceType.GeneralKi => "General ki",
         KiTechniqueSourceType.TurtleSchool => "Turtle School",
+        KiTechniqueSourceType.GohanLine => "Gohan line",
+        KiTechniqueSourceType.Namekian => "Namekian",
         KiTechniqueSourceType.VegetaLine => "Vegeta line",
         KiTechniqueSourceType.EarthlingTactical => "Earthling tactical",
+        KiTechniqueSourceType.FriezaLine => "Frieza line",
         KiTechniqueSourceType.GodKi => "God ki",
         KiTechniqueSourceType.UltraInstinct => "Ultra Instinct",
         _ => SourceType.ToString()

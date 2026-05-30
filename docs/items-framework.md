@@ -10,6 +10,8 @@ This document keeps the item roadmap separate from implemented gameplay.
 - `Weighted Training Bands`: starter accessory for movement-under-load training.
 - `Wooden Weight Bench`: placeable starter station that slowly trains physical power to an early cap.
 - `Copper Weight Bench`: placeable bench upgrade crafted from the wooden bench and copper bars.
+- `Wooden Training Bag`: placeable starter striking station for physical power and a little ki power.
+- `Meditation Mat`: placeable starter ki-control station for ki power.
 - `Gravity Room Core`: placeable training tile for mixed physical/ki training.
 - `Ki Fragment`: starter combat material dropped from enemies and bosses for future ascension crafting.
 

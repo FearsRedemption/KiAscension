@@ -38,6 +38,22 @@ public static class TrainingSources
                 2600,
                 0,
                 "This equipment can no longer push your limits."),
+            TrainingSource.WoodenTrainingBag => new(
+                source,
+                "Wooden Training Bag",
+                2,
+                1,
+                1600,
+                600,
+                "This equipment can no longer push your limits."),
+            TrainingSource.MeditationMat => new(
+                source,
+                "Meditation Mat",
+                0,
+                2,
+                0,
+                1600,
+                "This equipment can no longer push your limits."),
             TrainingSource.GravityRoom => new(
                 source,
                 "Gravity Room",
