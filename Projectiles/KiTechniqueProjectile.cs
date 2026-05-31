@@ -136,7 +136,7 @@ public class KiTechniqueProjectile : ModProjectile
                 HeavyBlastAI(technique);
                 break;
             default:
-                Projectile.rotation = Projectile.velocity.ToRotation();
+                BoltAI(technique);
                 break;
         }
 
@@ -211,6 +211,11 @@ public class KiTechniqueProjectile : ModProjectile
                 && Main.GameUpdateCount % 18UL == 0UL)
             {
                 KiSoundSystem.PlayTechniqueImpact(target.Center, technique);
+
+                if (technique.Technique == KiTechnique.FinalFlash)
+                {
+                    KiFeedbackSystem.RequestScreenShake(target.Center, 2.8f, 8);
+                }
             }
         }
 
@@ -232,17 +237,36 @@ public class KiTechniqueProjectile : ModProjectile
     public override void OnKill(int timeLeft)
     {
         KiTechniqueDefinition technique = CurrentTechnique;
-        int burstCount = technique.Category switch
+        int burstCount = technique.Technique switch
         {
-            KiTechniqueCategory.Ultimate => 48,
-            KiTechniqueCategory.HeavyBlast => 28,
-            KiTechniqueCategory.CuttingDisk => 16,
-            _ => 10
+            KiTechnique.BasicKiBlast => 6,
+            KiTechnique.KiBarrage => 4,
+            KiTechnique.UltraInstinctBarrage => 5,
+            KiTechnique.DeathBeam => 3,
+            KiTechnique.Masenko => 14,
+            KiTechnique.BigBangAttack => 38,
+            KiTechnique.SpiritBomb => 72,
+            _ => technique.Category switch
+            {
+                KiTechniqueCategory.Ultimate => 48,
+                KiTechniqueCategory.HeavyBlast => 28,
+                KiTechniqueCategory.CuttingDisk => 16,
+                _ => 10
+            }
         };
 
         if (technique.Behavior != KiTechniqueBehavior.Beam)
         {
             KiSoundSystem.PlayTechniqueImpact(Projectile.Center, technique);
+        }
+
+        if (technique.Technique == KiTechnique.BigBangAttack)
+        {
+            KiFeedbackSystem.RequestScreenShake(Projectile.Center, 4.5f, 14);
+        }
+        else if (technique.Technique == KiTechnique.SpiritBomb)
+        {
+            KiFeedbackSystem.RequestScreenShake(Projectile.Center, 9f, 26);
         }
 
         for (int i = 0; i < burstCount; i++)
@@ -278,24 +302,54 @@ public class KiTechniqueProjectile : ModProjectile
         Projectile.tileCollide = !technique.IgnoresTerrain;
         Projectile.localNPCHitCooldown = technique.Behavior == KiTechniqueBehavior.Beam ? 8 : 12;
 
+        if (technique.Technique == KiTechnique.BasicKiBlast)
+        {
+            Projectile.width = 10;
+            Projectile.height = 10;
+            Projectile.localNPCHitCooldown = 10;
+        }
+
+        if (technique.Technique == KiTechnique.KiBarrage)
+        {
+            Projectile.width = 9;
+            Projectile.height = 9;
+            Projectile.localNPCHitCooldown = 9;
+            Projectile.timeLeft -= (int)Projectile.ai[1] * 2;
+        }
+
+        if (technique.Technique == KiTechnique.UltraInstinctBarrage)
+        {
+            Projectile.width = 10;
+            Projectile.height = 10;
+            Projectile.localNPCHitCooldown = 7;
+            Projectile.timeLeft -= (int)Projectile.ai[1];
+        }
+
+        if (technique.Technique == KiTechnique.Masenko)
+        {
+            Projectile.width = 28;
+            Projectile.height = 14;
+            Projectile.localNPCHitCooldown = 10;
+        }
+
         if (technique.Behavior == KiTechniqueBehavior.SteeringDisk)
         {
             Projectile.localNPCHitCooldown = 10;
-            Projectile.width = 28;
-            Projectile.height = 18;
+            Projectile.width = 34;
+            Projectile.height = 16;
         }
 
         if (technique.Technique == KiTechnique.DeathBeam)
         {
-            Projectile.width = 8;
-            Projectile.height = 8;
-            Projectile.localNPCHitCooldown = 8;
+            Projectile.width = 6;
+            Projectile.height = 6;
+            Projectile.localNPCHitCooldown = 5;
         }
 
         if (technique.Technique == KiTechnique.BigBangAttack)
         {
-            Projectile.width = 30;
-            Projectile.height = 30;
+            Projectile.width = 40;
+            Projectile.height = 40;
         }
 
         if (technique.Technique == KiTechnique.SpiritBomb)
@@ -368,6 +422,15 @@ public class KiTechniqueProjectile : ModProjectile
         {
             Projectile.ai[1] = 1f;
             KiSoundSystem.PlayTechniqueRelease(Projectile.Center, technique);
+            if (technique.Technique == KiTechnique.FinalFlash)
+            {
+                KiFeedbackSystem.RequestScreenShake(Projectile.Center, 7.5f, 22);
+            }
+            else if (technique.Technique == KiTechnique.GodKamehameha)
+            {
+                KiFeedbackSystem.RequestScreenShake(Projectile.Center, 3f, 10);
+            }
+
             Projectile.netUpdate = true;
         }
 
@@ -403,6 +466,30 @@ public class KiTechniqueProjectile : ModProjectile
         Projectile.rotation += 0.45f * Math.Sign(Projectile.velocity.X == 0f ? 1f : Projectile.velocity.X);
     }
 
+    private void BoltAI(KiTechniqueDefinition technique)
+    {
+        Projectile.rotation = Projectile.velocity.ToRotation();
+
+        if (technique.Technique == KiTechnique.DeathBeam)
+        {
+            Projectile.extraUpdates = 1;
+            Lighting.AddLight(Projectile.Center, technique.Color.ToVector3() * 0.7f);
+            return;
+        }
+
+        if (technique.Technique == KiTechnique.UltraInstinctBarrage)
+        {
+            Projectile.extraUpdates = 1;
+            Projectile.velocity *= 1.002f;
+
+            if (Main.rand.NextBool(2))
+            {
+                int dust = Dust.NewDust(Projectile.position, Projectile.width, Projectile.height, DustID.GemDiamond, -Projectile.velocity.X * 0.15f, -Projectile.velocity.Y * 0.15f, 120, Color.White, 0.7f);
+                Main.dust[dust].noGravity = true;
+            }
+        }
+    }
+
     private void HeavyBlastAI(KiTechniqueDefinition technique)
     {
         if (technique.Technique == KiTechnique.SpiritBomb)
@@ -413,9 +500,32 @@ public class KiTechniqueProjectile : ModProjectile
 
         Projectile.rotation = Projectile.velocity.ToRotation();
 
+        if (technique.Technique == KiTechnique.Masenko)
+        {
+            Projectile.velocity *= 1.002f;
+        }
+
         if (technique.Technique == KiTechnique.BigBangAttack)
         {
-            Projectile.rotation += 0.04f;
+            Projectile.localAI[1]++;
+            Projectile.rotation += 0.045f;
+
+            if (Projectile.localAI[1] <= 12f)
+            {
+                Projectile.velocity *= 0.93f;
+                Projectile.scale = MathHelper.Lerp(0.9f, technique.ProjectileScale, Projectile.localAI[1] / 12f);
+            }
+            else
+            {
+                Projectile.velocity *= 1.003f;
+            }
+
+            if (Main.rand.NextBool(2))
+            {
+                int dust = Dust.NewDust(Projectile.position, Projectile.width, Projectile.height, DustID.Electric, 0f, 0f, 115, technique.Color, 1f);
+                Main.dust[dust].noGravity = true;
+                Main.dust[dust].velocity = Main.rand.NextVector2Circular(1.5f, 1.5f);
+            }
         }
     }
 
@@ -438,6 +548,14 @@ public class KiTechniqueProjectile : ModProjectile
             Projectile.width = Projectile.height = Math.Max(28, (int)(26 * Projectile.scale));
             player.itemTime = 2;
             player.itemAnimation = 2;
+            Lighting.AddLight(Projectile.Center, technique.Color.ToVector3() * (0.45f + Projectile.localAI[1] / SpiritBombMaxChargeTicks * 0.45f));
+
+            if (Main.rand.NextBool(2))
+            {
+                Vector2 dustVelocity = Main.rand.NextVector2CircularEdge(2.5f, 2.5f);
+                int dust = Dust.NewDust(Projectile.position, Projectile.width, Projectile.height, DustID.GemDiamond, dustVelocity.X, dustVelocity.Y, 90, technique.Color, 0.8f + Projectile.localAI[1] / SpiritBombMaxChargeTicks);
+                Main.dust[dust].noGravity = true;
+            }
 
             if (Main.GameUpdateCount % BeamDrainIntervalTicks == 0UL
                 && Main.netMode != NetmodeID.MultiplayerClient
@@ -475,6 +593,7 @@ public class KiTechniqueProjectile : ModProjectile
         Projectile.width = Projectile.height = Math.Max(30, (int)(28 * Projectile.scale));
         Projectile.timeLeft = Math.Max(120, technique.TimeLeft);
         KiSoundSystem.PlayTechniqueRelease(Projectile.Center, technique);
+        KiFeedbackSystem.RequestScreenShake(Projectile.Center, 6f, 18);
         Projectile.netUpdate = true;
     }
 
@@ -509,9 +628,10 @@ public class KiTechniqueProjectile : ModProjectile
         return technique.Technique switch
         {
             KiTechnique.SpecialBeamCannon => 8f,
-            KiTechnique.FinalFlash => 30f,
-            KiTechnique.GodKamehameha => 24f,
-            KiTechnique.GalickGun => 18f,
+            KiTechnique.FinalFlash => 42f,
+            KiTechnique.GodKamehameha => 26f,
+            KiTechnique.GalickGun => 24f,
+            KiTechnique.Kamehameha => 20f,
             _ => 16f + technique.ProjectileScale * 4f
         };
     }
@@ -520,11 +640,12 @@ public class KiTechniqueProjectile : ModProjectile
     {
         return technique.Technique switch
         {
-            KiTechnique.FinalFlash => 2800f,
-            KiTechnique.GodKamehameha => 3000f,
-            KiTechnique.SpecialBeamCannon => 2500f,
-            KiTechnique.GalickGun => 2200f,
-            _ => 1900f
+            KiTechnique.FinalFlash => 3600f,
+            KiTechnique.GodKamehameha => 3400f,
+            KiTechnique.SpecialBeamCannon => 2700f,
+            KiTechnique.GalickGun => 2600f,
+            KiTechnique.Kamehameha => 2400f,
+            _ => 2000f
         };
     }
 
@@ -534,9 +655,9 @@ public class KiTechniqueProjectile : ModProjectile
         {
             KiTechnique.Kamehameha => 14,
             KiTechnique.GalickGun => 18,
-            KiTechnique.SpecialBeamCannon => 32,
-            KiTechnique.FinalFlash => 54,
-            KiTechnique.GodKamehameha => 26,
+            KiTechnique.SpecialBeamCannon => 36,
+            KiTechnique.FinalFlash => 72,
+            KiTechnique.GodKamehameha => 20,
             _ => 12
         };
     }
@@ -545,7 +666,7 @@ public class KiTechniqueProjectile : ModProjectile
     {
         return technique.Technique switch
         {
-            KiTechnique.FinalFlash => 4,
+            KiTechnique.FinalFlash => 3,
             KiTechnique.SpecialBeamCannon => 5,
             _ => 6
         };
@@ -553,7 +674,13 @@ public class KiTechniqueProjectile : ModProjectile
 
     private static float GetBeamSegmentLength(KiTechniqueDefinition technique)
     {
-        return technique.Technique == KiTechnique.SpecialBeamCannon ? 34f : 46f;
+        return technique.Technique switch
+        {
+            KiTechnique.SpecialBeamCannon => 30f,
+            KiTechnique.FinalFlash => 64f,
+            KiTechnique.GodKamehameha => 42f,
+            _ => 46f
+        };
     }
 
     private static float GetBeamStreamSpeed(KiTechniqueDefinition technique)
@@ -561,8 +688,9 @@ public class KiTechniqueProjectile : ModProjectile
         return technique.Technique switch
         {
             KiTechnique.FinalFlash => 5.5f,
-            KiTechnique.GalickGun => 6.2f,
-            KiTechnique.SpecialBeamCannon => 7.4f,
+            KiTechnique.GalickGun => 7f,
+            KiTechnique.SpecialBeamCannon => 8.2f,
+            KiTechnique.GodKamehameha => 7.6f,
             _ => 4.8f
         };
     }
@@ -625,16 +753,33 @@ public class KiTechniqueProjectile : ModProjectile
             return;
         }
 
-        int dustCount = technique.Category switch
+        int dustCount = technique.Technique switch
         {
-            KiTechniqueCategory.Ultimate => 18,
-            KiTechniqueCategory.HeavyBlast => 12,
-            KiTechniqueCategory.CuttingDisk => 8,
-            KiTechniqueCategory.ContinuousBeam => 4,
-            _ => 5
+            KiTechnique.BasicKiBlast => 5,
+            KiTechnique.KiBarrage => 3,
+            KiTechnique.UltraInstinctBarrage => 4,
+            KiTechnique.DeathBeam => 3,
+            KiTechnique.Masenko => 10,
+            KiTechnique.BigBangAttack => 18,
+            KiTechnique.SpiritBomb => 28,
+            _ => technique.Category switch
+            {
+                KiTechniqueCategory.Ultimate => 18,
+                KiTechniqueCategory.HeavyBlast => 12,
+                KiTechniqueCategory.CuttingDisk => 8,
+                KiTechniqueCategory.ContinuousBeam => 4,
+                _ => 5
+            }
         };
 
-        float scale = technique.Category is KiTechniqueCategory.Ultimate or KiTechniqueCategory.HeavyBlast ? 1.25f : 0.85f;
+        float scale = technique.Technique switch
+        {
+            KiTechnique.DeathBeam => 0.55f,
+            KiTechnique.BasicKiBlast or KiTechnique.KiBarrage => 0.7f,
+            KiTechnique.SpiritBomb => 1.8f,
+            KiTechnique.BigBangAttack => 1.35f,
+            _ => technique.Category is KiTechniqueCategory.Ultimate or KiTechniqueCategory.HeavyBlast ? 1.25f : 0.85f
+        };
 
         for (int i = 0; i < dustCount; i++)
         {
@@ -741,8 +886,8 @@ public class KiTechniqueProjectile : ModProjectile
 
         float segmentLength = GetBeamSegmentLength(technique);
         float streamOffset = (Main.GameUpdateCount * GetBeamStreamSpeed(technique)) % segmentLength;
-        Color outerColor = technique.Color * 0.38f;
-        Color coreColor = Color.White * 0.88f;
+        Color outerColor = technique.Color * (technique.Technique == KiTechnique.FinalFlash ? 0.52f : 0.38f);
+        Color coreColor = technique.Technique == KiTechnique.GodKamehameha ? new Color(255, 235, 245) * 0.94f : Color.White * 0.88f;
 
         for (float offset = -streamOffset; offset < length; offset += segmentLength)
         {
@@ -762,11 +907,19 @@ public class KiTechniqueProjectile : ModProjectile
             Main.EntitySpriteDraw(segmentTexture, drawPosition, source, outerColor, rotation, origin, outerScale, SpriteEffects.None);
             Main.EntitySpriteDraw(segmentTexture, drawPosition, source, coreColor, rotation, origin, innerScale, SpriteEffects.None);
 
+            if (technique.Technique == KiTechnique.GalickGun)
+            {
+                float flicker = (float)Math.Sin((offset + Main.GameUpdateCount * 11f) * 0.055f) * width * 0.18f;
+                Vector2 perpendicular = normalizedDirection.RotatedBy(MathHelper.PiOver2) * flicker;
+                Main.EntitySpriteDraw(segmentTexture, drawPosition + perpendicular, source, new Color(255, 120, 255) * 0.42f, rotation, origin, new Vector2(drawLength / segmentTexture.Width, width * 0.34f / segmentTexture.Height), SpriteEffects.None);
+            }
+
             if (technique.Technique == KiTechnique.SpecialBeamCannon)
             {
                 float spiral = (float)Math.Sin((offset + Main.GameUpdateCount * 8f) * 0.045f) * width * 0.42f;
                 Vector2 perpendicular = normalizedDirection.RotatedBy(MathHelper.PiOver2) * spiral;
                 Main.EntitySpriteDraw(segmentTexture, drawPosition + perpendicular, source, technique.Color * 0.5f, rotation, origin, new Vector2(drawLength / segmentTexture.Width, 2.4f / segmentTexture.Height), SpriteEffects.None);
+                Main.EntitySpriteDraw(segmentTexture, drawPosition - perpendicular, source, Color.White * 0.32f, rotation, origin, new Vector2(drawLength / segmentTexture.Width, 1.7f / segmentTexture.Height), SpriteEffects.None);
             }
         }
 
@@ -789,7 +942,7 @@ public class KiTechniqueProjectile : ModProjectile
                 technique.Color * 0.8f,
                 Main.GameUpdateCount * 0.09f,
                 new Vector2(impactTexture.Width / 2f, impactTexture.Height / 2f),
-                Math.Max(0.9f, width / 16f),
+                Math.Max(0.9f, width / 14f),
                 SpriteEffects.None);
         }
     }
@@ -802,17 +955,44 @@ public class KiTechniqueProjectile : ModProjectile
             return;
         }
 
-        Texture2D texture = technique.Behavior == KiTechniqueBehavior.SteeringDisk
-            ? GetEffectTexture("KiDisk")
-            : GetEffectTexture("KiOrbProjectile");
+        if (technique.Technique == KiTechnique.Masenko)
+        {
+            DrawMasenkoShot(technique);
+            return;
+        }
 
-        float pulse = 1f + (float)Math.Sin(Main.GameUpdateCount * 0.2f + Projectile.whoAmI) * 0.05f;
-        float scale = Projectile.scale * pulse;
+        if (technique.Technique == KiTechnique.BigBangAttack)
+        {
+            DrawBigBangShot(technique);
+            return;
+        }
 
         if (technique.Technique == KiTechnique.SpiritBomb)
         {
-            scale = Projectile.scale * (Projectile.localAI[1] >= 0f ? 1f : 1.08f);
+            DrawSpiritBombShot(technique);
+            return;
         }
+
+        if (technique.Behavior == KiTechniqueBehavior.SteeringDisk)
+        {
+            DrawDiskShot(technique);
+            return;
+        }
+
+        if (technique.Behavior == KiTechniqueBehavior.Barrage)
+        {
+            DrawBarrageShot(technique);
+            return;
+        }
+
+        DrawOrbShot(technique);
+    }
+
+    private void DrawOrbShot(KiTechniqueDefinition technique)
+    {
+        Texture2D texture = GetEffectTexture("KiOrbProjectile");
+        float pulse = 1f + (float)Math.Sin(Main.GameUpdateCount * 0.2f + Projectile.whoAmI) * 0.04f;
+        float scale = Projectile.scale * pulse;
 
         Main.EntitySpriteDraw(
             texture,
@@ -824,11 +1004,6 @@ public class KiTechniqueProjectile : ModProjectile
             scale,
             SpriteEffects.None);
 
-        if (technique.Behavior == KiTechniqueBehavior.SteeringDisk)
-        {
-            return;
-        }
-
         Main.EntitySpriteDraw(
             texture,
             Projectile.Center - Main.screenPosition,
@@ -837,6 +1012,181 @@ public class KiTechniqueProjectile : ModProjectile
             -Projectile.rotation * 0.5f,
             new Vector2(texture.Width / 2f, texture.Height / 2f),
             scale * 0.54f,
+            SpriteEffects.None);
+    }
+
+    private void DrawBarrageShot(KiTechniqueDefinition technique)
+    {
+        Texture2D segmentTexture = GetEffectTexture("KiBeamSegment");
+        Texture2D orbTexture = GetEffectTexture("KiOrbProjectile");
+        Vector2 direction = NormalizeOrDefault(Projectile.velocity, Vector2.UnitX);
+        float length = technique.Technique == KiTechnique.UltraInstinctBarrage ? 72f : 38f;
+        float width = technique.Technique == KiTechnique.UltraInstinctBarrage ? 4.5f : 7f;
+        Color trailColor = technique.Technique == KiTechnique.UltraInstinctBarrage ? Color.White * 0.55f : technique.Color * 0.5f;
+        Rectangle source = new(0, 0, segmentTexture.Width, segmentTexture.Height);
+        Vector2 origin = new(0f, segmentTexture.Height / 2f);
+
+        Main.EntitySpriteDraw(
+            segmentTexture,
+            Projectile.Center - direction * length - Main.screenPosition,
+            source,
+            trailColor,
+            direction.ToRotation(),
+            origin,
+            new Vector2(length / segmentTexture.Width, width / segmentTexture.Height),
+            SpriteEffects.None);
+
+        Main.EntitySpriteDraw(
+            orbTexture,
+            Projectile.Center - Main.screenPosition,
+            null,
+            technique.Color,
+            Projectile.rotation,
+            new Vector2(orbTexture.Width / 2f, orbTexture.Height / 2f),
+            Projectile.scale,
+            SpriteEffects.None);
+    }
+
+    private void DrawMasenkoShot(KiTechniqueDefinition technique)
+    {
+        Texture2D segmentTexture = GetEffectTexture("KiBeamSegment");
+        Texture2D headTexture = GetEffectTexture("KiBeamHead");
+        Vector2 direction = NormalizeOrDefault(Projectile.velocity, Vector2.UnitX);
+        float length = 76f;
+        Rectangle source = new(0, 0, segmentTexture.Width, segmentTexture.Height);
+        Vector2 origin = new(0f, segmentTexture.Height / 2f);
+
+        Main.EntitySpriteDraw(
+            segmentTexture,
+            Projectile.Center - direction * length * 0.75f - Main.screenPosition,
+            source,
+            technique.Color * 0.72f,
+            direction.ToRotation(),
+            origin,
+            new Vector2(length / segmentTexture.Width, 16f / segmentTexture.Height),
+            SpriteEffects.None);
+
+        Main.EntitySpriteDraw(
+            segmentTexture,
+            Projectile.Center - direction * length * 0.55f - Main.screenPosition,
+            source,
+            Color.White * 0.62f,
+            direction.ToRotation(),
+            origin,
+            new Vector2(length * 0.66f / segmentTexture.Width, 6f / segmentTexture.Height),
+            SpriteEffects.None);
+
+        Main.EntitySpriteDraw(
+            headTexture,
+            Projectile.Center - Main.screenPosition,
+            null,
+            technique.Color,
+            Projectile.rotation,
+            new Vector2(headTexture.Width / 2f, headTexture.Height / 2f),
+            0.72f,
+            SpriteEffects.None);
+    }
+
+    private void DrawDiskShot(KiTechniqueDefinition technique)
+    {
+        Texture2D texture = GetEffectTexture("KiDisk");
+        float pulse = 1f + (float)Math.Sin(Main.GameUpdateCount * 0.3f) * 0.04f;
+        Vector2 scale = new(Projectile.scale * 1.28f * pulse, Projectile.scale * 0.62f);
+
+        Main.EntitySpriteDraw(
+            texture,
+            Projectile.Center - Main.screenPosition,
+            null,
+            technique.Color,
+            Projectile.rotation,
+            new Vector2(texture.Width / 2f, texture.Height / 2f),
+            scale,
+            SpriteEffects.None);
+
+        Main.EntitySpriteDraw(
+            texture,
+            Projectile.Center - Main.screenPosition,
+            null,
+            Color.White * 0.42f,
+            -Projectile.rotation * 1.4f,
+            new Vector2(texture.Width / 2f, texture.Height / 2f),
+            scale * 0.72f,
+            SpriteEffects.None);
+    }
+
+    private void DrawBigBangShot(KiTechniqueDefinition technique)
+    {
+        Texture2D orbTexture = GetEffectTexture("KiOrbProjectile");
+        Texture2D chargeTexture = GetEffectTexture("KiChargeOrb");
+        float pulse = 1f + (float)Math.Sin(Main.GameUpdateCount * 0.16f) * 0.06f;
+        float scale = Projectile.scale * pulse;
+
+        Main.EntitySpriteDraw(
+            chargeTexture,
+            Projectile.Center - Main.screenPosition,
+            null,
+            technique.Color * 0.58f,
+            -Projectile.rotation * 0.55f,
+            new Vector2(chargeTexture.Width / 2f, chargeTexture.Height / 2f),
+            scale * 1.32f,
+            SpriteEffects.None);
+
+        Main.EntitySpriteDraw(
+            orbTexture,
+            Projectile.Center - Main.screenPosition,
+            null,
+            technique.Color,
+            Projectile.rotation,
+            new Vector2(orbTexture.Width / 2f, orbTexture.Height / 2f),
+            scale,
+            SpriteEffects.None);
+
+        Main.EntitySpriteDraw(
+            orbTexture,
+            Projectile.Center - Main.screenPosition,
+            null,
+            Color.White * 0.62f,
+            -Projectile.rotation,
+            new Vector2(orbTexture.Width / 2f, orbTexture.Height / 2f),
+            scale * 0.45f,
+            SpriteEffects.None);
+    }
+
+    private void DrawSpiritBombShot(KiTechniqueDefinition technique)
+    {
+        Texture2D orbTexture = GetEffectTexture("KiOrbProjectile");
+        Texture2D chargeTexture = GetEffectTexture("KiChargeOrb");
+        float chargingPulse = Projectile.localAI[1] >= 0f ? (float)Math.Sin(Main.GameUpdateCount * 0.1f) * 0.08f : 0.08f;
+        float scale = Projectile.scale * (1f + chargingPulse);
+
+        Main.EntitySpriteDraw(
+            chargeTexture,
+            Projectile.Center - Main.screenPosition,
+            null,
+            technique.Color * 0.42f,
+            Main.GameUpdateCount * 0.018f,
+            new Vector2(chargeTexture.Width / 2f, chargeTexture.Height / 2f),
+            scale * 1.42f,
+            SpriteEffects.None);
+
+        Main.EntitySpriteDraw(
+            orbTexture,
+            Projectile.Center - Main.screenPosition,
+            null,
+            technique.Color,
+            Projectile.rotation,
+            new Vector2(orbTexture.Width / 2f, orbTexture.Height / 2f),
+            scale,
+            SpriteEffects.None);
+
+        Main.EntitySpriteDraw(
+            orbTexture,
+            Projectile.Center - Main.screenPosition,
+            null,
+            Color.White * 0.68f,
+            -Projectile.rotation * 0.35f,
+            new Vector2(orbTexture.Width / 2f, orbTexture.Height / 2f),
+            scale * 0.48f,
             SpriteEffects.None);
     }
 
@@ -873,7 +1223,15 @@ public class KiTechniqueProjectile : ModProjectile
     {
         Texture2D texture = GetEffectTexture("KiChargeOrb");
         float pulse = 1f + (float)Math.Sin(Main.GameUpdateCount * 0.18f) * 0.08f;
-        float scale = MathHelper.Clamp(intensity, 0.4f, 1.35f) * pulse * (technique.Technique == KiTechnique.FinalFlash ? 1.25f : 1f);
+        float chargeScale = technique.Technique switch
+        {
+            KiTechnique.FinalFlash => 1.8f,
+            KiTechnique.GodKamehameha => 1.28f,
+            KiTechnique.GalickGun => 1.14f,
+            KiTechnique.SpecialBeamCannon => 0.78f,
+            _ => 1f
+        };
+        float scale = MathHelper.Clamp(intensity, 0.4f, 1.35f) * pulse * chargeScale;
         Main.EntitySpriteDraw(
             texture,
             worldPosition + NormalizeOrDefault(Projectile.velocity, Vector2.UnitX) * 18f - Main.screenPosition,

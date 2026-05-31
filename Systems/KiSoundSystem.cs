@@ -67,14 +67,7 @@ public static class KiSoundSystem
     public static void PlayTechniqueFire(Vector2 position, KiTechniqueDefinition technique)
     {
         MarkProfile($"{technique.DisplayName} fire: {GetTechniqueSoundProfile(technique)}");
-        Play(technique.Behavior switch
-        {
-            KiTechniqueBehavior.Beam => KaioKenActivationSound,
-            KiTechniqueBehavior.SteeringDisk => ElectricSustainSound,
-            KiTechniqueBehavior.HeavyBlast => TransformationCompleteSound,
-            KiTechniqueBehavior.Barrage => KiBlastSound,
-            _ => KiBlastSound
-        }, GetTechniqueFireFallback(technique), position);
+        Play(GetTechniqueFireSound(technique), GetTechniqueFireFallback(technique), position);
     }
 
     public static void PlayTechniqueChargeStart(Vector2 position, KiTechniqueDefinition technique)
@@ -124,13 +117,29 @@ public static class KiSoundSystem
     {
         return technique.Technique switch
         {
+            KiTechnique.Kamehameha => "stable blue beam",
             KiTechnique.FinalFlash or KiTechnique.SpiritBomb => "heavy charge/impact",
+            KiTechnique.GodKamehameha => "clean god-ki beam",
             KiTechnique.GalickGun or KiTechnique.SpecialBeamCannon => "electric beam",
             KiTechnique.DestructoDisk => "electric cutting disk",
             KiTechnique.BigBangAttack => "heavy blast",
+            KiTechnique.Masenko => "quick yellow burst",
             KiTechnique.DeathBeam => "sharp ki shot",
-            KiTechnique.KiBarrage or KiTechnique.UltraInstinctBarrage => "rapid ki volley",
-            _ => "ki blast"
+            KiTechnique.UltraInstinctBarrage => "clean instinct volley",
+            KiTechnique.KiBarrage => "rapid ki volley",
+            _ => "small ki pop"
+        };
+    }
+
+    private static SoundStyle GetTechniqueFireSound(KiTechniqueDefinition technique)
+    {
+        return technique.Technique switch
+        {
+            KiTechnique.DestructoDisk => ElectricSustainSound,
+            KiTechnique.BigBangAttack or KiTechnique.Masenko => TransformationCompleteSound,
+            KiTechnique.DeathBeam => KiBlastSound with { Volume = 0.46f, Pitch = 0.3f },
+            KiTechnique.KiBarrage or KiTechnique.UltraInstinctBarrage => KiBlastSound with { Volume = 0.46f, Pitch = 0.2f },
+            _ => KiBlastSound
         };
     }
 
@@ -162,6 +171,7 @@ public static class KiSoundSystem
         return technique.Technique switch
         {
             KiTechnique.FinalFlash or KiTechnique.SpiritBomb => TransformationCompleteSound,
+            KiTechnique.GodKamehameha => PowerUpStartSound with { Volume = 0.72f, Pitch = 0.12f },
             KiTechnique.GalickGun or KiTechnique.SpecialBeamCannon => KaioKenActivationSound,
             KiTechnique.DestructoDisk => ElectricSustainSound,
             _ => PowerUpStartSound
@@ -173,7 +183,9 @@ public static class KiSoundSystem
         return technique.Technique switch
         {
             KiTechnique.FinalFlash or KiTechnique.BigBangAttack or KiTechnique.SpiritBomb => HeavyImpactSound,
-            KiTechnique.DeathBeam => KiBlastSound,
+            KiTechnique.GodKamehameha => TransformationCompleteSound with { Volume = 0.64f, Pitch = 0.14f },
+            KiTechnique.DeathBeam => KiBlastSound with { Volume = 0.48f, Pitch = 0.35f },
+            KiTechnique.Masenko => TransformationCompleteSound with { Volume = 0.58f, Pitch = 0.16f },
             KiTechnique.DestructoDisk or KiTechnique.SpecialBeamCannon => ElectricSustainSound,
             _ => KiBlastSound
         };
@@ -184,7 +196,9 @@ public static class KiSoundSystem
         return technique.Technique switch
         {
             KiTechnique.FinalFlash or KiTechnique.GodKamehameha => TransformationCompleteSound,
-            KiTechnique.SpecialBeamCannon or KiTechnique.GalickGun => ElectricSustainSound,
+            KiTechnique.SpecialBeamCannon => ElectricSustainSound with { Pitch = 0.18f },
+            KiTechnique.GalickGun => ElectricSustainSound with { Pitch = -0.08f },
+            KiTechnique.Kamehameha => KiBlastSound with { Volume = 0.38f, Pitch = -0.12f },
             _ => KiBlastSound
         };
     }
@@ -194,6 +208,7 @@ public static class KiSoundSystem
         return technique.Technique switch
         {
             KiTechnique.FinalFlash or KiTechnique.SpiritBomb => SoundID.Item29,
+            KiTechnique.Kamehameha or KiTechnique.GodKamehameha => SoundID.Item13,
             KiTechnique.GalickGun => SoundID.Item103,
             KiTechnique.SpecialBeamCannon => SoundID.Item93,
             _ => SoundID.Item13
@@ -208,6 +223,8 @@ public static class KiSoundSystem
             KiTechnique.DeathBeam => SoundID.Item12,
             KiTechnique.SpecialBeamCannon => SoundID.Item93,
             KiTechnique.GalickGun => SoundID.Item103,
+            KiTechnique.GodKamehameha => SoundID.Item122,
+            KiTechnique.Masenko => SoundID.Item20,
             _ => SoundID.Item20
         };
     }
@@ -219,6 +236,8 @@ public static class KiSoundSystem
             KiTechnique.SpecialBeamCannon => SoundID.Item93,
             KiTechnique.GalickGun => SoundID.Item15,
             KiTechnique.FinalFlash => SoundID.Item122,
+            KiTechnique.GodKamehameha => SoundID.Item13,
+            KiTechnique.Kamehameha => SoundID.Item15,
             _ => SoundID.Item13
         };
     }
@@ -231,7 +250,7 @@ public static class KiSoundSystem
             KiTechniqueCategory.HeavyBlast => SoundID.Item14,
             KiTechniqueCategory.CuttingDisk => SoundID.Item10,
             KiTechniqueCategory.ContinuousBeam => SoundID.Item93,
-            _ => SoundID.Item10
+            _ => technique.Technique == KiTechnique.DeathBeam ? SoundID.Item12 : SoundID.Item10
         };
     }
 

@@ -26,19 +26,19 @@ Projectile behavior now reads this metadata for terrain collision and impact fee
 
 | Technique | Category | Source label | Collision style | Notes |
 | --- | --- | --- | --- | --- |
-| Basic Ki Blast | Basic ki blast | General ki | Terrain blocked | Starter ranged pressure. |
-| Ki Barrage | Barrage | General ki | Terrain blocked | Early rapid-fire pressure. |
-| Masenko | Heavy blast | Gohan line | Heavy impact | Early focused impact wave after basic control. |
-| Kamehameha | Continuous beam | Turtle School | Sustained line | Held beam with ongoing ki drain. |
-| Death Beam | Basic ki blast | Frieza line | Terrain blocked | Fast precision single-target shot. |
-| Destructo Disk | Cutting disk | Earthling tactical | Guided piercing | Cursor-guided piercing disk. |
-| Galick Gun | Continuous beam | Vegeta line | Sustained line | Rival beam with higher burst profile. |
-| Special Beam Cannon | Continuous beam | Namekian | Sustained line | Narrow committed beam for boss pressure. |
-| Big Bang Attack | Heavy blast | Vegeta line | Heavy impact | Compact charged impact projectile. |
-| Final Flash | Continuous beam | Vegeta line | Sustained line | Higher-drain committed beam. |
-| Spirit Bomb | Ultimate | Turtle School | Terrain-passing ultimate | Held charge grows above the player, drains ki heavily, then launches slowly. |
-| God Kamehameha | Continuous beam | God ki | Sustained line | God-tier held beam. |
-| Ultra Instinct Barrage | Barrage | Ultra Instinct | Terrain blocked | Endgame rapid pressure. |
+| Basic Ki Blast | Basic ki blast | General ki | Terrain blocked | Cheap small pop-shot for constant starter pressure. |
+| Ki Barrage | Barrage | General ki | Terrain blocked | Four small pressure shots with spread and lighter per-shot damage. |
+| Masenko | Heavy blast | Gohan line | Heavy impact | Fast yellow palm-wave/lance burst after basic control. |
+| Kamehameha | Continuous beam | Turtle School | Sustained line | Stable blue-white held beam with short charge and long reach. |
+| Death Beam | Basic ki blast | Frieza line | Terrain blocked | Very fast thin precision shot with small bright impact. |
+| Destructo Disk | Cutting disk | Earthling tactical | Guided piercing | Cursor-guided spinning cutting disk with piercing identity. |
+| Galick Gun | Continuous beam | Vegeta line | Sustained line | Purple held beam with more aggressive flicker and higher strain. |
+| Special Beam Cannon | Continuous beam | Namekian | Sustained line | Narrow drill-like beam with spiral visual accents. |
+| Big Bang Attack | Heavy blast | Vegeta line | Heavy impact | Large compact orb that swells briefly and detonates harder. |
+| Final Flash | Continuous beam | Vegeta line | Sustained line | Long-charge huge yellow beam with high drain, long reach, and shake feedback. |
+| Spirit Bomb | Ultimate | Turtle School | Terrain-passing ultimate | Slow charge above the player, heavy ki drain, long terrain-passing travel, huge impact. |
+| God Kamehameha | Continuous beam | God ki | Sustained line | Cleaner high-tier god-ki beam with smoother charge/release profile. |
+| Ultra Instinct Barrage | Barrage | Ultra Instinct | Terrain blocked | Seven fast clean shots with afterimage-like streaks and lighter per-shot damage. |
 
 ## Planned Roster Buckets
 
@@ -78,3 +78,5 @@ Add future techniques by choosing a bucket first, then tuning the Terraria behav
 - melee impact
 
 Future original audio should swap through this helper instead of scattering sound calls across items, projectiles, and player code.
+
+The current pass also maps each implemented technique to a distinct temporary sound profile and fallback group. These are still placeholder sounds, but the charge/release/sustain/impact hooks no longer all advertise the same profile during dev inspection.

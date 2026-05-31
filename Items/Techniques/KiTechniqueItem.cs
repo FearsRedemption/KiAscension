@@ -193,13 +193,21 @@ public abstract class KiTechniqueItem : ModItem
         float knockback,
         KiTechniqueDefinition technique)
     {
-        int shotCount = technique.Technique == KiTechnique.UltraInstinctBarrage ? 5 : 3;
-        float spread = technique.Technique == KiTechnique.UltraInstinctBarrage ? 0.26f : 0.18f;
+        int shotCount = technique.Technique == KiTechnique.UltraInstinctBarrage ? 7 : 4;
+        float spread = technique.Technique == KiTechnique.UltraInstinctBarrage ? 0.18f : 0.24f;
+        Vector2 direction = velocity.LengthSquared() <= 0.001f ? Vector2.UnitX * player.direction : Vector2.Normalize(velocity);
+        Vector2 perpendicular = direction.RotatedBy(MathHelper.PiOver2);
 
         for (int i = 0; i < shotCount; i++)
         {
             float offset = shotCount == 1 ? 0f : MathHelper.Lerp(-spread, spread, i / (float)(shotCount - 1));
-            SpawnTechniqueProjectile(player, source, position, velocity.RotatedBy(offset), type, damage, knockback, technique, i);
+            float rowOffset = i - (shotCount - 1) * 0.5f;
+            Vector2 shotPosition = position + perpendicular * rowOffset * (technique.Technique == KiTechnique.UltraInstinctBarrage ? 8f : 5f);
+            Vector2 shotVelocity = direction.RotatedBy(offset) * technique.ShootSpeed;
+            int shotDamage = technique.Technique == KiTechnique.UltraInstinctBarrage
+                ? Math.Max(1, (int)(damage * 0.52f))
+                : Math.Max(1, (int)(damage * 0.76f));
+            SpawnTechniqueProjectile(player, source, shotPosition, shotVelocity, type, shotDamage, knockback, technique, i);
         }
     }
 

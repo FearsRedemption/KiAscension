@@ -28,6 +28,7 @@ The current build is playable prototype gameplay, not final content. Core progre
 - Starting items: `Ki Training Focus`, `Saiyan Strike`, and `Basic Ki Blast`
 - Separate ki spell items, from basic blasts through Masenko, Kamehameha, Death Beam, Destructo Disk, Galick Gun, Special Beam Cannon, Big Bang Attack, Final Flash, Spirit Bomb, God Kamehameha, and Ultra Instinct Barrage
 - Held beam behavior for Kamehameha-style techniques, using temporary charge orbs, animated beam streams, beam heads, and impact flares instead of plain bars
+- Technique identity pass for the current roster: distinct projectile sizes, beam widths/ranges/charge times, barrage patterns, disk spin, heavy-orb handling, impact feedback, and temporary sound profiles
 - Terrain-aware beam range for sustained beams, while ultimate terrain-passing attacks remain supported
 - Guided/piercing Destructo Disk behavior
 - Kai Level, physical power, and ki power tracking per player
