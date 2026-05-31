@@ -5,6 +5,7 @@ using KiAscension.Common;
 using KiAscension.Items;
 using KiAscension.Items.Combat;
 using KiAscension.Items.Techniques;
+using KiAscension.Projectiles;
 using KiAscension.Systems;
 using KiAscension.Tiles;
 using Microsoft.Xna.Framework;
@@ -58,6 +59,11 @@ public class KiPlayer : ModPlayer
     private Point activeTrainingStationTile;
     private int activeTrainingStationTicks;
     private int activeTrainingStationIntervalTicks;
+    private string lastTechniqueFeedbackText = "none";
+    private int techniqueFeedbackCooldown;
+    private int techniqueFeedbackDisplayTicks;
+    private string lastKillTrainingRewardText = "none";
+    private int killTrainingRewardDisplayTicks;
 
     public int PowerExperience { get; private set; }
 
@@ -139,6 +145,12 @@ public class KiPlayer : ModPlayer
 
     public int ActiveLifeDrainPerSecond => CurrentKaioKenLevel.LifeDrainPerSecond;
 
+    public int ActiveTechniqueDrainPerSecond => GetActiveTechniqueDrainPerSecond();
+
+    public int VisibleKiDrainPerSecond => ActiveKiDrainPerSecond + ActiveTechniqueDrainPerSecond + (IsKiFlying ? KiFlightDrainPerSecond : 0);
+
+    public int VisibleNetKiPerSecond => KiRegenPerSecond - VisibleKiDrainPerSecond;
+
     public float FlightControlMultiplier => CurrentStage.FlightControlMultiplier;
 
     public KiFlightProfile CurrentFlightProfile => KiFlightProfiles.Get(CurrentStage.Stage);
@@ -185,6 +197,31 @@ public class KiPlayer : ModPlayer
 
     public int ExperienceForNextKaiLevel => KaiLevelExperienceFactor * KaiLevel * KaiLevel;
 
+    public string LastTechniqueFeedbackText => techniqueFeedbackDisplayTicks > 0 ? lastTechniqueFeedbackText : "none";
+
+    public string LastKillTrainingRewardText => killTrainingRewardDisplayTicks > 0 ? lastKillTrainingRewardText : "none";
+
+    public string CurrentGateBlockerText => GetNextCeilingText();
+
+    public string CurrentAuraProfileText
+    {
+        get
+        {
+            AscensionAuraProfile aura = AscensionAuraProfiles.Get(CurrentStage.Stage);
+            string electric = aura.EmitsElectricArcs ? "electric" : "no arcs";
+            return $"{CurrentStage.DisplayName}: {aura.VisualNote}, {electric}";
+        }
+    }
+
+    public string CurrentHairProfileText
+    {
+        get
+        {
+            AscensionHairProfile hair = AscensionHairProfiles.Get(CurrentStage.Stage);
+            return $"{hair.HairStyle}: {hair.VisualNote}";
+        }
+    }
+
     public bool HasPendingWitnessBreakthrough =>
         UnlockedStageIndex < AscensionStages.MaxStageIndex
         && TotalPowerExperience >= NextStage.RequiredExperience
@@ -224,6 +261,11 @@ public class KiPlayer : ModPlayer
         activeTrainingStationTile = Point.Zero;
         activeTrainingStationTicks = 0;
         activeTrainingStationIntervalTicks = 0;
+        lastTechniqueFeedbackText = "none";
+        techniqueFeedbackCooldown = 0;
+        techniqueFeedbackDisplayTicks = 0;
+        lastKillTrainingRewardText = "none";
+        killTrainingRewardDisplayTicks = 0;
         IsKiFlying = false;
     }
 
@@ -430,6 +472,9 @@ public class KiPlayer : ModPlayer
 
         breakthroughBurstTicks = Math.Max(0, breakthroughBurstTicks - 1);
         trainingOutgrownNoticeCooldown = Math.Max(0, trainingOutgrownNoticeCooldown - 1);
+        techniqueFeedbackCooldown = Math.Max(0, techniqueFeedbackCooldown - 1);
+        techniqueFeedbackDisplayTicks = Math.Max(0, techniqueFeedbackDisplayTicks - 1);
+        killTrainingRewardDisplayTicks = Math.Max(0, killTrainingRewardDisplayTicks - 1);
 
         if (!Main.dedServ)
         {
@@ -543,6 +588,25 @@ public class KiPlayer : ModPlayer
         return TryConsumeKi(GetTechniqueChannelKiCost(technique, ticks));
     }
 
+    public void ReportTechniqueFeedback(string text, Color color)
+    {
+        if (string.IsNullOrWhiteSpace(text))
+        {
+            return;
+        }
+
+        lastTechniqueFeedbackText = text;
+        techniqueFeedbackDisplayTicks = 300;
+
+        if (Player.whoAmI != Main.myPlayer || techniqueFeedbackCooldown > 0)
+        {
+            return;
+        }
+
+        techniqueFeedbackCooldown = 45;
+        Main.NewText(text, color);
+    }
+
     public void AddExperience(int amount, bool announce)
     {
         AddPowerExperience(amount, announce);
@@ -561,6 +625,28 @@ public class KiPlayer : ModPlayer
     public void AddTrainingExperience(int powerAmount, int kiPowerAmount, bool announce)
     {
         AddProgress(powerAmount, kiPowerAmount, announce);
+    }
+
+    public void AddKillTrainingExperience(int powerAmount, int kiPowerAmount, bool bossKill, string sourceLabel)
+    {
+        if (Main.netMode == NetmodeID.MultiplayerClient)
+        {
+            return;
+        }
+
+        if (powerAmount > 0 || kiPowerAmount > 0)
+        {
+            string bossTag = bossKill ? " boss" : string.Empty;
+            lastKillTrainingRewardText = $"{sourceLabel}{bossTag}: +{powerAmount} physical, +{kiPowerAmount} ki";
+            killTrainingRewardDisplayTicks = 360;
+
+            if (bossKill && Player.whoAmI == Main.myPlayer)
+            {
+                Main.NewText($"Training surge: +{powerAmount} physical, +{kiPowerAmount} ki", new Color(255, 225, 120));
+            }
+        }
+
+        AddTrainingExperience(powerAmount, kiPowerAmount, bossKill);
     }
 
     public void ApplyTrainingSource(TrainingSource source, bool announce)
@@ -1277,6 +1363,31 @@ public class KiPlayer : ModPlayer
 
         int trainingDiscount = Math.Max(0, KiPowerLevel - 1) / 8;
         return Math.Max(1, profile.KiDrainPerSecond - trainingDiscount);
+    }
+
+    private int GetActiveTechniqueDrainPerSecond()
+    {
+        int projectileType = ModContent.ProjectileType<KiTechniqueProjectile>();
+
+        for (int i = 0; i < Main.maxProjectiles; i++)
+        {
+            Projectile projectile = Main.projectile[i];
+
+            if (!projectile.active || projectile.owner != Player.whoAmI || projectile.type != projectileType)
+            {
+                continue;
+            }
+
+            if (!KiTechniqueProjectile.IsChannelDrainActive(projectile))
+            {
+                continue;
+            }
+
+            KiTechniqueDefinition technique = KiTechniques.Get((int)projectile.ai[0]);
+            return GetTechniqueChannelKiCostPerSecond(technique);
+        }
+
+        return 0;
     }
 
     private void HandleSaiyanPowerUpInput()

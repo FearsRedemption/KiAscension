@@ -44,10 +44,10 @@ The current build is playable prototype gameplay, not final content. Core progre
 - Saiyan forms provide max ki, ki regeneration, defense, movement, damage, and light health regeneration hooks
 - Ki technique costs and beam drains scale through a shared ki resource system, with ki-control efficiency from ki power and advanced forms
 - Spell tooltips show current ki costs, locked requirements, and beam sustain drain
-- HUD ki readout shows net ki per second after active transformation drain
+- HUD ki readout shows net ki per second after transformation, flight, and active held-technique drain
 - Styled read-only inspection panels:
   - tap `B`: toggle detailed ki stats, active drains, gates, and held-spell costs
-  - tap `N`: toggle a dev inspection panel for synced player state
+  - tap `N`: toggle a dev inspection panel for synced player state plus temporary feel-debug readouts
 - Form-gated ki flight starts at Super Saiyan and scales through later forms with different control and ki drain
 - Hair/form visuals are routed through dedicated hair profiles separate from stat logic
 - Ki techniques have metadata for category, source label, collision style, terrain behavior, pierce, held-beam, and cursor-tracking behavior

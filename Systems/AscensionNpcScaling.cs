@@ -73,7 +73,7 @@ public class AscensionNpcScaling : GlobalNPC
             bool primaryKiller = playerIndex == lastPlayerHitIndex || lastPlayerHitIndex < 0 || npc.boss;
             int playerPhysicalReward = primaryKiller ? physicalReward : Math.Max(0, physicalReward / 2);
             int playerKiReward = primaryKiller ? kiReward : Math.Max(0, kiReward / 2);
-            kiPlayer.AddTrainingExperience(playerPhysicalReward, playerKiReward, npc.boss && primaryKiller);
+            kiPlayer.AddKillTrainingExperience(playerPhysicalReward, playerKiReward, npc.boss && primaryKiller, GetRewardSourceLabel());
         }
     }
 
@@ -232,6 +232,18 @@ public class AscensionNpcScaling : GlobalNPC
             physicalReward += lastTrainingSource == KillTrainingSource.KiTechnique ? reward / 4 : reward / 2;
             kiReward += lastTrainingSource is KillTrainingSource.SaiyanStrike or KillTrainingSource.Melee ? reward / 4 : reward / 2;
         }
+    }
+
+    private string GetRewardSourceLabel()
+    {
+        return lastTrainingSource switch
+        {
+            KillTrainingSource.KiTechnique => "ki kill",
+            KillTrainingSource.SaiyanStrike => "strike kill",
+            KillTrainingSource.Melee => "melee kill",
+            KillTrainingSource.VanillaWeapon => "weapon kill",
+            _ => "combat kill"
+        };
     }
 
     private static bool IsMeleeDamage(DamageClass damageClass)

@@ -17,34 +17,56 @@ public static class KiSoundSystem
     private static readonly SoundStyle ElectricSustainSound = CustomSound("ElectricLoop", 0.42f, 0.1f, 3);
     private static readonly SoundStyle HeavyImpactSound = CustomSound("HeavyImpact", 0.7f, 0.08f, 3);
     private static readonly SoundStyle MeleeImpactSound = CustomSound("MeleeImpact", 0.62f, 0.12f, 4);
+    private static string lastProfileText = "none";
+    private static ulong lastProfileTick;
+
+    public static string LastProfileDebugText
+    {
+        get
+        {
+            if (lastProfileText == "none")
+            {
+                return "none";
+            }
+
+            ulong ageTicks = Main.GameUpdateCount > lastProfileTick ? Main.GameUpdateCount - lastProfileTick : 0UL;
+            return $"{lastProfileText} ({ageTicks / 60UL}s ago)";
+        }
+    }
 
     public static void PlayPowerUpStart(Vector2 position)
     {
+        MarkProfile("power-up start");
         Play(PowerUpStartSound, SoundID.Item29, position);
     }
 
     public static void PlayTransformationComplete(Vector2 position)
     {
+        MarkProfile("transformation complete");
         Play(TransformationCompleteSound, SoundID.Item14, position);
     }
 
     public static void PlayPowerDown(Vector2 position)
     {
+        MarkProfile("power-down");
         Play(PowerDownSound, SoundID.Item8, position);
     }
 
     public static void PlayKaioKenActivation(Vector2 position)
     {
+        MarkProfile("Kaio-Ken activation");
         Play(KaioKenActivationSound, SoundID.Item29, position);
     }
 
     public static void PlayLowKiFizzle(Vector2 position)
     {
+        MarkProfile("low-ki fizzle");
         Play(PowerDownSound, SoundID.Item16, position);
     }
 
     public static void PlayTechniqueFire(Vector2 position, KiTechniqueDefinition technique)
     {
+        MarkProfile($"{technique.DisplayName} fire: {GetTechniqueSoundProfile(technique)}");
         Play(technique.Behavior switch
         {
             KiTechniqueBehavior.Beam => KaioKenActivationSound,
@@ -57,21 +79,25 @@ public static class KiSoundSystem
 
     public static void PlayTechniqueChargeStart(Vector2 position, KiTechniqueDefinition technique)
     {
+        MarkProfile($"{technique.DisplayName} charge: {GetTechniqueSoundProfile(technique)}");
         Play(GetTechniqueChargeSound(technique), GetTechniqueChargeFallback(technique), position);
     }
 
     public static void PlayTechniqueRelease(Vector2 position, KiTechniqueDefinition technique)
     {
+        MarkProfile($"{technique.DisplayName} release: {GetTechniqueSoundProfile(technique)}");
         Play(GetTechniqueReleaseSound(technique), GetTechniqueReleaseFallback(technique), position);
     }
 
     public static void PlayTechniqueSustain(Vector2 position, KiTechniqueDefinition technique)
     {
+        MarkProfile($"{technique.DisplayName} sustain: {GetTechniqueSoundProfile(technique)}");
         Play(GetTechniqueSustainSound(technique), GetTechniqueSustainFallback(technique), position);
     }
 
     public static void PlayTechniqueImpact(Vector2 position, KiTechniqueDefinition technique)
     {
+        MarkProfile($"{technique.DisplayName} impact: {GetTechniqueSoundProfile(technique)}");
         Play(technique.Category switch
         {
             KiTechniqueCategory.Ultimate => HeavyImpactSound,
@@ -84,7 +110,28 @@ public static class KiSoundSystem
 
     public static void PlayMeleeImpact(Vector2 position, int comboStep = 1)
     {
+        MarkProfile(comboStep >= 3 ? "Saiyan Strike heavy impact" : "Saiyan Strike impact");
         Play(comboStep >= 3 ? HeavyImpactSound : MeleeImpactSound, comboStep >= 3 ? SoundID.Item14 : SoundID.Item10, position);
+    }
+
+    private static void MarkProfile(string profileText)
+    {
+        lastProfileText = profileText;
+        lastProfileTick = Main.GameUpdateCount;
+    }
+
+    private static string GetTechniqueSoundProfile(KiTechniqueDefinition technique)
+    {
+        return technique.Technique switch
+        {
+            KiTechnique.FinalFlash or KiTechnique.SpiritBomb => "heavy charge/impact",
+            KiTechnique.GalickGun or KiTechnique.SpecialBeamCannon => "electric beam",
+            KiTechnique.DestructoDisk => "electric cutting disk",
+            KiTechnique.BigBangAttack => "heavy blast",
+            KiTechnique.DeathBeam => "sharp ki shot",
+            KiTechnique.KiBarrage or KiTechnique.UltraInstinctBarrage => "rapid ki volley",
+            _ => "ki blast"
+        };
     }
 
     private static SoundStyle CustomSound(string assetName, float volume, float pitchVariance, int maxInstances)

@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using KiAscension.Common;
 using KiAscension.Items.Techniques;
 using KiAscension.Players;
+using KiAscension.Projectiles;
 using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
 using Terraria;
@@ -99,20 +100,22 @@ public class KiHudSystem : ModSystem
         int width = content.Width;
         int gap = 6;
         int half = (width - gap) / 2;
+        int visibleDrain = kiPlayer.VisibleKiDrainPerSecond;
+        int visibleNet = kiPlayer.VisibleNetKiPerSecond;
 
         DrawMicroModule(new Rectangle(x, y, half, 24), "KAI", $"LV {kiPlayer.KaiLevel}", HeaderText);
         DrawMicroModule(
             new Rectangle(x + half + gap, y, half, 24),
             "FLOW",
-            $"{FormatSigned(resources.NetRegenPerSecond)}/s",
-            resources.NetRegenPerSecond >= 0 ? GoodText : LockedText);
+            $"{FormatSigned(visibleNet)}/s",
+            visibleNet >= 0 ? GoodText : LockedText);
         y += 30;
 
         DrawKiBar(
             new Rectangle(x, y, width, 23),
             kiPlayer.GetKiProgress(),
             $"KI {kiPlayer.Ki}/{resources.MaxKi}",
-            resources.PassiveDrainPerSecond > 0 ? $"DRN {resources.PassiveDrainPerSecond}/s" : "STABLE");
+            visibleDrain > 0 ? $"DRN {visibleDrain}/s" : "STABLE");
         y += 30;
 
         DrawBadge(
@@ -126,7 +129,7 @@ public class KiHudSystem : ModSystem
             DrawBadge(
                 new Rectangle(x + half + gap, y, half, 20),
                 "KK",
-                ShortKaioKenName(kiPlayer.CurrentKaioKenLevel.DisplayName),
+                $"{ShortKaioKenName(kiPlayer.CurrentKaioKenLevel.DisplayName)} HP-{kiPlayer.ActiveLifeDrainPerSecond}",
                 GetKaioKenTextColor(kiPlayer));
         }
         y += 26;
@@ -168,7 +171,9 @@ public class KiHudSystem : ModSystem
         rightY = DrawSection(rightX, rightY, columnWidth, "Combat", KiBlue);
         rightY = DrawMetric(rightX, rightY, columnWidth, "Ki", $"{kiPlayer.Ki}/{resources.MaxKi}", KiBlue);
         rightY = DrawMetric(rightX, rightY, columnWidth, "Regen", $"{resources.RegenPerSecond}/s", new Color(132, 255, 170));
-        rightY = DrawMetric(rightX, rightY, columnWidth, "Drain", $"{resources.PassiveDrainPerSecond}/s", resources.PassiveDrainPerSecond > 0 ? LockedText : MutedText);
+        rightY = DrawMetric(rightX, rightY, columnWidth, "Drain", $"{kiPlayer.VisibleKiDrainPerSecond}/s", kiPlayer.VisibleKiDrainPerSecond > 0 ? LockedText : MutedText);
+        rightY = DrawMetric(rightX, rightY, columnWidth, "Beam Drain", $"{kiPlayer.ActiveTechniqueDrainPerSecond}/s", kiPlayer.ActiveTechniqueDrainPerSecond > 0 ? LockedText : MutedText);
+        rightY = DrawMetric(rightX, rightY, columnWidth, "HP Strain", $"{kiPlayer.ActiveLifeDrainPerSecond}/s", kiPlayer.ActiveLifeDrainPerSecond > 0 ? LockedText : MutedText);
         rightY = DrawMetric(rightX, rightY, columnWidth, "Cost", $"{resources.TechniqueCostMultiplier * 100f:0}% base", new Color(180, 235, 255));
         rightY = DrawMetric(rightX, rightY, columnWidth, "Damage", $"x{kiPlayer.CombinedDamageMultiplier:0.00}", new Color(255, 220, 130));
         rightY = DrawMetric(rightX, rightY, columnWidth, "Speed", $"x{kiPlayer.CombinedSpeedMultiplier:0.00}", new Color(255, 220, 130));
@@ -201,7 +206,7 @@ public class KiHudSystem : ModSystem
             y = 84;
         }
 
-        Rectangle panel = new(x, Math.Max(84, y), width, 318);
+        Rectangle panel = new(x, Math.Max(84, y), width, 386);
         DrawPanelShell(panel, "DEV INSPECTOR", new Color(255, 168, 76));
 
         Rectangle content = GetContentArea(panel);
@@ -232,6 +237,17 @@ public class KiHudSystem : ModSystem
         rightY = DrawMetric(rightX, rightY, columnWidth, "Hardmode", FormatBool(Main.hardMode), Main.hardMode ? new Color(132, 255, 170) : LockedText);
         rightY = DrawMetric(rightX, rightY, columnWidth, "Mech boss", FormatBool(NPC.downedMechBossAny), NPC.downedMechBossAny ? new Color(132, 255, 170) : LockedText);
         rightY = DrawMetric(rightX, rightY, columnWidth, "Plantera", FormatBool(NPC.downedPlantBoss), NPC.downedPlantBoss ? new Color(132, 255, 170) : LockedText);
+
+        leftY = DrawSection(content.X, leftY + 8, columnWidth, "Feel Debug", new Color(255, 168, 76));
+        leftY = DrawMetric(content.X, leftY, columnWidth, "Gate", kiPlayer.CurrentGateBlockerText, HeaderText);
+        leftY = DrawMetric(content.X, leftY, columnWidth, "Cast", kiPlayer.LastTechniqueFeedbackText, LockedText);
+        leftY = DrawMetric(content.X, leftY, columnWidth, "Reward", kiPlayer.LastKillTrainingRewardText, new Color(255, 220, 130));
+
+        rightY = DrawSection(rightX, rightY + 8, columnWidth, "Active FX", KiBlue);
+        rightY = DrawMetric(rightX, rightY, columnWidth, "Projectile", KiTechniqueProjectile.GetOwnedTechniqueDebugText(Main.LocalPlayer), KiBlue);
+        rightY = DrawMetric(rightX, rightY, columnWidth, "Sound", KiSoundSystem.LastProfileDebugText, new Color(190, 220, 255));
+        rightY = DrawMetric(rightX, rightY, columnWidth, "Aura", kiPlayer.CurrentAuraProfileText, kiPlayer.CurrentStage.AuraColor);
+        rightY = DrawMetric(rightX, rightY, columnWidth, "Hair", kiPlayer.CurrentHairProfileText, kiPlayer.CurrentStage.AuraColor);
 
         int noteY = Math.Max(leftY, rightY) + 8;
         DrawWrappedText("Read-only testing view. Grant/reset buttons stay out until config-gated.", new Vector2(content.X, noteY), content.Width, MutedText, PanelTextScale, panel.Bottom - noteY - PanelPadding);

@@ -48,16 +48,26 @@ public abstract class KiTechniqueItem : ModItem
 
         if (!kiPlayer.IsTechniqueUnlocked(technique))
         {
+            kiPlayer.ReportTechniqueFeedback($"{technique.DisplayName} locked: {kiPlayer.GetTechniqueLockReason(technique)}", new Color(255, 150, 130));
             return false;
         }
 
         if (!kiPlayer.HasKiForTechnique(technique))
         {
+            int requiredKi = kiPlayer.GetTechniqueInitialKiCost(technique);
+            kiPlayer.ReportTechniqueFeedback($"{technique.DisplayName} needs {requiredKi} ki. Current: {kiPlayer.Ki}.", new Color(255, 190, 120));
             return false;
         }
 
-        return (technique.Behavior != KiTechniqueBehavior.Beam && technique.Technique != KiTechnique.SpiritBomb)
+        bool canStart = (technique.Behavior != KiTechniqueBehavior.Beam && technique.Technique != KiTechnique.SpiritBomb)
             || !HasOwnedTechniqueProjectile(player, technique.Technique);
+
+        if (!canStart)
+        {
+            kiPlayer.ReportTechniqueFeedback($"{technique.DisplayName} is already active.", new Color(190, 220, 255));
+        }
+
+        return canStart;
     }
 
     public override float UseSpeedMultiplier(Player player)
@@ -130,6 +140,8 @@ public abstract class KiTechniqueItem : ModItem
 
         if (!kiPlayer.TryConsumeTechniqueInitialKi(technique))
         {
+            int requiredKi = kiPlayer.GetTechniqueInitialKiCost(technique);
+            kiPlayer.ReportTechniqueFeedback($"{technique.DisplayName} fizzled: needs {requiredKi} ki.", new Color(255, 190, 120));
             return false;
         }
 

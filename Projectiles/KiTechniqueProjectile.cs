@@ -19,6 +19,66 @@ public class KiTechniqueProjectile : ModProjectile
     private const int BeamDrainIntervalTicks = 15;
     private const int SpiritBombMaxChargeTicks = 180;
 
+    public static string GetOwnedTechniqueDebugText(Player player)
+    {
+        if (player is null || !player.active)
+        {
+            return "none";
+        }
+
+        int projectileType = ModContent.ProjectileType<KiTechniqueProjectile>();
+
+        for (int i = 0; i < Main.maxProjectiles; i++)
+        {
+            Projectile projectile = Main.projectile[i];
+
+            if (!projectile.active || projectile.owner != player.whoAmI || projectile.type != projectileType)
+            {
+                continue;
+            }
+
+            KiTechniqueDefinition technique = KiTechniques.Get((int)projectile.ai[0]);
+
+            if (technique.Technique == KiTechnique.SpiritBomb)
+            {
+                float chargeTicks = projectile.localAI[1] >= 0f ? projectile.localAI[1] : -projectile.localAI[1];
+                int percent = (int)(MathHelper.Clamp(chargeTicks / SpiritBombMaxChargeTicks, 0f, 1f) * 100f);
+                return projectile.localAI[1] >= 0f
+                    ? $"{technique.DisplayName}: charging {percent}%"
+                    : $"{technique.DisplayName}: launched {percent}%";
+            }
+
+            if (technique.Behavior == KiTechniqueBehavior.Beam)
+            {
+                int chargeTicks = GetBeamChargeTicks(technique);
+                int percent = (int)(MathHelper.Clamp(projectile.localAI[1] / chargeTicks, 0f, 1f) * 100f);
+                string state = IsBeamReleased(technique, projectile) ? "released" : "charging";
+                return $"{technique.DisplayName}: {state} {percent}%, {GetBeamMaxLength(technique):0}px";
+            }
+
+            return $"{technique.DisplayName}: active {projectile.timeLeft}t";
+        }
+
+        return "none";
+    }
+
+    public static bool IsChannelDrainActive(Projectile projectile)
+    {
+        if (projectile is null || !projectile.active || projectile.type != ModContent.ProjectileType<KiTechniqueProjectile>())
+        {
+            return false;
+        }
+
+        KiTechniqueDefinition technique = KiTechniques.Get((int)projectile.ai[0]);
+
+        if (technique.Technique == KiTechnique.SpiritBomb)
+        {
+            return projectile.localAI[1] >= 0f;
+        }
+
+        return IsBeamReleased(technique, projectile);
+    }
+
     public override void SetDefaults()
     {
         Projectile.width = 14;
@@ -140,6 +200,20 @@ public class KiTechniqueProjectile : ModProjectile
 
     public override void OnHitNPC(NPC target, NPC.HitInfo hit, int damageDone)
     {
+        KiTechniqueDefinition technique = CurrentTechnique;
+
+        if (damageDone > 0)
+        {
+            SpawnImpactFeedback(technique, target, damageDone);
+
+            if (Projectile.owner == Main.myPlayer
+                && (technique.Behavior == KiTechniqueBehavior.Beam || technique.PiercesEnemies)
+                && Main.GameUpdateCount % 18UL == 0UL)
+            {
+                KiSoundSystem.PlayTechniqueImpact(target.Center, technique);
+            }
+        }
+
         if (Main.netMode == NetmodeID.MultiplayerClient || Projectile.owner < 0 || Projectile.owner >= Main.maxPlayers)
         {
             return;
@@ -495,7 +569,12 @@ public class KiTechniqueProjectile : ModProjectile
 
     private bool IsBeamReleased(KiTechniqueDefinition technique)
     {
-        return technique.Behavior == KiTechniqueBehavior.Beam && Projectile.localAI[1] >= GetBeamChargeTicks(technique);
+        return IsBeamReleased(technique, Projectile);
+    }
+
+    private static bool IsBeamReleased(KiTechniqueDefinition technique, Projectile projectile)
+    {
+        return technique.Behavior == KiTechniqueBehavior.Beam && projectile.localAI[1] >= GetBeamChargeTicks(technique);
     }
 
     private bool IsSpiritBombCharging(KiTechniqueDefinition technique)
@@ -511,6 +590,11 @@ public class KiTechniqueProjectile : ModProjectile
     private void FizzleBeam(KiTechniqueDefinition technique)
     {
         KiSoundSystem.PlayLowKiFizzle(Projectile.Center);
+
+        if (Projectile.owner >= 0 && Projectile.owner < Main.maxPlayers)
+        {
+            Main.player[Projectile.owner]?.GetModPlayer<KiPlayer>().ReportTechniqueFeedback($"{technique.DisplayName} fizzled: out of ki.", new Color(255, 190, 120));
+        }
 
         if (!Main.dedServ)
         {
@@ -532,6 +616,37 @@ public class KiTechniqueProjectile : ModProjectile
         }
 
         Projectile.Kill();
+    }
+
+    private void SpawnImpactFeedback(KiTechniqueDefinition technique, NPC target, int damageDone)
+    {
+        if (Main.dedServ)
+        {
+            return;
+        }
+
+        int dustCount = technique.Category switch
+        {
+            KiTechniqueCategory.Ultimate => 18,
+            KiTechniqueCategory.HeavyBlast => 12,
+            KiTechniqueCategory.CuttingDisk => 8,
+            KiTechniqueCategory.ContinuousBeam => 4,
+            _ => 5
+        };
+
+        float scale = technique.Category is KiTechniqueCategory.Ultimate or KiTechniqueCategory.HeavyBlast ? 1.25f : 0.85f;
+
+        for (int i = 0; i < dustCount; i++)
+        {
+            Vector2 velocity = Main.rand.NextVector2Circular(2.2f, 2.2f);
+            int dust = Dust.NewDust(target.position, target.width, target.height, GetDustType(technique), velocity.X, velocity.Y, 110, technique.Color, scale);
+            Main.dust[dust].noGravity = true;
+        }
+
+        if (technique.Category is KiTechniqueCategory.Ultimate or KiTechniqueCategory.HeavyBlast && damageDone > 0)
+        {
+            Lighting.AddLight(target.Center, technique.Color.ToVector3() * 0.5f);
+        }
     }
 
     private static float GetTerrainBlockedDistance(Vector2 start, Vector2 direction, float maxDistance, out bool blockedByTerrain)
