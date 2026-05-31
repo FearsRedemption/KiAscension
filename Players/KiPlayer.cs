@@ -218,7 +218,7 @@ public class KiPlayer : ModPlayer
         get
         {
             AscensionHairProfile hair = AscensionHairProfiles.Get(CurrentStage.Stage);
-            return $"{hair.HairStyle}: {hair.VisualNote}";
+            return $"{AscensionVisuals.GetHairModeNote()}: {hair.VisualNote}";
         }
     }
 

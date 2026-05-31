@@ -16,14 +16,14 @@ namespace KiAscension.Systems;
 
 public class KiHudSystem : ModSystem
 {
-    private const int HudWidth = 258;
-    private const int HudHeight = 168;
+    private const int HudWidth = 232;
+    private const int HudHeight = 132;
     private const int PanelWidth = 408;
-    private const int PanelPadding = 10;
+    private const int PanelPadding = 8;
     private const int RowHeight = 17;
-    private const float TinyTextScale = 0.58f;
-    private const float SmallTextScale = 0.64f;
-    private const float PanelTextScale = 0.68f;
+    private const float TinyTextScale = 0.52f;
+    private const float SmallTextScale = 0.58f;
+    private const float PanelTextScale = 0.66f;
 
     private static readonly Color PanelOuter = new(255, 198, 76, 185);
     private static readonly Color PanelInner = new(7, 10, 18, 226);
@@ -92,57 +92,51 @@ public class KiHudSystem : ModSystem
     private static void DrawMainHud(KiPlayer kiPlayer, KiResourceSnapshot resources)
     {
         Rectangle panel = new(16, 78, HudWidth, HudHeight);
-        DrawPanelShell(panel, "KI // SCOUTER", kiPlayer.CurrentStage.AuraColor, compact: true);
+        DrawPanelShell(panel, "KI SCOUTER", kiPlayer.CurrentStage.AuraColor, compact: true);
 
         Rectangle content = GetContentArea(panel, compact: true);
         int x = content.X;
         int y = content.Y;
         int width = content.Width;
-        int gap = 6;
-        int half = (width - gap) / 2;
         int visibleDrain = kiPlayer.VisibleKiDrainPerSecond;
         int visibleNet = kiPlayer.VisibleNetKiPerSecond;
 
-        DrawMicroModule(new Rectangle(x, y, half, 24), "KAI", $"LV {kiPlayer.KaiLevel}", HeaderText);
-        DrawMicroModule(
-            new Rectangle(x + half + gap, y, half, 24),
-            "FLOW",
-            $"{FormatSigned(visibleNet)}/s",
+        DrawCompactHeaderLine(
+            new Rectangle(x, y, width, 14),
+            $"KAI LV {kiPlayer.KaiLevel}",
+            $"FLOW {FormatSigned(visibleNet)}/s",
             visibleNet >= 0 ? GoodText : LockedText);
-        y += 30;
+        y += 17;
 
         DrawKiBar(
-            new Rectangle(x, y, width, 23),
+            new Rectangle(x, y, width, 25),
             kiPlayer.GetKiProgress(),
             $"KI {kiPlayer.Ki}/{resources.MaxKi}",
             visibleDrain > 0 ? $"DRN {visibleDrain}/s" : "STABLE");
         y += 30;
 
-        DrawBadge(
-            new Rectangle(x, y, kiPlayer.IsKaioKenActive ? half : width, 20),
-            "FORM",
+        int gap = 5;
+        int formWidth = kiPlayer.IsKaioKenActive ? (width - gap) / 2 : width;
+        DrawStatusPill(
+            new Rectangle(x, y, formWidth, 16),
             ShortFormName(kiPlayer.CurrentStage.DisplayName),
             kiPlayer.CurrentStage.AuraColor);
 
         if (kiPlayer.IsKaioKenActive)
         {
-            DrawBadge(
-                new Rectangle(x + half + gap, y, half, 20),
-                "KK",
-                $"{ShortKaioKenName(kiPlayer.CurrentKaioKenLevel.DisplayName)} HP-{kiPlayer.ActiveLifeDrainPerSecond}",
+            DrawStatusPill(
+                new Rectangle(x + formWidth + gap, y, width - formWidth - gap, 16),
+                $"KK {ShortKaioKenName(kiPlayer.CurrentKaioKenLevel.DisplayName)}",
                 GetKaioKenTextColor(kiPlayer));
         }
-        y += 26;
+        y += 20;
 
-        y = DrawHeldSpellHud(new Rectangle(x, y, width, 36), kiPlayer);
-        y += 4;
-
-        DrawDivider(new Rectangle(x, y, width, 1), kiPlayer.CurrentStage.AuraColor);
-        y += 5;
+        y = DrawHeldSpellHud(new Rectangle(x, y, width, 27), kiPlayer);
+        y += 3;
 
         string gate = kiPlayer.GetNextCeilingText();
         DrawText("GATE", new Vector2(x, y), MutedText, TinyTextScale);
-        DrawWrappedText(gate, new Vector2(x + 36, y), width - 36, new Color(226, 232, 242), TinyTextScale, panel.Bottom - y - 7);
+        DrawWrappedText(gate, new Vector2(x + 31, y), width - 31, new Color(226, 232, 242), TinyTextScale, panel.Bottom - y - 6);
     }
 
     private static void DrawStatsPanel(KiPlayer kiPlayer, KiResourceSnapshot resources)
@@ -291,7 +285,7 @@ public class KiHudSystem : ModSystem
     {
         if (Main.LocalPlayer.HeldItem?.ModItem is not KiTechniqueItem techniqueItem)
         {
-            DrawBadge(area, "SPELL", "none", MutedText);
+            DrawSpellStrip(area, "SPELL", "none", "no technique held", MutedText, MutedText);
             return area.Bottom;
         }
 
@@ -300,16 +294,40 @@ public class KiHudSystem : ModSystem
         Color color = unlocked ? technique.Color : LockedText;
         string status = unlocked ? "READY" : "LOCKED";
 
-        DrawModuleBack(area, color);
-        DrawText("SPELL", new Vector2(area.X + 7, area.Y + 5), MutedText, TinyTextScale);
-        DrawClippedText(technique.DisplayName, new Vector2(area.X + 48, area.Y + 5), area.Width - 104, color, SmallTextScale);
-        DrawText(status, new Vector2(area.Right - 51, area.Y + 5), unlocked ? GoodText : LockedText, TinyTextScale);
-
         string detail = unlocked
             ? $"{technique.CategoryLabel} | {kiPlayer.GetTechniqueInitialKiCost(technique)} ki"
             : $"Req: {kiPlayer.GetTechniqueLockReason(technique)}";
-        DrawClippedText(detail, new Vector2(area.X + 7, area.Y + 20), area.Width - 14, unlocked ? MutedText : new Color(255, 170, 124), TinyTextScale);
+        DrawSpellStrip(area, status, technique.DisplayName, detail, color, unlocked ? MutedText : new Color(255, 170, 124));
         return area.Bottom;
+    }
+
+    private static void DrawCompactHeaderLine(Rectangle area, string leftText, string rightText, Color rightColor)
+    {
+        DrawText(leftText, new Vector2(area.X, area.Y), HeaderText, SmallTextScale);
+        Vector2 rightSize = FontAssets.MouseText.Value.MeasureString(rightText) * TinyTextScale;
+        DrawText(rightText, new Vector2(area.Right - rightSize.X, area.Y + 1), rightColor, TinyTextScale);
+    }
+
+    private static void DrawStatusPill(Rectangle area, string value, Color accent)
+    {
+        Texture2D pixel = TextureAssets.MagicPixel.Value;
+        Main.spriteBatch.Draw(pixel, area, new Color(8, 13, 22, 205));
+        Main.spriteBatch.Draw(pixel, new Rectangle(area.X, area.Bottom - 1, area.Width, 1), accent * 0.55f);
+        Main.spriteBatch.Draw(pixel, new Rectangle(area.X, area.Y, 2, area.Height), accent * 0.9f);
+        DrawClippedText(value.ToUpperInvariant(), new Vector2(area.X + 6, area.Y + 2), area.Width - 10, accent, TinyTextScale);
+    }
+
+    private static void DrawSpellStrip(Rectangle area, string status, string name, string detail, Color nameColor, Color detailColor)
+    {
+        Texture2D pixel = TextureAssets.MagicPixel.Value;
+        Main.spriteBatch.Draw(pixel, area, new Color(8, 13, 22, 205));
+        Main.spriteBatch.Draw(pixel, new Rectangle(area.X, area.Y, 2, area.Height), nameColor * 0.76f);
+        Main.spriteBatch.Draw(pixel, new Rectangle(area.X + 2, area.Y, area.Width - 2, 1), nameColor * 0.22f);
+
+        Vector2 statusSize = FontAssets.MouseText.Value.MeasureString(status) * TinyTextScale;
+        DrawText(status, new Vector2(area.Right - statusSize.X - 6, area.Y + 3), nameColor, TinyTextScale);
+        DrawClippedText(name, new Vector2(area.X + 6, area.Y + 3), area.Width - (int)statusSize.X - 18, nameColor, TinyTextScale);
+        DrawClippedText(detail, new Vector2(area.X + 6, area.Y + 15), area.Width - 12, detailColor, TinyTextScale);
     }
 
     private static void DrawMicroModule(Rectangle area, string label, string value, Color valueColor)
@@ -329,12 +347,16 @@ public class KiHudSystem : ModSystem
 
     private static void DrawKiBar(Rectangle area, float progress, string label, string status)
     {
-        DrawModuleBack(area, KiBlue);
-        Rectangle bar = new(area.X + 7, area.Y + 14, area.Width - 14, 5);
+        Texture2D pixel = TextureAssets.MagicPixel.Value;
+        Main.spriteBatch.Draw(pixel, area, new Color(7, 15, 25, 214));
+        Main.spriteBatch.Draw(pixel, new Rectangle(area.X, area.Y, area.Width, 1), KiBlue * 0.25f);
+        Main.spriteBatch.Draw(pixel, new Rectangle(area.X, area.Bottom - 1, area.Width, 1), KiBlue * 0.55f);
+
+        Rectangle bar = new(area.X + 6, area.Y + 14, area.Width - 12, 7);
         DrawBar(bar, progress, KiBlue, new Color(13, 46, 64));
-        DrawText(label, new Vector2(area.X + 7, area.Y + 3), KiBlue, SmallTextScale);
+        DrawText(label, new Vector2(area.X + 6, area.Y + 2), KiBlue, SmallTextScale);
         Vector2 statusSize = FontAssets.MouseText.Value.MeasureString(status) * TinyTextScale;
-        DrawText(status, new Vector2(area.Right - 7 - statusSize.X, area.Y + 4), status.Contains("DRN", StringComparison.Ordinal) ? LockedText : GoodText, TinyTextScale);
+        DrawText(status, new Vector2(area.Right - 6 - statusSize.X, area.Y + 4), status.Contains("DRN", StringComparison.Ordinal) ? LockedText : GoodText, TinyTextScale);
     }
 
     private static void DrawModuleBack(Rectangle area, Color accent)
@@ -364,7 +386,7 @@ public class KiHudSystem : ModSystem
         Rectangle inner = new(panel.X + 2, panel.Y + 2, panel.Width - 4, panel.Height - 4);
         Main.spriteBatch.Draw(pixel, inner, PanelInner);
 
-        int headerHeight = compact ? 20 : 25;
+        int headerHeight = compact ? 18 : 25;
         Rectangle header = new(panel.X + 3, panel.Y + 3, panel.Width - 6, headerHeight);
         Main.spriteBatch.Draw(pixel, header, PanelBand);
         Main.spriteBatch.Draw(pixel, new Rectangle(header.X, header.Bottom - 1, header.Width, 1), accent * 0.82f);
@@ -372,7 +394,7 @@ public class KiHudSystem : ModSystem
         Main.spriteBatch.Draw(pixel, new Rectangle(header.Right - 42, header.Y + 5, 28, 1), accent * 0.5f);
         Main.spriteBatch.Draw(pixel, new Rectangle(header.Right - 10, header.Y + 5, 4, 1), accent * 0.85f);
 
-        DrawText(title, new Vector2(panel.X + PanelPadding, panel.Y + (compact ? 7 : 8)), HeaderText, compact ? 0.64f : 0.74f);
+        DrawText(title, new Vector2(panel.X + PanelPadding, panel.Y + (compact ? 6 : 8)), HeaderText, compact ? 0.58f : 0.74f);
     }
 
     private static void DrawBorder(Rectangle area, Color color)

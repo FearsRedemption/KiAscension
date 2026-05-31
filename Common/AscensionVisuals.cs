@@ -7,8 +7,15 @@ namespace KiAscension.Common;
 
 public static class AscensionVisuals
 {
+    public static readonly bool CustomHairSpritesEnabled = false;
+
     public static int GetHairStyle(AscensionStage stage, int naturalHairStyle)
     {
+        if (!CustomHairSpritesEnabled)
+        {
+            return naturalHairStyle;
+        }
+
         AscensionHairProfile profile = AscensionHairProfiles.Get(stage);
 
         return profile.HairStyle switch
@@ -45,5 +52,12 @@ public static class AscensionVisuals
     {
         player.hair = GetHairStyle(stage.Stage, naturalHairStyle);
         player.hairColor = GetHairColor(stage, naturalHairColor);
+    }
+
+    public static string GetHairModeNote()
+    {
+        return CustomHairSpritesEnabled
+            ? "custom ModHair sprite swap"
+            : "natural hair style with form tint";
     }
 }

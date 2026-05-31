@@ -22,7 +22,7 @@ Early mobs are scaled up compared to vanilla, but the starter spell, `Saiyan Str
 6. Hold `Z` to charge up into the highest unlocked Saiyan form; hold `X` to power down to Base Saiyan.
 7. Tap or hold `C`/`V` to raise or lower the separate Kaio-Ken level.
 
-The HUD is now a small scouter-style top-left panel instead of a bulky debug overlay. It uses compact modules for Kai Level, net ki flow, ki bar, current form badge, active Kaio-Ken badge, held spell, and next gate. The net-flow/drain display includes transformation drain, active flight drain, and active held-technique drain from beams or Spirit Bomb charging. Long gate and spell lines wrap or clip inside the panel so they should not run across the screen. Locked held spells display their locked state and a readable requirement, for example `Spell: Spirit Bomb [LOCKED]` and `Requires: Super Saiyan 3 + 14500 Ki Power`. This is a cleaner HUD foundation, not final UI art.
+The HUD is now a smaller scouter-style top-left panel instead of a bulky debug overlay. The ki bar is the main anchor, with compact Kai Level/net-flow text, current form and Kaio-Ken badges, held spell status, and next gate text tucked into one panel. The net-flow/drain display includes transformation drain, active flight drain, and active held-technique drain from beams or Spirit Bomb charging. Long gate and spell lines wrap or clip inside the panel so they should not run across the screen. Locked held spells display their locked state and a readable requirement, for example `Spell: Spirit Bomb [LOCKED]` and `Requires: Super Saiyan 3 + 14500 Ki Power`. This is a cleaner HUD foundation, not final UI art.
 
 Tap `B` to toggle a styled read-only stats panel with current form bonuses, Kaio-Ken strain, final damage/speed multipliers, ki economy, next gates, and held-spell cost details. Tap `N` to toggle a styled read-only dev inspection panel for synced player state while testing. The dev panel also exposes temporary feel-debug readouts: active beam/Spirit Bomb charge state, current gate blocker, last cast failure, last kill-training reward, last sound profile, current aura profile, and current hair profile. These panels use grouped columns and section bands; they are intentionally still read-only because editable dev tools are planned later.
 
@@ -86,20 +86,20 @@ Automatic breakthrough follows the current-form rule: if the player is already i
 
 ## Forms And Visuals
 
-When the player transforms, the mod stores the player's natural hair once, then applies custom Terraria-style `ModHair` sprites and stage colors:
+When the player transforms, the mod stores the player's natural hair once, then currently keeps that natural hair style while applying stage hair tint and aura effects:
 
 - Kaio-Ken: separate red aura overlay, no Saiyan hair change
 - Awakened State: mostly natural hair with a light tint
-- Super Saiyan forms: custom spiky gold hair
-- Super Saiyan 3: longer custom gold hair
-- Super Saiyan God: custom red-tinted compact hair
-- Super Saiyan Blue: custom spiky blue hair
-- Ultra Instinct Sign: custom darker/incomplete silver hair
-- Ultra Instinct: custom silver/white hair
+- Super Saiyan forms: natural hair style with gold tint plus gold aura
+- Super Saiyan 3: natural hair style with deeper gold tint plus heavier aura
+- Super Saiyan God: natural hair style with red divine tint plus red/magenta aura
+- Super Saiyan Blue: natural hair style with cyan/blue tint plus blue aura
+- Ultra Instinct Sign: natural hair style with dark silver-blue tint plus unstable aura
+- Ultra Instinct: natural hair style with silver/white tint plus clean mastered aura
 
 Powering down to Base explicitly restores the stored natural hair style and color. Kaio-Ken does not change hair style; it only adds a red aura layer. Aura behavior is profile-driven per form, with separate dust type, light strength, dust intensity, secondary color, electric-arc settings, an eight-frame animated aura sheet, and a separate electric-arc sheet. Holding power-up intensifies and widens the aura, breakthroughs flare harder, and holding power-down collapses/fades the aura toward the player.
 
-Current custom hair is still placeholder art, but each transformed form now has a separate silhouette and transparent face cutout. True animated hair overlays remain planned; the current build sells motion through the aura layers instead of trying to animate `ModHair` directly.
+Current custom hair sheets still exist with matching `_Alt` textures so tModLoader has the assets it expects, but normal play temporarily disables custom hair style swapping because the placeholder silhouettes are not final-quality. True animated hair overlays remain planned; the current build sells motion through stronger aura layers instead of trying to animate `ModHair` directly.
 
 ## Enemies And Boss Direction
 

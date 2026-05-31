@@ -269,18 +269,39 @@ public class KiTechniqueProjectile : ModProjectile
             KiFeedbackSystem.RequestScreenShake(Projectile.Center, 9f, 26);
         }
 
+        if (!Main.dedServ && technique.Category is KiTechniqueCategory.Ultimate or KiTechniqueCategory.HeavyBlast)
+        {
+            Lighting.AddLight(Projectile.Center, technique.Color.ToVector3() * (technique.Technique == KiTechnique.SpiritBomb ? 1.15f : 0.75f));
+        }
+
+        float burstSpeed = technique.Technique switch
+        {
+            KiTechnique.SpiritBomb => 6.5f,
+            KiTechnique.BigBangAttack => 4.8f,
+            KiTechnique.FinalFlash => 4.2f,
+            _ => technique.Category is KiTechniqueCategory.Ultimate or KiTechniqueCategory.HeavyBlast ? 3.8f : 2.6f
+        };
+
+        float burstScale = technique.Technique switch
+        {
+            KiTechnique.SpiritBomb => 1.65f,
+            KiTechnique.BigBangAttack => 1.35f,
+            _ => technique.Category is KiTechniqueCategory.Ultimate or KiTechniqueCategory.HeavyBlast ? 1.2f : 1f
+        };
+
         for (int i = 0; i < burstCount; i++)
         {
+            Vector2 velocity = Main.rand.NextVector2Circular(burstSpeed, burstSpeed);
             int dust = Dust.NewDust(
                 Projectile.position,
                 Projectile.width,
                 Projectile.height,
                 GetDustType(technique),
-                Main.rand.NextFloat(-3f, 3f),
-                Main.rand.NextFloat(-3f, 3f),
+                velocity.X,
+                velocity.Y,
                 130,
                 technique.Color,
-                GetDustScale(technique));
+                GetDustScale(technique) * burstScale);
 
             Main.dust[dust].noGravity = true;
         }
@@ -718,6 +739,7 @@ public class KiTechniqueProjectile : ModProjectile
     private void FizzleBeam(KiTechniqueDefinition technique)
     {
         KiSoundSystem.PlayLowKiFizzle(Projectile.Center);
+        KiFeedbackSystem.RequestScreenShake(Projectile.Center, 2.2f, 8);
 
         if (Projectile.owner >= 0 && Projectile.owner < Main.maxPlayers)
         {
@@ -726,18 +748,21 @@ public class KiTechniqueProjectile : ModProjectile
 
         if (!Main.dedServ)
         {
-            for (int i = 0; i < 8; i++)
+            Lighting.AddLight(Projectile.Center, new Vector3(0.9f, 0.35f, 0.12f));
+
+            for (int i = 0; i < 18; i++)
             {
+                Vector2 velocity = Main.rand.NextVector2Circular(2.4f, 2.4f);
                 int dust = Dust.NewDust(
                     Projectile.position,
                     Projectile.width,
                     Projectile.height,
                     GetDustType(technique),
-                    Main.rand.NextFloat(-1.2f, 1.2f),
-                    Main.rand.NextFloat(-1.2f, 1.2f),
+                    velocity.X,
+                    velocity.Y,
                     160,
                     technique.Color,
-                    0.8f);
+                    0.95f);
 
                 Main.dust[dust].noGravity = true;
             }

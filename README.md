@@ -32,7 +32,7 @@ The current build is playable prototype gameplay, not final content. Core progre
 - Terrain-aware beam range for sustained beams, while ultimate terrain-passing attacks remain supported
 - Guided/piercing Destructo Disk behavior
 - Kai Level, physical power, and ki power tracking per player
-- Compact scouter-style ki/power/form/held-spell/next-ceiling HUD foundation with smaller text, wrapped long lines, badges, and locked-spell status
+- Compact scouter-style ki/power/form/held-spell/next-ceiling HUD foundation with a smaller top-left footprint, ki-focused bar, compact badges, wrapped long lines, and locked-spell status
 - Power experience from combat, enemy kills, weight training, meditation, and gravity room training
 - Hotkeys:
   - tap `Z`: ascend one unlocked Saiyan form
@@ -50,7 +50,7 @@ The current build is playable prototype gameplay, not final content. Core progre
   - tap `B`: toggle detailed ki stats, active drains, gates, and held-spell costs
   - tap `N`: toggle a dev inspection panel for synced player state plus temporary feel-debug readouts
 - Form-gated ki flight starts at Super Saiyan and scales through later forms with different control and ki drain
-- Hair/form visuals are routed through dedicated hair profiles separate from stat logic
+- Hair/form visuals are routed through dedicated hair profiles separate from stat logic, with natural hair restore and form tinting active in-game
 - Ki techniques have metadata for category, source label, collision style, terrain behavior, pierce, held-beam, and cursor-tracking behavior
 - Central ki sound helper wired to transformations, technique charge/release/sustain, fire/impact, beam fizzle, and strain events using imported CC0 temporary sounds with Terraria fallback
 - Aura profiles plus a temporary animated aura draw layer, electric arc overlay, charge-up flare, and power-down collapse per Saiyan form/Kaio-Ken overlay
@@ -58,16 +58,16 @@ The current build is playable prototype gameplay, not final content. Core progre
 - Vanilla and non-ki weapons remain usable while the custom ki/melee systems are still growing, but Ki Ascension progression is intended to outscale them over time
 - Boss and witness-loss gates for major emotional breakthroughs, with auto-breakthrough only when already at the previous form ceiling
 - Multiplayer-safe per-player power, ki power, Kai Level, Saiyan form unlocks, Kaio-Ken level, and ki
-- Custom Terraria-style `ModHair` sprites for Super Saiyan-style forms, with matching `_Alt` textures and natural-hair restore handling
+- Placeholder Terraria-style `ModHair` sprite sheets for Super Saiyan-style forms, with matching `_Alt` textures kept bundled for later art replacement
 - `Weighted Training Bands`, wooden/copper placeable weight benches, wooden training bag, meditation mat, capped training sources, and `Gravity Room Core` training tools
 - `Saiba Sprout`, an early hostile ki-trained plant enemy that appears on the surface and fires simple ki shots
 - Starter item/crafting framework docs, `Ki Fragment` material drops, and implementation folders for future bosses and mobs
 
 ### Partially Implemented
 
-- UI polish: the main HUD and B/N panels are now styled and wrapped, but final UI art, advanced combat UI, and editable/config-gated dev controls are still planned.
-- Aura visuals: animated aura overlay support exists with temporary generated sheets, but final aura art/shaders are not complete.
-- Hair visuals: custom `ModHair` placeholders and `_Alt` textures exist with cleaner silhouettes/face cutouts, but final animated transformation hair needs an art pass.
+- UI polish: the main HUD is smaller and more ki-focused, and B/N panels are styled and wrapped, but final UI art, advanced combat UI, and editable/config-gated dev controls are still planned.
+- Aura visuals: animated aura overlay support exists with temporary generated sheets and stronger layered form/Kaio-Ken presentation, but final aura art/shaders are not complete.
+- Hair visuals: custom `ModHair` placeholders and `_Alt` textures exist, but active gameplay currently keeps the player's natural hair style and applies form tint/aura because the placeholder hair art is not final-quality yet.
 - Melee: `Saiyan Strike` is playable and scales with physical power, but full punch/kick animations, charged strikes, dash strikes, and combo visuals are not complete.
 - Training: focus meditation, weighted gear, wooden/copper benches, wooden training bag, meditation mat, and gravity training exist; higher station tiers and full gravity chamber progression are still in progress.
 - Sounds: a central sound helper is wired with temporary legally usable energy sounds; final DBZ-style original audio is planned.

@@ -6,17 +6,17 @@ No official Dragon Ball, Dragon Ball Z, Dragon Ball Super, Terraria, or third-pa
 
 ## Hair Sprites
 
-Status: improved original temporary placeholder.
+Status: improved original temporary placeholder, currently not swapped in during normal gameplay.
 
-The current `ModHair` sheets in `Hairs/` were generated for this mod as simple Terraria-format placeholders. They are 40x784 PNGs, matching 14 frames of 40x56 hair data. Each hair has a matching `_Alt.png` file because tModLoader expects alternate hair textures when head equipment changes how hair is drawn. The current pass regenerated every base and `_Alt` sheet together so they remain paired.
+The current `ModHair` sheets in `Hairs/` were generated for this mod as simple Terraria-format placeholders. They are 40x784 PNGs, matching 14 frames of 40x56 hair data. Each hair has a matching `_Alt.png` file because tModLoader expects alternate hair textures when head equipment changes how hair is drawn. Every base sheet and `_Alt` sheet is kept paired so the assets can be re-enabled safely after the art improves.
 
-These are not final art. They now use different silhouettes for Super Saiyan, Super Saiyan 2, Super Saiyan 3, God, Blue, Ultra Instinct Sign, and Ultra Instinct, with a transparent face cutout so the hair should not cover the player face. ModHair itself remains static; the animation energy is handled through aura overlays for now.
+These are not final art. Because the placeholder sprites still read as too rough in play, normal gameplay currently disables custom hair style swapping and instead keeps the player's natural hair style with form-specific tint plus aura. The sheets remain in the repo for tModLoader asset completeness and future replacement testing. ModHair itself remains static; the animation energy is handled through aura overlays for now.
 
 Replacement TODOs:
 
 - Draw or commission final Terraria-proportioned form hair sheets.
 - Keep every final sheet paired with a matching `_Alt.png`.
-- Re-test face alignment, head equipment behavior, power-down restore, and save/reload after replacing art.
+- Re-enable the custom hair swap only after face alignment, head equipment behavior, power-down restore, and save/reload are re-tested.
 
 Researched but not imported:
 
@@ -26,7 +26,7 @@ Researched but not imported:
 
 Status: improved original temporary placeholder.
 
-`Assets/Effects/KiAura.png` is an original eight-frame white aura sheet generated for this mod and tinted in code per form. `Assets/Effects/KiAuraElectric.png` is an original eight-frame electric arc sheet used for Super Saiyan 2-style arcs, unstable breakthroughs, and Kaio-Ken aggression. Together they give the mod a real animated aura foundation without depending on unverified anime assets.
+`Assets/Effects/KiAura.png` is an original eight-frame white aura sheet generated for this mod and tinted in code per form. `Assets/Effects/KiAuraElectric.png` is an original eight-frame electric arc sheet used for Super Saiyan 2-style arcs, unstable breakthroughs, and Kaio-Ken aggression. The draw layer now stacks multiple tinted, offset, and pulsing passes to make power-up, power-down, Kaio-Ken, Super Saiyan, and electric forms feel more alive while still using placeholder sheets.
 
 Replacement TODOs:
 

@@ -70,12 +70,27 @@ public class SaiyanStrike : ModItem
         };
 
         int dustCount = comboStep == 3 ? 12 : 7;
+        Lighting.AddLight(target.Center, comboStep == 3 ? new Vector3(0.75f, 0.52f, 0.12f) : new Vector3(0.32f, 0.24f, 0.16f));
+
         for (int i = 0; i < dustCount; i++)
         {
             Dust dust = Dust.NewDustDirect(target.position, target.width, target.height, dustType);
             dust.noGravity = comboStep >= 2;
             dust.velocity = new Vector2(player.direction * Main.rand.NextFloat(1.2f, 3.6f), Main.rand.NextFloat(-2.6f, 0.4f));
             dust.scale = comboStep == 3 ? 1.25f : 0.9f;
+        }
+
+        if (comboStep == 3)
+        {
+            KiFeedbackSystem.RequestScreenShake(target.Center, 2.4f, 8);
+
+            for (int i = 0; i < 6; i++)
+            {
+                Dust burst = Dust.NewDustDirect(target.position, target.width, target.height, DustID.Electric);
+                burst.noGravity = true;
+                burst.velocity = Main.rand.NextVector2Circular(2.8f, 2.1f);
+                burst.scale = 0.82f;
+            }
         }
     }
 }
