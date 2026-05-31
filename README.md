@@ -50,7 +50,7 @@ The current build is playable prototype gameplay, not final content. Core progre
   - tap `B`: toggle detailed ki stats, active drains, gates, and held-spell costs
   - tap `N`: toggle a dev inspection panel for synced player state plus temporary feel-debug readouts
 - Form-gated ki flight starts at Super Saiyan and scales through later forms with different control and ki drain
-- Hair/form visuals are routed through dedicated hair profiles separate from stat logic, with natural hair restore and form tinting active in-game
+- Hair/form visuals are routed through dedicated hair profiles separate from stat logic, with improved custom `ModHair` sheets, matching `_Alt` textures, and natural hair restore
 - Ki techniques have metadata for category, source label, collision style, terrain behavior, pierce, held-beam, and cursor-tracking behavior
 - Central ki sound helper wired to transformations, technique charge/release/sustain, fire/impact, beam fizzle, and strain events using imported CC0 temporary sounds with Terraria fallback
 - Aura profiles plus a temporary animated aura draw layer, electric arc overlay, charge-up flare, and power-down collapse per Saiyan form/Kaio-Ken overlay
@@ -58,7 +58,7 @@ The current build is playable prototype gameplay, not final content. Core progre
 - Vanilla and non-ki weapons remain usable while the custom ki/melee systems are still growing, but Ki Ascension progression is intended to outscale them over time
 - Boss and witness-loss gates for major emotional breakthroughs, with auto-breakthrough only when already at the previous form ceiling
 - Multiplayer-safe per-player power, ki power, Kai Level, Saiyan form unlocks, Kaio-Ken level, and ki
-- Placeholder Terraria-style `ModHair` sprite sheets for Super Saiyan-style forms, with matching `_Alt` textures kept bundled for later art replacement
+- Original Terraria-scale sprite pass for the current DBZ-style content: technique icons, training items/tiles, effects, hair sheets, `Saiyan Strike`, `Ki Fragment`, `Saiba Sprout`, and mod icons
 - `Weighted Training Bands`, wooden/copper placeable weight benches, wooden training bag, meditation mat, capped training sources, and `Gravity Room Core` training tools
 - `Saiba Sprout`, an early hostile ki-trained plant enemy that appears on the surface and fires simple ki shots
 - Starter item/crafting framework docs, `Ki Fragment` material drops, and implementation folders for future bosses and mobs
@@ -66,8 +66,8 @@ The current build is playable prototype gameplay, not final content. Core progre
 ### Partially Implemented
 
 - UI polish: the main HUD is smaller and more ki-focused, and B/N panels are styled and wrapped, but final UI art, advanced combat UI, and editable/config-gated dev controls are still planned.
-- Aura visuals: animated aura overlay support exists with temporary generated sheets and stronger layered form/Kaio-Ken presentation, but final aura art/shaders are not complete.
-- Hair visuals: custom `ModHair` placeholders and `_Alt` textures exist, but active gameplay currently keeps the player's natural hair style and applies form tint/aura because the placeholder hair art is not final-quality yet.
+- Aura visuals: animated aura overlay support exists with improved temporary generated sheets and stronger layered form/Kaio-Ken presentation, but final aura art/shaders are not complete.
+- Hair visuals: custom `ModHair` sheets and `_Alt` textures are active again after the sprite cleanup pass, but they remain original placeholder art until tested in more armor/head-equipment cases.
 - Melee: `Saiyan Strike` is playable and scales with physical power, but full punch/kick animations, charged strikes, dash strikes, and combo visuals are not complete.
 - Training: focus meditation, weighted gear, wooden/copper benches, wooden training bag, meditation mat, and gravity training exist; higher station tiers and full gravity chamber progression are still in progress.
 - Sounds: a central sound helper is wired with temporary legally usable energy sounds; final DBZ-style original audio is planned.
@@ -98,6 +98,7 @@ Implemented Saiyan form path:
 Kaio-Ken is implemented as a separate parallel track from `Off` through late-game fantasy levels such as `x20`, `x100`, and `x200`. The display names keep the anime flavor, while the actual multipliers are tuned for Terraria instead of literal numeric scaling.
 
 See [docs/progression.md](docs/progression.md) for the design pass that keeps the DBZ progression fantasy aligned with Terraria pacing. See [docs/current-behavior.md](docs/current-behavior.md) for what the current prototype should feel like in game. See [docs/phase-audit.md](docs/phase-audit.md) for the phase-by-phase implementation audit. See [docs/ki-skills.md](docs/ki-skills.md) for implemented technique metadata and planned roster buckets. See [docs/asset-sources.md](docs/asset-sources.md) for imported/placeholder asset notes. See [docs/items-framework.md](docs/items-framework.md) and [docs/bosses-and-mobs.md](docs/bosses-and-mobs.md) for expansion planning.
+See [docs/sprite-art-review.md](docs/sprite-art-review.md) for the current sprite-art QA notes and contact sheets.
 
 ## Development Setup
 

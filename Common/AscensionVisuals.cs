@@ -7,7 +7,7 @@ namespace KiAscension.Common;
 
 public static class AscensionVisuals
 {
-    public static readonly bool CustomHairSpritesEnabled = false;
+    public static readonly bool CustomHairSpritesEnabled = true;
 
     public static int GetHairStyle(AscensionStage stage, int naturalHairStyle)
     {

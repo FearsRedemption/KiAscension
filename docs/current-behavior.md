@@ -86,20 +86,20 @@ Automatic breakthrough follows the current-form rule: if the player is already i
 
 ## Forms And Visuals
 
-When the player transforms, the mod stores the player's natural hair once, then currently keeps that natural hair style while applying stage hair tint and aura effects:
+When the player transforms, the mod stores the player's natural hair once, then applies the current custom Terraria-scale `ModHair` sheet for the active Saiyan form plus stage hair tint and aura effects:
 
 - Kaio-Ken: separate red aura overlay, no Saiyan hair change
 - Awakened State: mostly natural hair with a light tint
-- Super Saiyan forms: natural hair style with gold tint plus gold aura
-- Super Saiyan 3: natural hair style with deeper gold tint plus heavier aura
-- Super Saiyan God: natural hair style with red divine tint plus red/magenta aura
-- Super Saiyan Blue: natural hair style with cyan/blue tint plus blue aura
-- Ultra Instinct Sign: natural hair style with dark silver-blue tint plus unstable aura
-- Ultra Instinct: natural hair style with silver/white tint plus clean mastered aura
+- Super Saiyan forms: custom spiked hair with gold tint plus gold aura
+- Super Saiyan 3: custom long side/back hair with deeper gold tint plus heavier aura
+- Super Saiyan God: compact custom hair with red divine tint plus red/magenta aura
+- Super Saiyan Blue: Super Saiyan-like custom hair with cyan/blue tint plus blue aura
+- Ultra Instinct Sign: compact custom hair with dark silver-blue tint plus unstable aura
+- Ultra Instinct: custom silver/white form hair plus clean mastered aura
 
 Powering down to Base explicitly restores the stored natural hair style and color. Kaio-Ken does not change hair style; it only adds a red aura layer. Aura behavior is profile-driven per form, with separate dust type, light strength, dust intensity, secondary color, electric-arc settings, an eight-frame animated aura sheet, and a separate electric-arc sheet. Holding power-up intensifies and widens the aura, breakthroughs flare harder, and holding power-down collapses/fades the aura toward the player.
 
-Current custom hair sheets still exist with matching `_Alt` textures so tModLoader has the assets it expects, but normal play temporarily disables custom hair style swapping because the placeholder silhouettes are not final-quality. True animated hair overlays remain planned; the current build sells motion through stronger aura layers instead of trying to animate `ModHair` directly.
+The current custom hair sheets have matching `_Alt` textures so tModLoader has the assets it expects. They are improved original placeholders, not final art, and still need broader head-equipment/in-game alignment testing. True animated hair overlays remain planned; the current build sells motion through stronger aura layers instead of trying to animate `ModHair` directly.
 
 ## Enemies And Boss Direction
 

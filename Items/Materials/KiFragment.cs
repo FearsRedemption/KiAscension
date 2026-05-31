@@ -6,8 +6,6 @@ namespace KiAscension.Items.Materials;
 
 public class KiFragment : ModItem
 {
-    public override string Texture => $"Terraria/Images/Item_{ItemID.FallenStar}";
-
     public override void SetDefaults()
     {
         Item.width = 18;

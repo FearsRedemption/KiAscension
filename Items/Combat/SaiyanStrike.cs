@@ -10,8 +10,6 @@ namespace KiAscension.Items.Combat;
 
 public class SaiyanStrike : ModItem
 {
-    public override string Texture => $"Terraria/Images/Item_{ItemID.FeralClaws}";
-
     public override void SetDefaults()
     {
         Item.damage = 20;

@@ -4,19 +4,25 @@ This file tracks art and audio source status separately from gameplay design doc
 
 No official Dragon Ball, Dragon Ball Z, Dragon Ball Super, Terraria, or third-party copyrighted fan assets are intentionally bundled here. Current visual assets are either original temporary placeholders generated for this mod or imported CC0 audio files listed below.
 
+## Sprite Art Direction
+
+Status: original temporary pixel art, improved for Terraria-scale readability.
+
+The current sprite pass uses original pixel art made specifically for this mod. It does not bundle official Dragon Ball/DBZ sprites or ripped Terraria assets. The target style is readable Terraria-scale silhouettes: transparent backgrounds, dark outlines, compact 28-36 pixel item/tile forms, restrained palettes, and DBZ-inspired colors/energy shapes without copying protected artwork.
+
 ## Hair Sprites
 
-Status: improved original temporary placeholder, currently not swapped in during normal gameplay.
+Status: improved original temporary placeholder, active in gameplay.
 
-The current `ModHair` sheets in `Hairs/` were generated for this mod as simple Terraria-format placeholders. They are 40x784 PNGs, matching 14 frames of 40x56 hair data. Each hair has a matching `_Alt.png` file because tModLoader expects alternate hair textures when head equipment changes how hair is drawn. Every base sheet and `_Alt` sheet is kept paired so the assets can be re-enabled safely after the art improves.
+The current `ModHair` sheets in `Hairs/` were generated for this mod as Terraria-format placeholders. They are 40x784 PNGs, matching 14 frames of 40x56 hair data. Each hair has a matching `_Alt.png` file because tModLoader expects alternate hair textures when head equipment changes how hair is drawn. Every base sheet and `_Alt` sheet is kept paired and currently identical.
 
-These are not final art. Because the placeholder sprites still read as too rough in play, normal gameplay currently disables custom hair style swapping and instead keeps the player's natural hair style with form-specific tint plus aura. The sheets remain in the repo for tModLoader asset completeness and future replacement testing. ModHair itself remains static; the animation energy is handled through aura overlays for now.
+These are not final art, but they have been cleaned up from the earlier rough sheets. Each form now has a clearer silhouette, a dark outline/shadow, and a transparent face opening to reduce the chance that transformation hair covers the player's face. ModHair itself remains static; the animation energy is handled through aura overlays for now.
 
 Replacement TODOs:
 
 - Draw or commission final Terraria-proportioned form hair sheets.
 - Keep every final sheet paired with a matching `_Alt.png`.
-- Re-enable the custom hair swap only after face alignment, head equipment behavior, power-down restore, and save/reload are re-tested.
+- Re-test face alignment, head equipment behavior, power-down restore, and save/reload after replacing or further revising the sheets.
 
 Researched but not imported:
 
@@ -26,7 +32,7 @@ Researched but not imported:
 
 Status: improved original temporary placeholder.
 
-`Assets/Effects/KiAura.png` is an original eight-frame white aura sheet generated for this mod and tinted in code per form. `Assets/Effects/KiAuraElectric.png` is an original eight-frame electric arc sheet used for Super Saiyan 2-style arcs, unstable breakthroughs, and Kaio-Ken aggression. The draw layer now stacks multiple tinted, offset, and pulsing passes to make power-up, power-down, Kaio-Ken, Super Saiyan, and electric forms feel more alive while still using placeholder sheets.
+`Assets/Effects/KiAura.png` is an original eight-frame white aura sheet generated for this mod and tinted in code per form. `Assets/Effects/KiAuraElectric.png` is an original eight-frame electric arc sheet used for Super Saiyan 2-style arcs, unstable breakthroughs, and Kaio-Ken aggression. The draw layer stacks multiple tinted, offset, and pulsing passes to make power-up, power-down, Kaio-Ken, Super Saiyan, and electric forms feel more alive while still using placeholder sheets.
 
 Replacement TODOs:
 
@@ -43,7 +49,7 @@ Researched but not imported:
 
 Status: original temporary placeholder.
 
-`Assets/Effects/KiBeamSegment.png`, `KiBeamHead.png`, `KiBeamImpact.png`, `KiChargeOrb.png`, `KiOrbProjectile.png`, and `KiDisk.png` were generated for this mod as small grayscale/white-alpha effect textures. The renderer tints them per technique, so the same legal placeholder sheets can support Kamehameha blue, Galick Gun purple, Final Flash yellow, Special Beam Cannon drill accents, Spirit Bomb white/blue, and Destructo Disk cutting visuals.
+`Assets/Effects/KiBeamSegment.png`, `KiBeamHead.png`, `KiBeamImpact.png`, `KiChargeOrb.png`, `KiOrbProjectile.png`, and `KiDisk.png` were generated for this mod as small grayscale/white-alpha effect textures. The renderer tints them per technique, so the same legal placeholder sheets can support Kamehameha blue, Galick Gun purple, Final Flash yellow, Special Beam Cannon drill accents, Spirit Bomb white/blue, and Destructo Disk cutting visuals. The latest pass added stronger beam segment texture, impact flare, orb volume, and disk readability.
 
 These are not final art. They exist to replace plain rectangle beams and generic projectiles with readable gameplay silhouettes while the final projectile art direction is developed.
 
@@ -88,22 +94,40 @@ Replacement TODOs:
 - Keep all calls routed through `KiSoundSystem` so replacement assets remain centralized.
 - Re-test missing-asset fallback behavior after any rename or asset swap.
 
+## Technique And Combat Item Sprites
+
+Status: improved original temporary pixel art.
+
+The technique spell icons in `Items/Techniques/` were regenerated as 32x32 original pixel sprites with stronger inventory-scale silhouettes. They now separate the current skills visually: small orb, barrage cluster, blue/purple/red/yellow beams, Death Beam laser, Destructo Disk ring, Special Beam Cannon drill, Spirit Bomb orb, Big Bang orb, and Ultra Instinct white/blue burst cluster. `Items/Combat/SaiyanStrike.png` is now a custom fist/impact icon instead of a vanilla Feral Claws fallback. `Items/Materials/KiFragment.png` is now a custom blue ki shard instead of a vanilla Fallen Star fallback.
+
+These are still temporary gameplay sprites, but they should no longer read as one-dot placeholders.
+
+Replacement TODOs:
+
+- Give each technique a final icon language once the skill roster stabilizes.
+- Add custom projectile sprite sheets per high-value technique if the shared renderer stops being enough.
+- Keep icons readable at 1x inventory scale.
+
 ## Training Station Sprites
 
-Status: original temporary placeholder.
+Status: improved original temporary placeholder.
 
-`Items/Training/WoodenWeightBench.png`, `Items/Training/CopperWeightBench.png`, `Items/Training/WoodenTrainingBag.png`, `Items/Training/MeditationMat.png`, `Tiles/WoodenWeightBenchTile.png`, `Tiles/CopperWeightBenchTile.png`, `Tiles/WoodenTrainingBagTile.png`, and `Tiles/MeditationMatTile.png` were generated as original simple pixel placeholders for the first training station passes. The tile sheets are 36x36 to match tModLoader 2x2 tile framing, while the item icons are 32x32.
+`Items/Training/WoodenWeightBench.png`, `Items/Training/CopperWeightBench.png`, `Items/Training/WoodenTrainingBag.png`, `Items/Training/MeditationMat.png`, `Items/Training/WeightedTrainingBands.png`, `Items/Training/GravityRoomCore.png`, `Tiles/WoodenWeightBenchTile.png`, `Tiles/CopperWeightBenchTile.png`, `Tiles/WoodenTrainingBagTile.png`, `Tiles/MeditationMatTile.png`, and `Tiles/GravityRoomCoreTile.png` were generated as original pixel placeholders for the first training station passes. The tile sheets are 36x36 to match tModLoader 2x2 tile framing, while the item icons are 32x32.
 
 These are not final furniture sprites. Later training stations should get a cohesive art pass once the station roster settles.
 
-## Technique Item Sprites
-
-Status: original temporary placeholder.
-
-The added technique icons, including `MasenkoSpell.png`, `DeathBeamSpell.png`, and `SpecialBeamCannonSpell.png`, are original simple 28x28 placeholder item sprites generated for this mod. They are visual identifiers for gameplay testing, not final spell art.
-
 ## Enemy Sprites
 
-Status: original temporary placeholder.
+Status: improved original temporary placeholder.
 
-`NPCs/Enemies/SaibaSprout.png` is an original simple placeholder sprite for the first implemented early enemy. It is meant to prove the spawn/combat/drop loop before a cohesive enemy art pass.
+`NPCs/Enemies/SaibaSprout.png` is an original placeholder sprite for the first implemented early enemy. It is a DBZ-inspired plant-warrior silhouette, not a copied Saibaman sprite. The current pass improved the body outline, leaf crest, eyes, limbs, and shadow so it reads better at Terraria NPC scale.
+
+## Mod Icons
+
+Status: improved original temporary placeholder.
+
+`icon.png` was replaced with an original ki-orb/aura icon instead of the default `MOD` placeholder. `icon_small.png` was removed because tModLoader/FNA3D emitted an image-load warning for that optional small icon even after re-encoding; keeping the clean 80x80 mod icon avoids suspicious Build + Reload output.
+
+## Review Artifacts
+
+Temporary contact sheets were generated during the sprite review and then removed from the mod source tree because tModLoader scans PNG files as loadable mod assets. Future contact sheets should be kept outside `ModSources/KiAscension` or stored in a non-bundled format.
